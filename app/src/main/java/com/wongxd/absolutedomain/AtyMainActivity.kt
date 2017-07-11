@@ -71,7 +71,7 @@ class AtyMainActivity : BaseSwipeActivity() {
         }
 
         tv_about.setOnClickListener { showAbout() }
-
+        initPermission()
     }
 
     private fun eMailMe() {
@@ -91,10 +91,6 @@ class AtyMainActivity : BaseSwipeActivity() {
                 .show()
     }
 
-    override fun onResume() {
-        super.onResume()
-        initPermission()
-    }
 
     fun initPermission() {
         val permissions = RxPermissions(this)

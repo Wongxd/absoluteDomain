@@ -70,6 +70,25 @@ class AtyMainActivity : BaseSwipeActivity() {
             }
         }
 
+        tv_about.setOnClickListener { showAbout() }
+
+    }
+
+    private fun eMailMe() {
+        val data = Intent(Intent.ACTION_SENDTO)
+        data.data = Uri.parse("mailto:974501076@qq.com")
+        data.putExtra(Intent.EXTRA_SUBJECT, "\"绝对领域\" 反馈")
+        data.putExtra(Intent.EXTRA_TEXT, "")
+        startActivity(data)
+    }
+
+    private fun showAbout() {
+        AlertDialog.Builder(this)
+                .setTitle("关于")
+                .setMessage("数据来源于\n http://www.jdlingyu.moe \n仅供学习交流使用，如果对网站运营带来不便，请联系我（974501076@qq.com）删除。")
+                .setNeutralButton("联系我") { dialog, which -> eMailMe() }
+                .create()
+                .show()
     }
 
     override fun onResume() {
@@ -113,11 +132,11 @@ class AtyMainActivity : BaseSwipeActivity() {
         doAsync {
             val homeList = JsoupUtil.getList(1)
             if (homeList == null) {
-               uiThread {
-                   smartLayout.finishRefresh()
-                   TU.cT("服务器开小差了")
-                   adpater?.setNewData(null)
-               }
+                uiThread {
+                    smartLayout.finishRefresh()
+                    TU.cT("服务器开小差了")
+                    adpater?.setNewData(null)
+                }
                 return@doAsync
             }
             //put cache

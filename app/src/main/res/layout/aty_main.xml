@@ -52,6 +52,14 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:text="绝对领域" />
+
+        <TextView
+            android:id="@+id/tv_about"
+            android:layout_alignParentRight="true"
+            android:gravity="center"
+            android:layout_width="60dp"
+            android:layout_height="match_parent"
+            android:text="关于" />
     </RelativeLayout>
 
 

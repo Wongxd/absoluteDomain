@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#ff000000">
+
+    <com.wongxd.absolutedomain.widget.pinchImageview.PinchImageView
+        android:id="@+id/zoom_image_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+
+    <com.filippudak.ProgressPieView.ProgressPieView
+        android:id="@+id/loading"
+        app:ppvProgressColor="@color/colorAccent"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="center" />
+
+    <!--<ProgressBar-->
+        <!--android:id="@+id/loading"-->
+        <!--style="?android:attr/progressBarStyleHorizontal"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="5dp" />-->
+
+</FrameLayout>

@@ -25,6 +25,10 @@ import com.wongxd.absolutedomain.util.StatusBarUtil
 import com.wongxd.absolutedomain.util.TU
 import com.wongxd.absolutedomain.util.cache.DataCleanManager
 import com.wongxd.absolutedomain.util.cache.GlideCatchUtil
+import com.wongxd.wthing_kotlin.database.Tu
+import com.wongxd.wthing_kotlin.database.TuTable
+import com.wongxd.wthing_kotlin.database.toVarargArray
+import com.wongxd.wthing_kotlin.database.tuDB
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.annotations.NonNull
 import io.reactivex.functions.Consumer
@@ -32,6 +36,7 @@ import io.reactivex.functions.Function
 import io.reactivex.schedulers.Schedulers
 import jp.wasabeef.recyclerview.animators.LandingAnimator
 import kotlinx.android.synthetic.main.aty_main.*
+import org.jetbrains.anko.db.insert
 import org.jsoup.Jsoup
 
 
@@ -89,13 +94,25 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
         StatusBarUtil.setMargin(this, findViewById(R.id.fl_top))
         StatusBarUtil.setMargin(this, findViewById(R.id.classic_header))
 
-        iv_menu.setOnClickListener { drawerlayout.openDrawer(nav_aty_main) }
 
         SwipeBackHelper.getCurrentPage(this)
                 .setSwipeBackEnable(false)
                 .setSwipeRelateEnable(true)
 
+        iv_menu.setOnClickListener { drawerlayout.openDrawer(nav_aty_main) }
 
+        nav_aty_main.setNavigationItemSelectedListener(this)
+
+        initRecycle()
+        initPermission()
+
+        smartLayout.autoRefresh()
+    }
+
+    /**
+     * recycleView and smartRefreshLayout
+     */
+    private fun initRecycle() {
         adpater = RvHomeAdapter {
             val intent = Intent(this, SeePicActivity::class.java)
             intent.putExtra("url", it)
@@ -103,18 +120,29 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
         }
         adpater?.setEnableLoadMore(false)
 
+        adpater?.setOnItemLongClickListener { adapter1, view1, position ->
+            //收藏
+            adpater?.data?.let {
+                val bean = it[position]
+                tuDB.use {
+                    val tu = Tu()
+                    tu.address = bean.url
+                    tu.name = bean.title
+                    insert(TuTable.TABLE_NAME, *tu.map.toVarargArray())
+                }
+            }
+
+            return@setOnItemLongClickListener true
+        }
+
+
+
         rv_main.adapter = adpater
-        rv_main.layoutManager = GridLayoutManager(applicationContext, 2)
         rv_main.itemAnimator = LandingAnimator()
-//        adpater?.setEmptyView(R.layout.item_rv_empty, rv_main)
-//        adpater?.openLoadAnimation(BaseQuickAdapter.SLIDEIN_LEFT)
+        rv_main.layoutManager = GridLayoutManager(applicationContext, 2)
 
         smartLayout.setOnRefreshListener { doRefresh() }
         smartLayout.setOnLoadmoreListener { doLoadMore(currentPage) }
-        initPermission()
-
-        smartLayout.autoRefresh()
-        nav_aty_main.setNavigationItemSelectedListener(this)
     }
 
     private fun eMailMe() {

@@ -1,12 +1,17 @@
 package com.wongxd.absolutedomain
 
+
 import android.Manifest
+import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
+import android.support.design.widget.NavigationView
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.GridLayoutManager
+import android.view.MenuItem
+import android.view.View
 import com.jude.swipbackhelper.SwipeBackHelper
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.wongxd.absolutedomain.Retrofit.ApiStore
@@ -15,8 +20,11 @@ import com.wongxd.absolutedomain.adapter.RvHomeAdapter
 import com.wongxd.absolutedomain.base.BaseSwipeActivity
 import com.wongxd.absolutedomain.bean.HomeListBean
 import com.wongxd.absolutedomain.ui.aty.SeePicActivity
+import com.wongxd.absolutedomain.ui.aty.ThemeActivity
 import com.wongxd.absolutedomain.util.StatusBarUtil
 import com.wongxd.absolutedomain.util.TU
+import com.wongxd.absolutedomain.util.cache.DataCleanManager
+import com.wongxd.absolutedomain.util.cache.GlideCatchUtil
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.annotations.NonNull
 import io.reactivex.functions.Consumer
@@ -27,21 +35,61 @@ import kotlinx.android.synthetic.main.aty_main.*
 import org.jsoup.Jsoup
 
 
-class AtyMainActivity : BaseSwipeActivity() {
+class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSelectedListener {
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.menu_theme -> startActivity(Intent(this, ThemeActivity::class.java))
+            R.id.menu_cache -> cacheThing()
+            R.id.menu_about -> showAbout()
+        }
+        drawerlayout.postDelayed({ drawerlayout.closeDrawer(nav_aty_main) }, 500)
+        return true
+    }
+
+    /**
+     * 缓存
+     */
+    private fun cacheThing() {
+        val imgCache = GlideCatchUtil.getInstance().cacheSize
+        val totalCache = DataCleanManager.getTotalCacheSize(applicationContext)
+        AlertDialog.Builder(this)
+                .setTitle("缓存信息")
+                .setMessage("图片缓存: $imgCache \n全部缓存: $totalCache")
+                .setNeutralButton("清除全部缓存", object : DialogInterface.OnClickListener {
+                    override fun onClick(dialog: DialogInterface?, which: Int) {
+                        DataCleanManager.clearAllCache(applicationContext)
+                        dialog?.dismiss()
+                    }
+
+                })
+                .setNegativeButton("清除图片缓存", object : DialogInterface.OnClickListener {
+                    override fun onClick(dialog: DialogInterface?, which: Int) {
+                        GlideCatchUtil.getInstance().clearCacheDiskSelf()
+                        dialog?.dismiss()
+                    }
+
+                })
+                .create()
+                .show()
+    }
 
     var currentPage = 1
+
     var adpater: RvHomeAdapter? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.aty_main)
 
         //状态栏透明和间距处理
-        StatusBarUtil.darkMode(this)
+        StatusBarUtil.immersive(this)
         StatusBarUtil.setPaddingSmart(this, rv_main)
-        StatusBarUtil.setPaddingSmart(this, rl_top)
         StatusBarUtil.setPaddingSmart(this, realtime_blur)
+        StatusBarUtil.setMargin(this, findViewById(R.id.fl_top))
         StatusBarUtil.setMargin(this, findViewById(R.id.classic_header))
+
+        iv_menu.setOnClickListener { drawerlayout.openDrawer(nav_aty_main) }
 
         SwipeBackHelper.getCurrentPage(this)
                 .setSwipeBackEnable(false)
@@ -53,18 +101,20 @@ class AtyMainActivity : BaseSwipeActivity() {
             intent.putExtra("url", it)
             startActivity(intent)
         }
+        adpater?.setEnableLoadMore(false)
+
         rv_main.adapter = adpater
         rv_main.layoutManager = GridLayoutManager(applicationContext, 2)
-        rv_main.itemAnimator=LandingAnimator()
+        rv_main.itemAnimator = LandingAnimator()
 //        adpater?.setEmptyView(R.layout.item_rv_empty, rv_main)
 //        adpater?.openLoadAnimation(BaseQuickAdapter.SLIDEIN_LEFT)
 
         smartLayout.setOnRefreshListener { doRefresh() }
         smartLayout.setOnLoadmoreListener { doLoadMore(currentPage) }
-        tv_about.setOnClickListener { showAbout() }
         initPermission()
 
         smartLayout.autoRefresh()
+        nav_aty_main.setNavigationItemSelectedListener(this)
     }
 
     private fun eMailMe() {
@@ -78,7 +128,7 @@ class AtyMainActivity : BaseSwipeActivity() {
     private fun showAbout() {
         AlertDialog.Builder(this)
                 .setTitle("关于")
-                .setMessage("数据来源于\n http://www.jdlingyu.moe \n仅供学习交流使用，如果对网站运营带来不便，请联系我（974501076@qq.com）删除。")
+                .setMessage("数据来源于网络，仅供学习交流使用。切勿 违法及商用。对滥用本软件造成的一切后果，请自行承担。\n如有侵权，请联系该网站管理员。")
                 .setNeutralButton("联系我") { dialog, which -> eMailMe() }
                 .create()
                 .show()
@@ -153,7 +203,7 @@ class AtyMainActivity : BaseSwipeActivity() {
                     @Throws(Exception::class)
                     override fun accept(@NonNull t: List<HomeListBean>) {
                         if (t.isNotEmpty()) currentPage++
-
+                        rl_empty.visibility = View.GONE
                         if (page == 0) {
                             smartLayout.finishRefresh()
                             adpater?.setNewData(t)

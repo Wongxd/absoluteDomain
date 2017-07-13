@@ -3,6 +3,7 @@ package com.wongxd.absolutedomain.ui.aty
 import android.os.Bundle
 import android.support.v7.widget.StaggeredGridLayoutManager
 import android.text.TextUtils
+import android.view.View
 import com.scwang.smartrefresh.layout.util.DensityUtil
 import com.wongxd.absolutedomain.R
 import com.wongxd.absolutedomain.adapter.RvSeePicAdapter
@@ -28,7 +29,7 @@ class SeePicActivity : BaseSwipeActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.aty_see_pic)
         //状态栏透明和间距处理
-        StatusBarUtil.darkMode(this)
+        StatusBarUtil.immersive(this)
         StatusBarUtil.setPaddingSmart(this, rv_see_pic)
         StatusBarUtil.setPaddingSmart(this, rl_top)
         StatusBarUtil.setPaddingSmart(this, realtime_blur)
@@ -37,14 +38,15 @@ class SeePicActivity : BaseSwipeActivity() {
         adpater = RvSeePicAdapter {
             ViewBigImageActivity.startActivity(this, it.position, adpater?.data as ArrayList<String>?, it.v)
         }
+        adpater?.setEnableLoadMore(false)
+
+
 
         rv_see_pic.adapter = adpater
         rv_see_pic.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
                 .apply { this.gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE }
         rv_see_pic.itemAnimator = LandingAnimator()
-        rv_see_pic.addItemDecoration(SGSpacingItemDecoration(2,DensityUtil.dp2px(4f)))
-//        adpater?.setEmptyView(R.layout.item_rv_empty, rv_see_pic)
-//        adpater?.openLoadAnimation(BaseQuickAdapter.SCALEIN)
+        rv_see_pic.addItemDecoration(SGSpacingItemDecoration(2, DensityUtil.dp2px(4f)))
 
         val url = intent.getStringExtra("url")
         smartLayout.setOnRefreshListener { doGetDetail(url) }
@@ -52,6 +54,7 @@ class SeePicActivity : BaseSwipeActivity() {
             val childCache: ChildDetailBean? = AcacheUtil.getDefault(applicationContext, AcacheUtil.ObjCache).getAsObject(url) as ChildDetailBean?
             uiThread {
                 if (childCache != null && childCache.list.isNotEmpty()) {
+                    rl_empty.visibility = View.GONE
                     tv_title.text = childCache.title
                     adpater?.setNewData(childCache.list)
                 } else smartLayout.autoRefresh()
@@ -69,6 +72,7 @@ class SeePicActivity : BaseSwipeActivity() {
             uiThread {
                 smartLayout.finishRefresh()
                 if (list != null && list.list.isNotEmpty()) {
+                    rl_empty.visibility = View.GONE
                     tv_title.text = list.title
                     adpater?.setNewData(list.list)
                 }

@@ -71,31 +71,46 @@ inline fun <T, R : Any> Iterable<T>.firstResult(predicate: (T) -> R?): R {
 /**
  * openhelper
  */
-class DatabaseOpenHelper(ctx: Context = App.instance) : ManagedSQLiteOpenHelper(ctx, DB_NAME, null, DB_VERSION) {
+class DatabaseOpenHelper(ctx: Context = App.instance, isGetTu: Boolean = false) : ManagedSQLiteOpenHelper(ctx, DB_NAME, null, DB_VERSION) {
 
     companion object {
-        val DB_NAME = "company_db"
+        val DB_NAME = "girl_db"
         val DB_VERSION = 1
         val instance by lazy { DatabaseOpenHelper() }
     }
 
+    var isTu = isGetTu
+
     override fun onCreate(db: SQLiteDatabase) {
-        db.createTable(CompanyTable.TABLE_NAME, true,
-                CompanyTable.ID to INTEGER + PRIMARY_KEY + UNIQUE,
-                CompanyTable.NAME to TEXT,
-                CompanyTable.ADDRESS to TEXT)
+        if (isTu) {
+            db.createTable(TuTable.TABLE_NAME, true,
+                    TuTable.ID to INTEGER + PRIMARY_KEY + UNIQUE,
+                    TuTable.NAME to TEXT,
+                    TuTable.ADDRESS to TEXT)
+        } else
+            db.createTable(GirlTable.TABLE_NAME, true,
+                    GirlTable.ID to INTEGER + PRIMARY_KEY + UNIQUE,
+                    GirlTable.NAME to TEXT,
+                    GirlTable.ADDRESS to TEXT)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        db.dropTable(CompanyTable.TABLE_NAME, true)
+        if (isTu)
+            db.dropTable(TuTable.TABLE_NAME, true)
+        else
+            db.dropTable(GirlTable.TABLE_NAME, true)
         onCreate(db)
     }
 
 }
 
 
-val Context.database: DatabaseOpenHelper
-    get() = DatabaseOpenHelper.instance
+val Context.girlDB: DatabaseOpenHelper
+    get() = DatabaseOpenHelper()
+
+val Context.tuDB: DatabaseOpenHelper
+    get() = DatabaseOpenHelper(App.instance, true)
+
 
 
 

@@ -3,11 +3,10 @@ package com.wongxd.absolutedomain.base
 import android.graphics.Color
 import android.os.Bundle
 import android.os.PersistableBundle
-import android.support.v7.app.AppCompatActivity
 import com.jude.swipbackhelper.SwipeBackHelper
 import com.jude.swipbackhelper.SwipeListener
 
-open class BaseSwipeActivity : AppCompatActivity() {
+open class BaseSwipeActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

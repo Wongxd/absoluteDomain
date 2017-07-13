@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="content_board_background_color" format="color" />
+    <attr name="board_background_color" format="color" />
+    <attr name="material_drawer_selected_text" format="color" />
+    <attr name="material_drawer_primary_text" format="color" />
+    <attr name="material_drawer_secondary_text" format="color" />
+    <attr name="material_drawer_divider" format="color" />
+    <attr name="material_drawer_selected" format="color" />
+    <attr name="w_primary_color" format="color" />
+    <attr name="w_accent_color" format="color" />
+</resources>

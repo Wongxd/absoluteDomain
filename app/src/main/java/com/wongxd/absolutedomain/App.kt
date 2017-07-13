@@ -1,6 +1,7 @@
 package com.wongxd.absolutedomain
 
 import android.app.Application
+import com.wongxd.absolutedomain.base.exception.CrashHandler
 import com.wongxd.absolutedomain.util.TU
 import me.jessyan.progressmanager.ProgressManager
 import okhttp3.OkHttpClient
@@ -20,14 +21,16 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         instance = this
-        TU.register(this)
 
         mOkHttpClient = ProgressManager.getInstance().with(OkHttpClient.Builder())
                 .build()
+
+        TU.register(this)
+
+        CrashHandler.getInstance().init(this)
     }
 
 
-    fun getOkHttpClient(): OkHttpClient {
-        return mOkHttpClient
-    }
+
+    fun getOkHttpClient() = mOkHttpClient
 }

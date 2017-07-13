@@ -4,17 +4,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?attr/board_background_color"
     tools:context="com.wongxd.absolutedomain.ui.aty.SeePicActivity">
 
 
     <com.scwang.smartrefresh.layout.SmartRefreshLayout
+        android:background="?attr/content_board_background_color"
         android:id="@+id/smartLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:srlDragRate="0.7"
         app:srlHeaderMaxDragRate="1.3"
         app:srlEnableHeaderTranslationContent="true"
-        app:srlHeaderHeight="150dp"
+        app:srlHeaderHeight="200dp"
         app:srlEnableLoadmore="false">
 
         <pl.droidsonroids.gif.GifImageView
@@ -47,9 +49,33 @@
         android:layout_height="40dp">
 
         <TextView
+            android:textColor="?attr/colorPrimary"
             android:id="@+id/tv_title"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/rl_empty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/iv_empty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_empty" />
+
+        <TextView
+            android:id="@+id/tv_empty_tip"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/iv_empty"
+            android:gravity="center"
+            android:paddingTop="10dp"
+            android:text="暂无数据，请下拉重试" />
     </RelativeLayout>
 </FrameLayout>

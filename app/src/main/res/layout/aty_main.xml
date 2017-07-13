@@ -1,66 +1,116 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawerlayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.wongxd.absolutedomain.AtyMainActivity">
 
-    <com.scwang.smartrefresh.layout.SmartRefreshLayout
-        android:id="@+id/smartLayout"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:srlDragRate="0.7"
-        app:srlEnableAutoLoadmore="true"
-        app:srlHeaderHeight="120dp"
-        app:srlHeaderMaxDragRate="1.3">
+        android:background="?attr/board_background_color">
 
-        <com.scwang.smartrefresh.layout.header.ClassicsHeader
-            android:id="@+id/classic_header"
+        <com.scwang.smartrefresh.layout.SmartRefreshLayout
+            android:id="@+id/smartLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="40dp" />
+            android:background="?attr/content_board_background_color"
+            app:srlDragRate="0.7"
+            app:srlEnableAutoLoadmore="true"
+            app:srlHeaderHeight="120dp"
+            app:srlHeaderMaxDragRate="1.3">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/rv_main"
+            <com.scwang.smartrefresh.layout.header.ClassicsHeader
+                android:id="@+id/classic_header"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="40dp"
+                app:srlClassicsSpinnerStyle="Translate" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rv_main"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:overScrollMode="never"
+                android:paddingTop="40dp" />
+
+            <com.scwang.smartrefresh.layout.footer.ClassicsFooter
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:srlClassicsSpinnerStyle="Translate" />
+        </com.scwang.smartrefresh.layout.SmartRefreshLayout>
+
+
+        <com.github.mmin18.widget.RealtimeBlurView
+            android:id="@+id/realtime_blur"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:overScrollMode="never"
-            android:paddingTop="40dp" />
+            android:layout_height="40dp"
+            android:visibility="visible"
+            app:realtimeBlurRadius="5dp" />
 
-        <com.scwang.smartrefresh.layout.footer.ClassicsFooter
+        <FrameLayout
+            android:id="@+id/fl_top"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-    </com.scwang.smartrefresh.layout.SmartRefreshLayout>
+            android:layout_height="40dp">
 
-    <com.github.mmin18.widget.RealtimeBlurView
-        android:id="@+id/realtime_blur"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:visibility="visible"
-        app:realtimeBlurRadius="5dp" />
+            <ImageView
+                android:id="@+id/iv_menu"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="10dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/menu"
+                android:tint="?attr/colorPrimary" />
 
-    <RelativeLayout
-        android:id="@+id/rl_top"
-        android:layout_width="match_parent"
-        android:layout_height="40dp">
+            <TextView
+                android:id="@+id/tv_title"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:clickable="false"
+                android:gravity="center"
+                android:text="@string/app_name"
+                android:textColor="?attr/colorPrimary" />
 
-        <TextView
-            android:id="@+id/tv_title"
+        </FrameLayout>
+
+
+        <RelativeLayout
+            android:id="@+id/rl_empty"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:text="绝对领域" />
+            android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/tv_about"
-            android:layout_alignParentRight="true"
-            android:gravity="center"
-            android:layout_width="60dp"
-            android:layout_height="match_parent"
-            android:text="关于" />
-    </RelativeLayout>
+            <ImageView
+                android:id="@+id/iv_empty"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_empty" />
 
+            <TextView
+                android:id="@+id/tv_empty_tip"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/iv_empty"
+                android:gravity="center"
+                android:paddingTop="10dp"
+                android:text="暂无数据，请下拉重试" />
+        </RelativeLayout>
 
-</FrameLayout>
+    </FrameLayout>
+
+    <com.wongxd.absolutedomain.widget.arcNavigationView.ArcNavigationView
+        android:id="@+id/nav_aty_main"
+        android:layout_width="250dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="@color/white"
+        app:arc_cropDirection="cropInside"
+        app:arc_width="80dp"
+        app:headerLayout="@layout/nav_header_main"
+        app:menu="@menu/activity_main_drawer" />
+</android.support.v4.widget.DrawerLayout>

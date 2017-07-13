@@ -13,7 +13,8 @@
 
     <com.filippudak.ProgressPieView.ProgressPieView
         android:id="@+id/loading"
-        app:ppvProgressColor="@color/colorAccent"
+        app:ppvStrokeColor="?attr/colorPrimary"
+        app:ppvProgressColor="?attr/colorAccent"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_gravity="center" />

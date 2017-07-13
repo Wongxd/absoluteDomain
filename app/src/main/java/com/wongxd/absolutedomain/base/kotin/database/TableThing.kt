@@ -9,9 +9,10 @@ import org.jetbrains.anko.db.RowParser
 
 /**
  * table 结构
+ * 单张图
  */
-object CompanyTable {
-    val TABLE_NAME = "Company"
+object GirlTable {
+    val TABLE_NAME = "girl"
     val ID = "_id"
     val NAME = "name"
     val ADDRESS = "address"
@@ -20,8 +21,9 @@ object CompanyTable {
 
 /**
  * table 对象
+ * 单张图
  */
-data class Company(val map: MutableMap<String, Any?>) {
+data class Girl(val map: MutableMap<String, Any?>) {
     var _id: Long by map
     var name: String by map
     var address: String by map
@@ -37,11 +39,41 @@ data class Company(val map: MutableMap<String, Any?>) {
 
 
 /**
+ * 图集
+ */
+object  TuTable{
+    val TABLE_NAME = "tu"
+    val ID = "_id"
+    val NAME = "name"
+    val ADDRESS = "address"
+}
+
+
+/**
+ * 图集
+ */
+data class Tu(val map: MutableMap<String, Any?>) {
+    var _id: Long by map
+    var name: String by map
+    var address: String by map
+
+    constructor() : this(HashMap())
+
+    constructor(id: Long, name: String, address: String) : this(HashMap()) {
+        this._id = id
+        this.name = name
+        this.address = address
+    }
+}
+
+
+
+/**
  *table 对象 对应 的 rowparser
  */
-class CompanyRowParser : RowParser<Company> {
-    override fun parseRow(columns: Array<Any?>): Company {
-        return Company(columns[0] as Long, columns[1] as String, columns[2] as String)
+class CompanyRowParser : RowParser<Girl> {
+    override fun parseRow(columns: Array<Any?>): Girl {
+        return Girl(columns[0] as Long, columns[1] as String, columns[2] as String)
     }
 }
 
@@ -49,8 +81,8 @@ class CompanyRowParser : RowParser<Company> {
 /**
  *table 对象 对应 的 maprowparser
  */
-class CompanyMapRowParser : MapRowParser<Company> {
-    override fun parseRow(columns: Map<String, Any?>): Company {
-        return Company(columns[CompanyTable.ID] as Long, columns[CompanyTable.NAME] as String, columns[CompanyTable.ADDRESS] as String)
+class CompanyMapRowParser : MapRowParser<Girl> {
+    override fun parseRow(columns: Map<String, Any?>): Girl {
+        return Girl(columns[GirlTable.ID] as Long, columns[GirlTable.NAME] as String, columns[GirlTable.ADDRESS] as String)
     }
 }

@@ -9,9 +9,9 @@ android {
         minSdkVersion 19
         targetSdkVersion 25
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-       renderscriptSupportModeEnabled true
+        renderscriptSupportModeEnabled true
     }
     buildTypes {
         release {
@@ -40,42 +40,52 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    //网络请求
-    //图片处理
-    //数据抓取
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
-    //anko
-    // So here it's 15 too
-    //    compile 'com.google.code.gson:gson:2.8.0'
-    //    compile 'com.squareup.okhttp3:okhttp:3.6.0'
-
-
     compile 'com.android.support:appcompat-v7:25.0.0'
     compile 'com.android.support:cardview-v7:25.0.0'
-    compile 'com.squareup.retrofit2:retrofit:2.3.0'
-    compile 'com.squareup.retrofit2:converter-gson:2.3.0'
-    compile 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
-    compile 'com.github.bumptech.glide:glide:3.7.0'
-    compile 'com.github.chrisbanes:PhotoView:1.3.1'
-    compile 'org.jsoup:jsoup:1.10.1'
-    compile 'com.scwang.smartrefresh:SmartRefreshLayout:1.0.1'
+
+
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    //anko
     compile 'org.jetbrains.anko:anko-sdk15:0.10.0'
     compile 'org.jetbrains.anko:anko-appcompat-v7:0.10.0'
     compile 'org.jetbrains.anko:anko-design:0.10.0'
     compile 'org.jetbrains.anko:anko-recyclerview-v7:0.10.0'
     compile 'org.jetbrains.anko:anko-sqlite:0.10.0'
+
+    //    compile 'com.google.code.gson:gson:2.8.0'
+        compile 'com.squareup.okhttp3:okhttp:3.6.0'
+    compile 'com.squareup.okhttp3:logging-interceptor:3.6.0'
+    //retrofit
+    compile 'com.squareup.retrofit2:retrofit:2.3.0'
+    compile 'com.squareup.retrofit2:converter-gson:2.3.0'
+    compile 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
+    compile "com.squareup.retrofit2:retrofit-converters:2.3.0"
+    compile "com.squareup.retrofit2:retrofit-adapters:2.3.0"
+    compile "com.squareup.retrofit2:converter-scalars:2.3.0"
+
+    //often
     compile 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.15'
+    compile 'com.github.bumptech.glide:glide:3.7.0'
+    compile 'com.github.bumptech.glide:okhttp3-integration:1.4.0@aar'
+    compile 'com.scwang.smartrefresh:SmartRefreshLayout:1.0.1'
     compile 'com.orhanobut:logger:1.15'
+    compile 'me.jessyan:progressmanager:1.3.1'
+    compile 'org.jsoup:jsoup:1.10.1'
+    compile 'com.github.chrisbanes:PhotoView:1.3.1'
+    compile "jp.wasabeef:recyclerview-animators:2.2.6"
+
+    //rx
     compile 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.4@aar'
     compile 'io.reactivex.rxjava2:rxjava:2.0.8'
     compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
-    compile 'com.github.bumptech.glide:okhttp3-integration:1.4.0@aar'
-    compile 'me.jessyan:progressmanager:1.3.1'
+
+
     compile 'com.github.mmin18:realtimeblurview:1.1.0'
     compile 'pl.droidsonroids.gif:android-gif-drawable:1.2.3'
     compile 'com.github.filippudak.progresspieview:library:1.0.4'
     compile 'com.jude:swipebackhelper:3.1.2'
-    testCompile 'junit:junit:4.12'
+
+
 }
 repositories {
     mavenCentral()

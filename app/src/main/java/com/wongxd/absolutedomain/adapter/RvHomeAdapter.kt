@@ -15,13 +15,13 @@ class RvHomeAdapter(val click: (String) -> Unit) : BaseQuickAdapter<HomeListBean
     override fun convert(helper: BaseViewHolder, item: HomeListBean) {
         with(helper) {
             setText(R.id.tv_title, item.title)
-                    .setText(R.id.tv_time, item.time)
+                    .setText(R.id.tv_time, item.date)
                     .setText(R.id.tv_view, item.view)
                     .setText(R.id.tv_like, item.like+"次喜欢")
                     .setVisible(R.id.tv_like,false)
             getView<ImageView>(R.id.iv).loadImg(item.imgPath)
 
-//            Logger.e("标题 "+item.title +" 时间 "+item.time +" 浏览 "+item.view+" 喜欢 "+item.like+" 图片地址 "+item.imgPath)
+//            Logger.e("标题 "+item.title +" 时间 "+item.date +" 浏览 "+item.view+" 喜欢 "+item.like+" 图片地址 "+item.imgPath)
             itemView.setOnClickListener {click(item.url) }
         }
     }

@@ -4,29 +4,31 @@ import android.Manifest
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.os.SystemClock
 import android.provider.Settings
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.GridLayoutManager
-import com.chad.library.adapter.base.BaseQuickAdapter
 import com.jude.swipbackhelper.SwipeBackHelper
 import com.tbruyelle.rxpermissions2.RxPermissions
+import com.wongxd.absolutedomain.Retrofit.ApiStore
+import com.wongxd.absolutedomain.Retrofit.RetrofitUtils
 import com.wongxd.absolutedomain.adapter.RvHomeAdapter
 import com.wongxd.absolutedomain.base.BaseSwipeActivity
-import com.wongxd.absolutedomain.base.aCache.AcacheUtil
-import com.wongxd.absolutedomain.bean.HomeCacheBean
+import com.wongxd.absolutedomain.bean.HomeListBean
 import com.wongxd.absolutedomain.ui.aty.SeePicActivity
-import com.wongxd.absolutedomain.util.JsoupUtil
 import com.wongxd.absolutedomain.util.StatusBarUtil
 import com.wongxd.absolutedomain.util.TU
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.annotations.NonNull
+import io.reactivex.functions.Consumer
+import io.reactivex.functions.Function
+import io.reactivex.schedulers.Schedulers
+import jp.wasabeef.recyclerview.animators.LandingAnimator
 import kotlinx.android.synthetic.main.aty_main.*
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
+import org.jsoup.Jsoup
 
 
 class AtyMainActivity : BaseSwipeActivity() {
 
-    val lastCache = "lastCache"
     var currentPage = 1
     var adpater: RvHomeAdapter? = null
 
@@ -53,25 +55,16 @@ class AtyMainActivity : BaseSwipeActivity() {
         }
         rv_main.adapter = adpater
         rv_main.layoutManager = GridLayoutManager(applicationContext, 2)
+        rv_main.itemAnimator=LandingAnimator()
 //        adpater?.setEmptyView(R.layout.item_rv_empty, rv_main)
-        adpater?.openLoadAnimation(BaseQuickAdapter.SLIDEIN_LEFT)
+//        adpater?.openLoadAnimation(BaseQuickAdapter.SLIDEIN_LEFT)
 
         smartLayout.setOnRefreshListener { doRefresh() }
         smartLayout.setOnLoadmoreListener { doLoadMore(currentPage) }
-
-        // if can get cache ,use chache else  from net
-        doAsync {
-            val homeCache: HomeCacheBean? = AcacheUtil.getDefault(applicationContext, AcacheUtil.ObjCache).getAsObject(lastCache) as HomeCacheBean?
-            uiThread {
-                if (homeCache?.list?.size != 0) {
-                    adpater?.setNewData(homeCache?.list)
-                    currentPage++
-                } else smartLayout.autoRefresh()
-            }
-        }
-
         tv_about.setOnClickListener { showAbout() }
         initPermission()
+
+        smartLayout.autoRefresh()
     }
 
     private fun eMailMe() {
@@ -90,7 +83,6 @@ class AtyMainActivity : BaseSwipeActivity() {
                 .create()
                 .show()
     }
-
 
     fun initPermission() {
         val permissions = RxPermissions(this)
@@ -123,50 +115,63 @@ class AtyMainActivity : BaseSwipeActivity() {
                 }
     }
 
-    fun doRefresh() {
-        currentPage = 1
-        doAsync {
-            val homeList = JsoupUtil.getList(1)
-            if (homeList == null) {
-                uiThread {
-                    smartLayout.finishRefresh()
-                    TU.cT("服务器开小差了")
-                    adpater?.setNewData(null)
-                }
-                return@doAsync
-            }
-            //put cache
-            AcacheUtil.getDefault(applicationContext, AcacheUtil.ObjCache)
-                    .put(lastCache, HomeCacheBean(SystemClock.currentThreadTimeMillis().toString()
-                            , homeList))
-            uiThread {
-                with(homeList) {
-                    smartLayout.finishRefresh()
-                    if (size != 0) currentPage++
-                    adpater?.setNewData(this)
-                }
-            }
+    fun doRefresh(page: Int = 0) {
+        var url = "http://www.jdlingyu.moe/page/$page"
+        if (page == 0) {
+            currentPage = 1
+            url = "http://www.jdlingyu.moe/"
         }
+        val apiStore = RetrofitUtils.getStringInstance().create(ApiStore::class.java)
+        apiStore.getString(url)
+                .subscribeOn(Schedulers.io())
+                .map(Function<String, List<HomeListBean>> { s ->
+                    val list = ArrayList<HomeListBean>()
+                    val select = Jsoup.parse(s).select("#postlist > div.pin")
+                    for (element in select) {
+
+                        var preview: String? = element.select("div.pin-coat > a > img").attr("original")
+                        if (preview == null || preview.length < 5) {
+                            preview = element.select("div.pin-coat > a > img").attr("src")
+                        }
+                        val title = element.select("div.pin-coat > a > img").attr("alt")
+
+                        val imgUrl = element.select("div.pin-coat > a").attr("href")
+
+                        val date = element.select("div.pin-coat > div.pin-data > span.timer > span").text()
+
+                        val like = element.select("div.pin-coat > div.pin-data > a.likes > span > span").text()
+
+                        val view = element.select("div.pin-coat > div.pin-data > a.viewsButton > span").text()
+
+                        list.add(HomeListBean(title, preview!!, imgUrl, date, view, like))
+                    }
+                    list
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+
+                .subscribe(object : Consumer<List<HomeListBean>> {
+                    @Throws(Exception::class)
+                    override fun accept(@NonNull t: List<HomeListBean>) {
+                        if (t.isNotEmpty()) currentPage++
+
+                        if (page == 0) {
+                            smartLayout.finishRefresh()
+                            adpater?.setNewData(t)
+                        } else {
+                            smartLayout.finishLoadmore()
+                            adpater?.addData(t)
+                        }
+
+                    }
+                }, Consumer<Throwable> {
+                    TU.cT(it.message)
+                    if (page == 0) smartLayout.finishRefresh()
+                    else smartLayout.finishLoadmore()
+                })
     }
 
     fun doLoadMore(page: Int) {
-        doAsync {
-            val homeList = JsoupUtil.getList(page)
-            if (homeList == null) {
-                uiThread {
-                    smartLayout.finishLoadmore()
-                    TU.cT("服务器开小差了")
-                }
-                return@doAsync
-            }
-            uiThread {
-                with(homeList) {
-                    smartLayout.finishLoadmore()
-                    if (size != 0) currentPage++
-                    adpater?.addData(this)
-                }
-            }
-        }
+        doRefresh(page)
     }
 
 

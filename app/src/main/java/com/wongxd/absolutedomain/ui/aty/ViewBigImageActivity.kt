@@ -26,13 +26,14 @@ import com.bumptech.glide.load.resource.drawable.GlideDrawable
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.filippudak.ProgressPieView.ProgressPieView
-import com.orhanobut.logger.Logger
 import com.wongxd.absolutedomain.R
 import com.wongxd.absolutedomain.base.BaseSwipeActivity
 import com.wongxd.absolutedomain.base.rx.RxBus
 import com.wongxd.absolutedomain.base.rx.RxEventCodeType
 import com.wongxd.absolutedomain.util.TU
 import com.wongxd.absolutedomain.widget.pinchImageview.PinchImageView
+import io.reactivex.disposables.Disposable
+import io.reactivex.functions.Consumer
 import me.jessyan.progressmanager.ProgressListener
 import me.jessyan.progressmanager.ProgressManager
 import me.jessyan.progressmanager.body.ProgressInfo
@@ -42,8 +43,6 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
-import java.lang.Exception
-import java.util.*
 import java.util.concurrent.ExecutionException
 import kotlin.properties.Delegates
 
@@ -198,45 +197,64 @@ class ViewBigImageActivity : BaseSwipeActivity(), ViewPager.OnPageChangeListener
 
     }
 
+    /**
+     * 添加进度监听
+     * @param position
+     * @param url
+     */
+    fun addProgressListener(position: Int, url: String) {
+
+        ProgressManager.getInstance().addResponseListener(url, object : ProgressListener {
+            override fun onProgress(progressInfo: ProgressInfo?) {
+
+                RxBus.getDefault().post(position, progressInfo?.percent)
+                if(progressInfo?.isFinish!!) {
+                    RxBus.getDefault().post(position, -1)
+                    disposeMap[position]?.dispose()
+                }
+            }
+
+            override fun onError(id: Long, e: Exception?) {
+                RxBus.getDefault().post(position, -1)
+                disposeMap[position]?.dispose()
+            }
+        })
+    }
+
+
+    val disposeMap: MutableMap<Int, Disposable> = HashMap()
 
     /**
      * ViewPager的适配器
-
-     * @author guolin
      */
     inner class ViewPagerAdapter : PagerAdapter() {
-
-        var inflater: LayoutInflater
-
-        init {
-            inflater = layoutInflater
-        }
-
+        var inflater: LayoutInflater = layoutInflater
         override fun instantiateItem(container: ViewGroup, position: Int): Any {
             val view = inflater.inflate(R.layout.viewpager_very_image, container, false)
             val zoom_image_view = view.findViewById(R.id.zoom_image_view) as PinchImageView
 
-//            val spinner = view.findViewById(R.id.loading) as ProgressBar
             val spinner = view.findViewById(R.id.loading) as ProgressPieView
             // 保存网络图片的路径
             val adapter_image_Entity = getItem(position) as String
-            Logger.e("图片地址--" + adapter_image_Entity)
+
             spinner.visibility = View.VISIBLE
             spinner.isClickable = false
-            //下载进度
-            ProgressManager.getInstance().addResponseListener(adapter_image_Entity, object : ProgressListener {
-                override fun onProgress(progressInfo: ProgressInfo?) {
-                    spinner.progress = progressInfo?.percent!!
-                }
 
-                override fun onError(id: Long, e: Exception?) {
+
+            //进度相关
+            addProgressListener(position, adapter_image_Entity)
+
+            val dis = RxBus.getDefault().toObservable(position, Integer::class.java).subscribe(Consumer {
+                if (it.toInt() == -1) {
                     spinner.visibility = View.GONE
-                }
+                } else spinner.progress = it.toInt()
             })
+            disposeMap.put(position, dis)
 
             Glide.with(this@ViewBigImageActivity)
                     .load(adapter_image_Entity)
                     .placeholder(R.drawable.placeholder)
+                    .error(R.drawable.error)
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .crossFade(700)
                     .listener(object : RequestListener<String, GlideDrawable> {
@@ -257,7 +275,6 @@ class ViewBigImageActivity : BaseSwipeActivity(), ViewPager.OnPageChangeListener
                         }
 
                         override fun onException(e: java.lang.Exception?, model: String?, target: Target<GlideDrawable>?, isFirstResource: Boolean): Boolean {
-                            TU.cT("资源加载异常")
                             spinner.visibility = View.GONE
                             return false
                         }
@@ -266,6 +283,7 @@ class ViewBigImageActivity : BaseSwipeActivity(), ViewPager.OnPageChangeListener
                     })
                     .into(zoom_image_view)
 
+            view.tag = position
             container.addView(view, 0)
             return view
         }
@@ -284,6 +302,7 @@ class ViewBigImageActivity : BaseSwipeActivity(), ViewPager.OnPageChangeListener
         override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
             val view = `object` as View
             container.removeView(view)
+            disposeMap[position]?.dispose()
         }
 
         fun getItem(position: Int): Any {
@@ -298,9 +317,6 @@ class ViewBigImageActivity : BaseSwipeActivity(), ViewPager.OnPageChangeListener
 
     override fun onPageScrolled(arg0: Int, arg1: Float, arg2: Int) {}
 
-    /**
-     * 本方法主要监听viewpager滑动的时候的操作
-     */
     override fun onPageSelected(arg0: Int) {
         // 每当页数发生改变时重新设定一遍当前的页数和总页数
         very_image_viewpager_text.text = (arg0 + 1).toString() + " / " + imageurl!!.size
@@ -309,6 +325,7 @@ class ViewBigImageActivity : BaseSwipeActivity(), ViewPager.OnPageChangeListener
 
     override fun onDestroy() {
         RxBus.getDefault().post(RxEventCodeType.IMG_LIST_POSTION_CHANGE, page)
+        for (i in disposeMap.values) i.dispose()
         super.onDestroy()
     }
 

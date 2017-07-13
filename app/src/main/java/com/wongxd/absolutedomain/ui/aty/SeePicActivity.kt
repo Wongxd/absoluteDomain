@@ -1,11 +1,12 @@
 package com.wongxd.absolutedomain.ui.aty
 
 import android.os.Bundle
-import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.StaggeredGridLayoutManager
 import android.text.TextUtils
-import com.chad.library.adapter.base.BaseQuickAdapter
+import com.scwang.smartrefresh.layout.util.DensityUtil
 import com.wongxd.absolutedomain.R
 import com.wongxd.absolutedomain.adapter.RvSeePicAdapter
+import com.wongxd.absolutedomain.adapter.SGSpacingItemDecoration
 import com.wongxd.absolutedomain.base.BaseSwipeActivity
 import com.wongxd.absolutedomain.base.aCache.AcacheUtil
 import com.wongxd.absolutedomain.base.rx.RxBus
@@ -14,6 +15,7 @@ import com.wongxd.absolutedomain.base.rx.Subscribe
 import com.wongxd.absolutedomain.bean.ChildDetailBean
 import com.wongxd.absolutedomain.util.JsoupUtil
 import com.wongxd.absolutedomain.util.StatusBarUtil
+import jp.wasabeef.recyclerview.animators.LandingAnimator
 import kotlinx.android.synthetic.main.aty_see_pic.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
@@ -37,9 +39,12 @@ class SeePicActivity : BaseSwipeActivity() {
         }
 
         rv_see_pic.adapter = adpater
-        rv_see_pic.layoutManager = LinearLayoutManager(applicationContext)
-        adpater?.setEmptyView(R.layout.item_rv_empty, rv_see_pic)
-        adpater?.openLoadAnimation(BaseQuickAdapter.SLIDEIN_RIGHT)
+        rv_see_pic.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+                .apply { this.gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE }
+        rv_see_pic.itemAnimator = LandingAnimator()
+        rv_see_pic.addItemDecoration(SGSpacingItemDecoration(2,DensityUtil.dp2px(4f)))
+//        adpater?.setEmptyView(R.layout.item_rv_empty, rv_see_pic)
+//        adpater?.openLoadAnimation(BaseQuickAdapter.SCALEIN)
 
         val url = intent.getStringExtra("url")
         smartLayout.setOnRefreshListener { doGetDetail(url) }

@@ -20,7 +20,7 @@ object JsoupUtil {
         var doc: Document? = null
         val list = ArrayList<HomeListBean>()
         try {
-            doc = Jsoup.parse(URL(url), 5000)
+            doc = Jsoup.parse(URL(url), 8000)
             val es_item = doc!!.getElementsByClass("main-content").first()
             val items = es_item.getElementsByClass("pin-coat")
 
@@ -42,7 +42,7 @@ object JsoupUtil {
                         .getElementsByTag("span").first().text()
                 list.add(HomeListBean(title, imgPath, childUrl, time, views, like))
 
-//                Logger.e("$title  $imgPath  $time")
+//                Logger.e("$title  $imgPath  $date")
             }
 
         } catch (e: Exception) {
@@ -65,7 +65,7 @@ object JsoupUtil {
         var doc: Document? = null
         var childList: ChildDetailBean? = null
         try {
-            doc = Jsoup.parse(URL(url), 5000)
+            doc = Jsoup.parse(URL(url), 8000)
             val etTitle = doc!!.getElementsByClass("main-title").first()
             val title = etTitle.text()
             //            Logger.e("标题: " + title);
@@ -74,11 +74,9 @@ object JsoupUtil {
             val urls = `as`.indices
                     .mapNotNull {
                         `as`[it]
-                        //                Logger.e(et.toString());
                     }
                     .map {
                         it.attr("href")
-                        //                    Logger.e("第 " + i + " 个 url- " + childUrl + "\t\t");
                     }
             childList = ChildDetailBean(title, urls)
         } catch (e: Exception) {

@@ -25,10 +25,7 @@ import com.wongxd.absolutedomain.util.StatusBarUtil
 import com.wongxd.absolutedomain.util.TU
 import com.wongxd.absolutedomain.util.cache.DataCleanManager
 import com.wongxd.absolutedomain.util.cache.GlideCatchUtil
-import com.wongxd.wthing_kotlin.database.Tu
-import com.wongxd.wthing_kotlin.database.TuTable
-import com.wongxd.wthing_kotlin.database.toVarargArray
-import com.wongxd.wthing_kotlin.database.tuDB
+import com.wongxd.wthing_kotlin.database.*
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.annotations.NonNull
 import io.reactivex.functions.Consumer
@@ -37,6 +34,7 @@ import io.reactivex.schedulers.Schedulers
 import jp.wasabeef.recyclerview.animators.LandingAnimator
 import kotlinx.android.synthetic.main.aty_main.*
 import org.jetbrains.anko.db.insert
+import org.jetbrains.anko.db.select
 import org.jsoup.Jsoup
 
 
@@ -125,10 +123,16 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
             adpater?.data?.let {
                 val bean = it[position]
                 tuDB.use {
-                    val tu = Tu()
-                    tu.address = bean.url
-                    tu.name = bean.title
-                    insert(TuTable.TABLE_NAME, *tu.map.toVarargArray())
+
+                    val items = select(TuTable.TABLE_NAME).whereSimple(TuTable.ADDRESS + "=?", bean.url)
+                            .parseList({ Tu(HashMap(it)) })
+
+                    if (items.isEmpty()) {  //如果是空的
+                        val tu = Tu()
+                        tu.address = bean.url
+                        tu.name = bean.title
+                        insert(TuTable.TABLE_NAME, *tu.map.toVarargArray())
+                    }
                 }
             }
 

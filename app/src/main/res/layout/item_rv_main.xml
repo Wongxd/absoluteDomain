@@ -29,30 +29,24 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="40dp">
-
             <TextView
-                android:layout_weight="1"
+                android:padding="5dp"
                 android:gravity="center"
                 android:id="@+id/tv_time"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent" />
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
             <TextView
-                android:layout_weight="1"
+                android:paddingBottom="10dp"
                 android:gravity="center"
                 android:id="@+id/tv_view"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent" />
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
             <TextView
-                android:layout_weight="1"
                 android:gravity="center"
                 android:id="@+id/tv_like"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent" />
-        </LinearLayout>
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
     </LinearLayout>
 </android.support.v7.widget.CardView>

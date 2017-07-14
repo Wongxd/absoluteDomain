@@ -102,6 +102,10 @@ class SeePicActivity : BaseSwipeActivity() {
             return JsoupUtil.getMeizituChildDetail(url)
         else if (url.contains("192tt.com"))
             return JsoupUtil.get192TTDetail(url)
+        else if (url.contains("mmonly.cc")){
+            val title = intent.getStringExtra("title")
+            return JsoupUtil.getMMonlyDetail(url,title)
+        }
         return null
     }
 

@@ -127,6 +127,30 @@ object JsoupUtil {
 
     }
 
+    /**
+     * mmonly 图集列表
+     */
+    fun mapMMonly(s: String,list: ArrayList<HomeListBean>){
+
+
+        val select = Jsoup.parse(s).select("#infinite_scroll > div.item > div.item_t > div > div.ABox > a")
+
+        for (element in select) {
+
+
+            val date = ""
+            val preview = element.select("img").attr("original")
+
+            val url = element.attr("href")
+
+            val description = element.select("img").attr("alt")
+
+            list.add(HomeListBean(description,preview,url,date,"",""))
+
+        }
+
+    }
+
 
     /**#############################################################二级页面#############################################################################**/
 
@@ -201,7 +225,6 @@ object JsoupUtil {
         try {
             val doc = Jsoup.parse(URL(url).readText())
             val etTitle = doc!!.getElementsByClass("main-title").first()
-            val title = etTitle.text()
             val es_item = doc.getElementsByClass("main-image").first()
             val a = es_item.getElementsByTag("a").first()
             val imgUrl = a.getElementsByTag("img").first().attr("src")
@@ -282,5 +305,73 @@ object JsoupUtil {
 
     }
 
+
+    /**
+     * 获取 mmonly 某个图集的详情
+     *
+     * @param url: 图集的url
+     *
+     */
+    fun getMMonlyDetail(urlOrigin: String,title:String): ChildDetailBean? {
+        if (TextUtils.isEmpty(urlOrigin)) return null
+        var url = urlOrigin
+        var tagUrl =""
+        if (url.contains("_1.html")) {
+            url = url.replace("_1.html", ".html")
+            tagUrl = url.replace("http://www.mmonly.cc","").replace(".html","")
+        }
+
+        if (!url.contains("mmonly")) {
+            tagUrl = url.replace(".html","")
+            url = "http://www.mmonly.cc" + url
+        }else{
+            tagUrl = url.replace(".html","").replace("http://www.mmonly.cc","")
+        }
+
+//        Logger.e("$urlOrigin  +  $url   +  $tagUrl"  )
+        var doc: Document? = null
+        var childList: ChildDetailBean? = null
+        val urls = ArrayList<String>()
+        try {
+            doc = Jsoup.parse(URL(url).readText())
+            val imgUrl = doc.select("#big-pic > p > a > img").first().attr("src")
+//            val title =  doc.select("#big-pic > p > a > img").first().attr("alt").toString()
+            urls.add(imgUrl)
+
+            val current = doc.select("#picnum > span.nowpage").first().text().toInt()
+            val total = doc.select("#picnum  > span.totalpage").first().text().toInt()
+//            Logger.e("$title  $total")
+            if(current<total){
+                JsoupUtil.getMMonlyDeep(tagUrl,current+1,urls)
+            }
+            childList = ChildDetailBean(title, urls)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        return childList
+    }
+
+    /**
+     * mmonly 递归调用 爬取
+     */
+    fun getMMonlyDeep(tagUrl: String, page:Int,urls: ArrayList<String>) {
+        try {
+            val url = "http://www.mmonly.cc"+tagUrl+"_$page.html"
+            val  doc = Jsoup.parse(URL(url).readText())
+            val imgUrl = doc.select("#big-pic > p > a > img").first().attr("src")
+            urls.add(imgUrl)
+
+            val current = doc.select("#picnum > span.nowpage").first().text().toInt()
+            val total = doc.select("#picnum  > span.totalpage").first().text().toInt()
+            if(current<total){
+                JsoupUtil.getMMonlyDeep(tagUrl,current+1,urls)
+            }
+//            Logger.e("$imgUrl   $current  $total  $tagUrl")
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+    }
 
 }

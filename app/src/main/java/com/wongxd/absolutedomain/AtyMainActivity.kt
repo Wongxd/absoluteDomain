@@ -131,6 +131,7 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
             val intent = Intent(this, SeePicActivity::class.java)
             intent.putExtra("url", it.url)
             intent.putExtra("imgPath", it.imgPath)
+            intent.putExtra("title",it.title)
             startActivity(intent)
         }
         adpater?.setEnableLoadMore(false)
@@ -228,8 +229,8 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
         when (site) {
             1 -> tv_title.text = "绝对领域"
             2 -> tv_title.text = "妹子图"
-            3 -> tv_title.text = "192TT"
-            4 -> tv_title.text = "4--后续添加"
+            3 -> tv_title.text = "192tt"
+            4 -> tv_title.text = "mmonly"
         }
 
         //不同网站，不同url
@@ -335,6 +336,8 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
             2 -> url = "http://www.mzitu.com"
         //192tt
             3 -> url = "http://www.192tt.com/new"
+
+            4-> url ="http://www.mmonly.cc/mmtp"
         }
 
         //页面判断
@@ -346,6 +349,8 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
             url ="http://www.192tt.com"
             suffix = "/listinfo-1-$page.html"
             if (currentPage==2) currentPage++
+        }else if(url.contains("mmonly.cc")){
+            suffix ="/list_9_$page.html"
         }
 
         return url + suffix
@@ -359,6 +364,7 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
             1 -> JsoupUtil.mapJdlingyu(s, list)
             2 -> JsoupUtil.mapMzitu(s, list)
             3 -> JsoupUtil.map192TT(s, list)
+            4->JsoupUtil.mapMMonly(s,list)
         }
     }
 

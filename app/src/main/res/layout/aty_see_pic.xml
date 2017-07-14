@@ -9,30 +9,30 @@
 
 
     <com.scwang.smartrefresh.layout.SmartRefreshLayout
-        android:background="?attr/content_board_background_color"
         android:id="@+id/smartLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="?attr/content_board_background_color"
         app:srlDragRate="0.7"
-        app:srlHeaderMaxDragRate="1.3"
         app:srlEnableHeaderTranslationContent="true"
+        app:srlEnableLoadmore="false"
         app:srlHeaderHeight="200dp"
-        app:srlEnableLoadmore="false">
+        app:srlHeaderMaxDragRate="1.3">
 
         <pl.droidsonroids.gif.GifImageView
-            android:layout_marginTop="40dp"
             android:id="@+id/gifview"
-            android:scaleType="centerCrop"
-            android:src="@drawable/header"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:layout_marginTop="40dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/header" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rv_see_pic"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:overScrollMode="never"
             android:clipToPadding="false"
+            android:overScrollMode="never"
             android:paddingTop="40dp" />
     </com.scwang.smartrefresh.layout.SmartRefreshLayout>
 
@@ -40,8 +40,8 @@
         android:id="@+id/realtime_blur"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        app:realtimeBlurRadius="5dp"
-        android:visibility="visible"/>
+        android:visibility="visible"
+        app:realtimeBlurRadius="5dp" />
 
     <FrameLayout
         android:id="@+id/fl_top"
@@ -50,23 +50,29 @@
 
         <ImageView
             android:id="@+id/iv_favorite"
-            android:layout_marginLeft="10dp"
-            android:layout_gravity="center_vertical"
             android:layout_width="30dp"
-            android:layout_height="30dp" />
-        <TextView
-            android:textColor="?attr/colorPrimary"
+            android:layout_height="30dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="10dp" />
+
+        <com.wongxd.wthing_kotlin.MarqueeTextView
             android:id="@+id/tv_title"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center" />
+            android:ellipsize="marquee"
+            android:gravity="center"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:paddingLeft="40dp"
+            android:paddingRight="40dp"
+            android:singleLine="true"
+            android:textColor="?attr/colorPrimary" />
     </FrameLayout>
 
     <RelativeLayout
-        android:layout_marginTop="60dp"
         android:id="@+id/rl_empty"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_marginTop="60dp">
 
         <ImageView
             android:id="@+id/iv_empty"

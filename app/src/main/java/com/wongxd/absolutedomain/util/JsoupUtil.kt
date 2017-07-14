@@ -47,7 +47,7 @@ object JsoupUtil {
 
         } catch (e: Exception) {
             e.printStackTrace()
-          return null
+            return null
         }
 
         return list
@@ -55,12 +55,12 @@ object JsoupUtil {
 
 
     /**
-     * 获取某个图集的详情
+     * 获取 jdlingyu 某个图集的详情
      *
      * @param url: 图集的url
      *
      */
-    fun getChildDetail(url: String): ChildDetailBean? {
+    fun getJdlingyuChildDetail(url: String): ChildDetailBean? {
         if (TextUtils.isEmpty(url)) return null
         var doc: Document? = null
         var childList: ChildDetailBean? = null
@@ -85,5 +85,57 @@ object JsoupUtil {
 
         return childList
     }
+
+
+    /**
+     * 获取 mzitu 某个图集的详情
+     *
+     * @param url: 图集的url
+     *
+     */
+    fun getMeizituChildDetail(url: String): ChildDetailBean? {
+        if (TextUtils.isEmpty(url)) return null
+        var doc: Document? = null
+        var childList: ChildDetailBean? = null
+        val urls = ArrayList<String>()
+        try {
+            doc = Jsoup.parse(URL(url).readText())
+            val etTitle = doc!!.getElementsByClass("main-title").first()
+            val title = etTitle.text()
+            val es_item = doc.getElementsByClass("main-image").first()
+            val a = es_item.getElementsByTag("a").first()
+            val imgUrl = a.getElementsByTag("img").first().attr("src")
+            val href = a.attr("href")
+            urls.add(imgUrl)
+            if (url.length <= href.length) getMeiziDeep(href, urls)
+
+            childList = ChildDetailBean(title, urls)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        return childList
+    }
+
+    /**
+     * 递归调用 爬取
+     */
+    fun getMeiziDeep(url: String, urls: ArrayList<String>) {
+        try {
+            val doc = Jsoup.parse(URL(url).readText())
+            val etTitle = doc!!.getElementsByClass("main-title").first()
+            val title = etTitle.text()
+            val es_item = doc.getElementsByClass("main-image").first()
+            val a = es_item.getElementsByTag("a").first()
+            val imgUrl = a.getElementsByTag("img").first().attr("src")
+            val href = a.attr("href")
+            urls.add(imgUrl)
+            if (url.length <= href.length) getMeiziDeep(href, urls)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+    }
+
 
 }

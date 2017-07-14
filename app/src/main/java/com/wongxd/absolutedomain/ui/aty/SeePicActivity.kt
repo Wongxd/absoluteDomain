@@ -17,6 +17,7 @@ import com.wongxd.absolutedomain.base.rx.Subscribe
 import com.wongxd.absolutedomain.bean.ChildDetailBean
 import com.wongxd.absolutedomain.util.JsoupUtil
 import com.wongxd.absolutedomain.util.StatusBarUtil
+import com.wongxd.absolutedomain.util.TU
 import com.wongxd.wthing_kotlin.database.*
 import jp.wasabeef.recyclerview.animators.LandingAnimator
 import kotlinx.android.synthetic.main.aty_see_pic.*
@@ -69,9 +70,13 @@ class SeePicActivity : BaseSwipeActivity() {
 
 
     fun doGetDetail(url: String) {
-        if (TextUtils.isEmpty(url)) return
+        if (TextUtils.isEmpty(url)) {
+            TU.cT("没有获取到 该图集 的 url")
+            smartLayout.finishRefresh()
+            return
+        }
         doAsync {
-            val list = JsoupUtil.getChildDetail(url)
+            val list = handleUrlLogic(url)
             if (list != null && list.list.isNotEmpty())
                 AcacheUtil.getDefault(applicationContext, AcacheUtil.ObjCache).put(url, list)
             uiThread {
@@ -85,6 +90,18 @@ class SeePicActivity : BaseSwipeActivity() {
                 }
             }
         }
+    }
+
+    /**
+     * 不同网站 不同逻辑
+     */
+    private fun handleUrlLogic(url: String): ChildDetailBean? {
+        if (url.contains("jdlingyu.moe"))
+            return JsoupUtil.getJdlingyuChildDetail(url)
+        else if (url.contains("mzitu.com"))
+            return JsoupUtil.getMeizituChildDetail(url)
+
+        return null
     }
 
     private fun doFavoriteLogic(url: String, name: String) {

@@ -71,7 +71,8 @@ inline fun <T, R : Any> Iterable<T>.firstResult(predicate: (T) -> R?): R {
 /**
  * openhelper
  */
-class DatabaseOpenHelper(ctx: Context = App.instance, isGetTu: Boolean = false) : ManagedSQLiteOpenHelper(ctx, DB_NAME, null, DB_VERSION) {
+class DatabaseOpenHelper(ctx: Context = App.instance, isGetTu: Boolean = false, dbName: String = DatabaseOpenHelper.DB_NAME)
+    : ManagedSQLiteOpenHelper(ctx, dbName, null, DB_VERSION) {
 
     companion object {
         val DB_NAME = "girl_db"
@@ -86,12 +87,14 @@ class DatabaseOpenHelper(ctx: Context = App.instance, isGetTu: Boolean = false) 
             db.createTable(TuTable.TABLE_NAME, true,
                     TuTable.ID to INTEGER + PRIMARY_KEY + UNIQUE,
                     TuTable.NAME to TEXT,
-                    TuTable.ADDRESS to TEXT)
+                    TuTable.ADDRESS to TEXT,
+                    TuTable.IMGPATH to TEXT)
         } else
             db.createTable(GirlTable.TABLE_NAME, true,
                     GirlTable.ID to INTEGER + PRIMARY_KEY + UNIQUE,
                     GirlTable.NAME to TEXT,
-                    GirlTable.ADDRESS to TEXT)
+                    GirlTable.ADDRESS to TEXT,
+                    GirlTable.IMGPATH to TEXT)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
@@ -109,7 +112,7 @@ val Context.girlDB: DatabaseOpenHelper
     get() = DatabaseOpenHelper()
 
 val Context.tuDB: DatabaseOpenHelper
-    get() = DatabaseOpenHelper(App.instance, true)
+    get() = DatabaseOpenHelper(App.instance, true,"tu_db")
 
 
 

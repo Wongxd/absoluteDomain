@@ -28,7 +28,8 @@
         <activity android:name=".ui.aty.SeePicActivity" />
         <activity android:name=".ui.aty.ViewBigImageActivity" />
         <activity android:name=".base.BaseSwipeActivity" />
-        <activity android:name=".ui.aty.ThemeActivity"></activity>
+        <activity android:name=".ui.aty.ThemeActivity" />
+        <activity android:name=".ui.aty.TuFavoriteActivity"></activity>
     </application>
 
 </manifest>

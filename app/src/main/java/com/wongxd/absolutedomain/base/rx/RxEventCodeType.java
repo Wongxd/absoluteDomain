@@ -5,11 +5,10 @@ package com.wongxd.absolutedomain.base.rx;
  */
 
 public class RxEventCodeType {
-    /**
-     * 党务管理跳转
-     */
-    public static final int IMG_LIST_POSTION_CHANGE = 100;
 
+    public static final int IMG_LIST_POSTION_CHANGE = 1000;
+
+    public static final int SYNC_FAVORITE = 1001;
 
 
 }

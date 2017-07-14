@@ -2,6 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group android:menuCategory="container">
         <item
+            android:id="@+id/menu_tu_favorite"
+            android:icon="@drawable/menu_tu_favorit"
+            android:title="收藏图集" />
+
+        <item
             android:id="@+id/menu_theme"
             android:icon="@drawable/menu_theme"
             android:title="换肤" />

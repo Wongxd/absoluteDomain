@@ -16,6 +16,7 @@ object GirlTable {
     val ID = "_id"
     val NAME = "name"
     val ADDRESS = "address"
+    val IMGPATH = "imgPath"
 }
 
 
@@ -27,13 +28,16 @@ data class Girl(val map: MutableMap<String, Any?>) {
     var _id: Long by map
     var name: String by map
     var address: String by map
+    var imgPath: String by map
+
 
     constructor() : this(HashMap())
 
-    constructor(id: Long, name: String, address: String) : this(HashMap()) {
+    constructor(id: Long, name: String, address: String, imgPath: String) : this(HashMap()) {
         this._id = id
         this.name = name
         this.address = address
+        this.imgPath = imgPath
     }
 }
 
@@ -41,11 +45,12 @@ data class Girl(val map: MutableMap<String, Any?>) {
 /**
  * 图集
  */
-object  TuTable{
+object TuTable {
     val TABLE_NAME = "tu"
     val ID = "_id"
     val NAME = "name"
     val ADDRESS = "address"
+    val IMGPATH = "imgPath"
 }
 
 
@@ -56,16 +61,17 @@ data class Tu(val map: MutableMap<String, Any?>) {
     var _id: Long by map
     var name: String by map
     var address: String by map
+    var imgPath: String by map
 
     constructor() : this(HashMap())
 
-    constructor(id: Long, name: String, address: String) : this(HashMap()) {
+    constructor(id: Long, name: String, address: String, imgPath: String) : this(HashMap()) {
         this._id = id
         this.name = name
         this.address = address
+        this.imgPath = imgPath
     }
 }
-
 
 
 /**
@@ -73,7 +79,7 @@ data class Tu(val map: MutableMap<String, Any?>) {
  */
 class CompanyRowParser : RowParser<Girl> {
     override fun parseRow(columns: Array<Any?>): Girl {
-        return Girl(columns[0] as Long, columns[1] as String, columns[2] as String)
+        return Girl(columns[0] as Long, columns[1] as String, columns[2] as String, columns[3] as String)
     }
 }
 
@@ -83,6 +89,7 @@ class CompanyRowParser : RowParser<Girl> {
  */
 class CompanyMapRowParser : MapRowParser<Girl> {
     override fun parseRow(columns: Map<String, Any?>): Girl {
-        return Girl(columns[GirlTable.ID] as Long, columns[GirlTable.NAME] as String, columns[GirlTable.ADDRESS] as String)
+        return Girl(columns[GirlTable.ID] as Long, columns[GirlTable.NAME] as String,
+                columns[GirlTable.ADDRESS] as String, columns[GirlTable.ADDRESS] as String)
     }
 }

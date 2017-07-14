@@ -18,9 +18,13 @@ import com.wongxd.absolutedomain.Retrofit.ApiStore
 import com.wongxd.absolutedomain.Retrofit.RetrofitUtils
 import com.wongxd.absolutedomain.adapter.RvHomeAdapter
 import com.wongxd.absolutedomain.base.BaseSwipeActivity
+import com.wongxd.absolutedomain.base.rx.RxBus
+import com.wongxd.absolutedomain.base.rx.RxEventCodeType
+import com.wongxd.absolutedomain.base.rx.Subscribe
 import com.wongxd.absolutedomain.bean.HomeListBean
 import com.wongxd.absolutedomain.ui.aty.SeePicActivity
 import com.wongxd.absolutedomain.ui.aty.ThemeActivity
+import com.wongxd.absolutedomain.ui.aty.TuFavoriteActivity
 import com.wongxd.absolutedomain.util.StatusBarUtil
 import com.wongxd.absolutedomain.util.TU
 import com.wongxd.absolutedomain.util.cache.DataCleanManager
@@ -35,6 +39,7 @@ import jp.wasabeef.recyclerview.animators.LandingAnimator
 import kotlinx.android.synthetic.main.aty_main.*
 import org.jetbrains.anko.db.insert
 import org.jetbrains.anko.db.select
+import org.jetbrains.anko.db.transaction
 import org.jsoup.Jsoup
 
 
@@ -44,6 +49,9 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
             R.id.menu_theme -> startActivity(Intent(this, ThemeActivity::class.java))
             R.id.menu_cache -> cacheThing()
             R.id.menu_about -> showAbout()
+            R.id.menu_tu_favorite -> {
+                startActivity(Intent(this, TuFavoriteActivity::class.java))
+            }
         }
         drawerlayout.postDelayed({ drawerlayout.closeDrawer(nav_aty_main) }, 500)
         return true
@@ -85,6 +93,7 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
         super.onCreate(savedInstanceState)
         setContentView(R.layout.aty_main)
 
+        RxBus.getDefault().register(this)
         //状态栏透明和间距处理
         StatusBarUtil.immersive(this)
         StatusBarUtil.setPaddingSmart(this, rv_main)
@@ -123,15 +132,21 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
             adpater?.data?.let {
                 val bean = it[position]
                 tuDB.use {
+                    transaction {
+                        val items = select(TuTable.TABLE_NAME).whereSimple(TuTable.ADDRESS + "=?", bean.url)
+                                .parseList({ Tu(HashMap(it)) })
 
-                    val items = select(TuTable.TABLE_NAME).whereSimple(TuTable.ADDRESS + "=?", bean.url)
-                            .parseList({ Tu(HashMap(it)) })
-
-                    if (items.isEmpty()) {  //如果是空的
-                        val tu = Tu()
-                        tu.address = bean.url
-                        tu.name = bean.title
-                        insert(TuTable.TABLE_NAME, *tu.map.toVarargArray())
+                        if (items.isEmpty()) {  //如果是空的
+                            val tu = Tu()
+                            tu.address = bean.url
+                            tu.name = bean.title
+                            tu.imgPath =bean.imgPath
+                            insert(TuTable.TABLE_NAME, *tu.map.toVarargArray())
+                            adpater?.notifyItemChanged(position)
+                        } else {
+                            delete(TuTable.TABLE_NAME, TuTable.ADDRESS + "=?", arrayOf(bean.url))
+                            adpater?.notifyItemChanged(position)
+                        }
                     }
                 }
             }
@@ -256,5 +271,14 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
         doRefresh(page)
     }
 
+    @Subscribe(code = RxEventCodeType.SYNC_FAVORITE)
+    fun syncFavorite(p: Integer) {
+        adpater?.notifyDataSetChanged()
+    }
+
+    override fun onDestroy() {
+        RxBus.getDefault().unRegister(this)
+        super.onDestroy()
+    }
 
 }

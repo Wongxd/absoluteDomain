@@ -54,6 +54,67 @@ object JsoupUtil {
     }
 
 
+    /***###############################################################一级页面###############################################################################**/
+
+    /**
+     * 匹配 Mzitu.com
+     */
+    fun mapMzitu(s: String, list: ArrayList<HomeListBean>) {
+        val doc = Jsoup.parse(s)
+        val ul = doc.getElementById("pins")
+        val lis = ul.getElementsByTag("li")
+        for (element in lis) {
+            val preview: String? = element.getElementsByTag("a").first().getElementsByTag("img").first().attr("data-original")
+
+            val title = element.getElementsByTag("a").first().getElementsByTag("img").first().attr("alt")
+
+            val imgUrl = element.getElementsByTag("a").first().attr("href")
+
+            val date = element.getElementsByClass("time").first().text()
+            val view = element.getElementsByClass("view").first().text()
+
+            val like = " "
+//            Logger .e("$preview  +  $title  +$imgUrl  +$date  +$view")
+
+            list.add(HomeListBean(title, preview!!, imgUrl, date, view, like))
+        }
+
+    }
+
+    /**
+     * 匹配 jdlingyu.moe
+     */
+    fun mapJdlingyu(s: String, list: ArrayList<HomeListBean>) {
+        val select = Jsoup.parse(s).select("#postlist > div.pin")
+        for (element in select) {
+
+            var preview: String? = element.select("div.pin-coat > a > img").attr("original")
+            if (preview == null || preview.length < 5) {
+                preview = element.select("div.pin-coat > a > img").attr("src")
+            }
+            val title = element.select("div.pin-coat > a > img").attr("alt")
+
+            val imgUrl = element.select("div.pin-coat > a").attr("href")
+
+            val date = element.select("div.pin-coat > div.pin-data > span.timer > span").text()
+
+            val like = element.select("div.pin-coat > div.pin-data > a.likes > span > span").text()
+
+            val view = element.select("div.pin-coat > div.pin-data > a.viewsButton > span").text()
+
+            list.add(HomeListBean(title, preview!!, imgUrl, date, view, like))
+        }
+    }
+
+
+
+
+
+
+
+    /**#############################################################二级页面#############################################################################**/
+
+
     /**
      * 获取 jdlingyu 某个图集的详情
      *

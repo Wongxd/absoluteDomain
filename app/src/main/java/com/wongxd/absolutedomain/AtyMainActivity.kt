@@ -30,6 +30,7 @@ import com.wongxd.absolutedomain.bean.HomeListBean
 import com.wongxd.absolutedomain.ui.aty.SeePicActivity
 import com.wongxd.absolutedomain.ui.aty.ThemeActivity
 import com.wongxd.absolutedomain.ui.aty.TuFavoriteActivity
+import com.wongxd.absolutedomain.util.JsoupUtil
 import com.wongxd.absolutedomain.util.StatusBarUtil
 import com.wongxd.absolutedomain.util.TU
 import com.wongxd.absolutedomain.util.cache.DataCleanManager
@@ -45,7 +46,6 @@ import kotlinx.android.synthetic.main.aty_main.*
 import org.jetbrains.anko.db.insert
 import org.jetbrains.anko.db.select
 import org.jetbrains.anko.db.transaction
-import org.jsoup.Jsoup
 
 
 class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -227,8 +227,8 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
         when (site) {
             1 -> tv_title.text = "绝对领域"
             2 -> tv_title.text = "妹子图"
-            3 -> tv_title.text = "3"
-            4 -> tv_title.text = "4"
+            3 -> tv_title.text = "3--后续添加"
+            4 -> tv_title.text = "4--后续添加"
         }
         //不同网站，不同url
         val url = handleUrlogic(page)
@@ -256,11 +256,18 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
                             adpater?.addData(t)
                         }
 
+                        if (adpater?.data?.size == 0 || adpater?.data == null) {
+                            rl_empty.visibility = View.VISIBLE
+                        }
+
                     }
                 }, Consumer<Throwable> {
-                    TU.cT(it.message.toString()+" ")
+                    TU.cT(it.message.toString() + " ")
                     if (page == 0) smartLayout.finishRefresh()
                     else smartLayout.finishLoadmore()
+                    if (adpater?.data?.size == 0 || adpater?.data == null) {
+                        rl_empty.visibility = View.VISIBLE
+                    }
                 })
     }
 
@@ -293,58 +300,8 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
      */
     private fun mapSpecificSite(s: String, list: ArrayList<HomeListBean>) {
         when (site) {
-            1 -> mapJdlingyu(s, list)
-            2 -> mapMzitu(s, list)
-        }
-    }
-
-    /**
-     * 匹配 Mzitu.com
-     */
-    private fun mapMzitu(s: String, list: ArrayList<HomeListBean>) {
-        val doc = Jsoup.parse(s)
-        val ul = doc.getElementById("pins")
-        val lis = ul.getElementsByTag("li")
-        for (element in lis) {
-            val preview: String? = element.getElementsByTag("a").first().getElementsByTag("img").first().attr("data-original")
-
-            val title = element.getElementsByTag("a").first().getElementsByTag("img").first().attr("alt")
-
-            val imgUrl = element.getElementsByTag("a").first().attr("href")
-
-            val date = element.getElementsByClass("time").first().text()
-            val view = element.getElementsByClass("view").first().text()
-
-            val like = " "
-//            Logger .e("$preview  +  $title  +$imgUrl  +$date  +$view")
-
-            list.add(HomeListBean(title, preview!!, imgUrl, date, view, like))
-        }
-
-    }
-
-    /**
-     * 匹配 jdlingyu.moe
-     */
-    private fun mapJdlingyu(s: String, list: ArrayList<HomeListBean>) {
-        val select = Jsoup.parse(s).select("#postlist > div.pin")
-        for (element in select) {
-
-            var preview: String? = element.select("div.pin-coat > a > img").attr("original")
-            if (preview == null || preview.length < 5) {
-                preview = element.select("div.pin-coat > a > img").attr("src")
-            }
-            val title = element.select("div.pin-coat > a > img").attr("alt")
-
-            val imgUrl = element.select("div.pin-coat > a").attr("href")
-
-            val date = element.select("div.pin-coat > div.pin-data > span.timer > span").text()
-
-            val like = element.select("div.pin-coat > div.pin-data > a.likes > span > span").text()
-
-            val view = element.select("div.pin-coat > div.pin-data > a.viewsButton > span").text()
-
-            list.add(HomeListBean(title, preview!!, imgUrl, date, view, like))
+            1 -> JsoupUtil.mapJdlingyu(s, list)
+            2 -> JsoupUtil.mapMzitu(s, list)
         }
     }
 

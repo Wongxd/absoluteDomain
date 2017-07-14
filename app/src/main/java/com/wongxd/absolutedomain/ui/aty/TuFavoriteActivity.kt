@@ -2,6 +2,7 @@ package com.wongxd.absolutedomain.ui.aty
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.SystemClock
 import android.support.v7.widget.GridLayoutManager
 import android.view.View
 import android.widget.ImageView
@@ -79,7 +80,7 @@ class TuFavoriteActivity : BaseSwipeActivity() {
     }
 
     override fun finish() {
-        RxBus.getDefault().post(RxEventCodeType.SYNC_FAVORITE, 0)
+        RxBus.getDefault().post(RxEventCodeType.SYNC_FAVORITE, SystemClock.currentThreadTimeMillis().toString())
         super.finish()
     }
 

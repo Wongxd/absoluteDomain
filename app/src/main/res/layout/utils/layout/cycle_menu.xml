@@ -7,6 +7,7 @@
     android:orientation="vertical">
 
     <ImageView
+        android:src="@mipmap/ic_launcher"
         android:id="@+id/circle_menu_button_2"
         android:layout_width="40dp"
         android:layout_height="40dp"
@@ -19,6 +20,7 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_gravity="bottom|right"
+        android:src="@mipmap/ic_launcher"
         android:layout_marginBottom="15dp"
         android:layout_marginRight="15dp" />
 
@@ -27,6 +29,7 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_gravity="bottom|right"
+        android:src="@mipmap/ic_launcher"
         android:layout_marginBottom="15dp"
         android:layout_marginRight="15dp" />
 
@@ -36,7 +39,9 @@
         android:layout_height="40dp"
         android:layout_gravity="bottom|right"
         android:layout_marginBottom="15dp"
-        android:layout_marginRight="15dp" />
+        android:layout_marginRight="15dp"
+        android:src="@mipmap/ic_launcher"
+        />
 
     <ImageView
         android:id="@+id/circle_menu_button_1"

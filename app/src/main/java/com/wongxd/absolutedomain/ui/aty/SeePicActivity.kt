@@ -1,6 +1,7 @@
 package com.wongxd.absolutedomain.ui.aty
 
 import android.os.Bundle
+import android.os.SystemClock
 import android.support.v7.widget.StaggeredGridLayoutManager
 import android.text.TextUtils
 import android.view.View
@@ -16,8 +17,12 @@ import com.wongxd.absolutedomain.base.rx.Subscribe
 import com.wongxd.absolutedomain.bean.ChildDetailBean
 import com.wongxd.absolutedomain.util.JsoupUtil
 import com.wongxd.absolutedomain.util.StatusBarUtil
+import com.wongxd.wthing_kotlin.database.*
 import jp.wasabeef.recyclerview.animators.LandingAnimator
 import kotlinx.android.synthetic.main.aty_see_pic.*
+import org.jetbrains.anko.db.insert
+import org.jetbrains.anko.db.select
+import org.jetbrains.anko.db.transaction
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import java.util.*
@@ -31,15 +36,14 @@ class SeePicActivity : BaseSwipeActivity() {
         //状态栏透明和间距处理
         StatusBarUtil.immersive(this)
         StatusBarUtil.setPaddingSmart(this, rv_see_pic)
-        StatusBarUtil.setPaddingSmart(this, rl_top)
         StatusBarUtil.setPaddingSmart(this, realtime_blur)
+        StatusBarUtil.setMargin(this, fl_top)
         StatusBarUtil.setMargin(this, findViewById(R.id.gifview))
         RxBus.getDefault().register(this)
         adpater = RvSeePicAdapter {
             ViewBigImageActivity.startActivity(this, it.position, adpater?.data as ArrayList<String>?, it.v)
         }
         adpater?.setEnableLoadMore(false)
-
 
 
         rv_see_pic.adapter = adpater
@@ -57,6 +61,7 @@ class SeePicActivity : BaseSwipeActivity() {
                     rl_empty.visibility = View.GONE
                     tv_title.text = childCache.title
                     adpater?.setNewData(childCache.list)
+                    doFavoriteLogic(url, childCache.title)
                 } else smartLayout.autoRefresh()
             }
         }
@@ -75,6 +80,41 @@ class SeePicActivity : BaseSwipeActivity() {
                     rl_empty.visibility = View.GONE
                     tv_title.text = list.title
                     adpater?.setNewData(list.list)
+
+                    doFavoriteLogic(url, list.title)
+                }
+            }
+        }
+    }
+
+    private fun doFavoriteLogic(url: String, name: String) {
+        tuDB.use {
+            val items = select(TuTable.TABLE_NAME).whereSimple(TuTable.ADDRESS + "=?", url)
+                    .parseList({ Tu(HashMap(it)) })
+            if (items.isEmpty()) iv_favorite.setImageResource(R.mipmap.star_border)
+            else iv_favorite.setImageResource(R.mipmap.star_solid)
+        }
+
+
+        iv_favorite.setOnClickListener {
+            tuDB.use {
+                transaction {
+                    val items = select(TuTable.TABLE_NAME).whereSimple(TuTable.ADDRESS + "=?", url)
+                            .parseList({ Tu(HashMap(it)) })
+
+                    if (items.isEmpty()) {  //如果是空的
+                        val tu = Tu()
+                        tu.address = url
+                        tu.name = name
+                        tu.imgPath = intent.getStringExtra("imgPath")
+                        insert(TuTable.TABLE_NAME, *tu.map.toVarargArray())
+                        iv_favorite.setImageResource(R.mipmap.star_solid)
+                    } else {
+                        delete(TuTable.TABLE_NAME, TuTable.ADDRESS + "=?", arrayOf(url))
+                        iv_favorite.setImageResource(R.mipmap.star_border)
+                    }
+
+                    RxBus.getDefault().post(RxEventCodeType.SYNC_FAVORITE, SystemClock.currentThreadTimeMillis().toString())
                 }
             }
         }

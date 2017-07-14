@@ -17,6 +17,7 @@ import android.view.View
 import android.view.animation.BounceInterpolator
 import android.widget.ImageView
 import com.jude.swipbackhelper.SwipeBackHelper
+import com.orhanobut.logger.Logger
 import com.scwang.smartrefresh.layout.util.DensityUtil
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.wongxd.absolutedomain.Retrofit.ApiStore
@@ -165,7 +166,7 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
 
         rv_main.adapter = adpater
         rv_main.itemAnimator = LandingAnimator()
-        rv_main.layoutManager = GridLayoutManager(applicationContext, 2)
+        rv_main.layoutManager = GridLayoutManager(applicationContext, 3)
 
         smartLayout.setOnRefreshListener { doRefresh() }
         smartLayout.setOnLoadmoreListener { doLoadMore(currentPage) }
@@ -230,8 +231,10 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
             3 -> tv_title.text = "192TT"
             4 -> tv_title.text = "4--后续添加"
         }
+
         //不同网站，不同url
         val url = handleUrlogic(page)
+        Logger.e(url)
         val apiStore = RetrofitUtils.getStringInstance().create(ApiStore::class.java)
         apiStore.getString(url)
                 .subscribeOn(Schedulers.io())
@@ -340,8 +343,9 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
             currentPage = 1
             suffix = ""
         } else if (url.contains("192tt.com")) {
-            url ="http://www.192tt.com/"
+            url ="http://www.192tt.com"
             suffix = "/listinfo-1-$page.html"
+            if (currentPage==2) currentPage++
         }
 
         return url + suffix

@@ -48,10 +48,10 @@ class SeePicActivity : BaseSwipeActivity() {
 
 
         rv_see_pic.adapter = adpater
-        rv_see_pic.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+        rv_see_pic.layoutManager = StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL)
                 .apply { this.gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE }
         rv_see_pic.itemAnimator = LandingAnimator()
-        rv_see_pic.addItemDecoration(SGSpacingItemDecoration(2, DensityUtil.dp2px(4f)))
+        rv_see_pic.addItemDecoration(SGSpacingItemDecoration(3, DensityUtil.dp2px(4f)))
 
         val url = intent.getStringExtra("url")
         smartLayout.setOnRefreshListener { doGetDetail(url) }

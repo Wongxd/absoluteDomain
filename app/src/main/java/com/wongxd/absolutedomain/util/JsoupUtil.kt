@@ -224,22 +224,36 @@ object JsoupUtil {
     fun get192TTDetail(urlOrigin: String): ChildDetailBean? {
         if (TextUtils.isEmpty(urlOrigin)) return null
         var url = urlOrigin
+        var tagUrl =""
         if (url.contains("_1.html")) {
             url = url.replace("_1.html", ".html")
+            tagUrl = url.replace("http://www.192tt.com","").replace(".html","")
         }
+
         if (!url.contains("192tt")) {
+             tagUrl = url.replace(".html","")
             url = "http://www.192tt.com" + url
+        }else{
+            tagUrl = url.replace(".html","").replace("http://www.192tt.com","")
         }
+
+//        Logger.e("$urlOrigin  +  $url   +  $tagUrl"  )
         var doc: Document? = null
         var childList: ChildDetailBean? = null
         val urls = ArrayList<String>()
         try {
             doc = Jsoup.parse(URL(url).readText())
             val imgUrl = doc.select("#p > center > img").first().attr("lazysrc")
+            val title = doc.select("#p > center > img").first().attr("alt")
             urls.add(imgUrl)
-//            if (url.length <= href.length) getMeiziDeep(href, urls)
-//
-//            childList = ChildDetailBean(title, urls)
+
+            var current = doc.select("#nownum").first().text().toInt()
+            val total = doc.select("#allnum").first().text().toInt()
+
+            if(current<total){
+                JsoupUtil.get192TTDeep(tagUrl,current+1,urls)
+            }
+            childList = ChildDetailBean(title, urls)
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -250,17 +264,18 @@ object JsoupUtil {
     /**
      * 192tt 递归调用 爬取
      */
-    fun get192TTDeep(url: String, urls: ArrayList<String>) {
+    fun get192TTDeep(tagUrl: String, page:Int,urls: ArrayList<String>) {
         try {
-            val doc = Jsoup.parse(URL(url).readText())
-            val etTitle = doc!!.getElementsByClass("main-title").first()
-            val title = etTitle.text()
-            val es_item = doc.getElementsByClass("main-image").first()
-            val a = es_item.getElementsByTag("a").first()
-            val imgUrl = a.getElementsByTag("img").first().attr("src")
-            val href = a.attr("href")
+            val url = "http://www.192tt.com"+tagUrl+"_$page.html"
+             val  doc = Jsoup.parse(URL(url).readText())
+            val imgUrl = doc.select("#p > center > img").first().attr("lazysrc")
             urls.add(imgUrl)
-            if (url.length <= href.length) getMeiziDeep(href, urls)
+            var current = doc.select("#nownum").first().text().toInt()
+            val total = doc.select("#allnum").first().text().toInt()
+            if(current<total){
+                JsoupUtil.get192TTDeep(tagUrl,current+1,urls)
+            }
+//            Logger.e("$imgUrl   $current  $total  $tagUrl")
         } catch (e: Exception) {
             e.printStackTrace()
         }

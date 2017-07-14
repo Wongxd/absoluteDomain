@@ -223,11 +223,11 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
         doRefresh(page)
     }
 
-    fun doRefresh(page: Int = 0) {
+    fun doRefresh(page: Int = 1) {
         when (site) {
             1 -> tv_title.text = "绝对领域"
             2 -> tv_title.text = "妹子图"
-            3 -> tv_title.text = "3--后续添加"
+            3 -> tv_title.text = "192TT"
             4 -> tv_title.text = "4--后续添加"
         }
         //不同网站，不同url
@@ -242,13 +242,12 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
                     list
                 })
                 .observeOn(AndroidSchedulers.mainThread())
-
                 .subscribe(object : Consumer<List<HomeListBean>> {
                     @Throws(Exception::class)
                     override fun accept(@NonNull t: List<HomeListBean>) {
                         if (t.isNotEmpty()) currentPage++
                         rl_empty.visibility = View.GONE
-                        if (page == 0) {
+                        if (page == 1) {
                             smartLayout.finishRefresh()
                             adpater?.setNewData(t)
                         } else {
@@ -263,13 +262,62 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
                     }
                 }, Consumer<Throwable> {
                     TU.cT(it.message.toString() + " ")
-                    if (page == 0) smartLayout.finishRefresh()
+                    if (page == 1) smartLayout.finishRefresh()
                     else smartLayout.finishLoadmore()
                     if (adpater?.data?.size == 0 || adpater?.data == null) {
                         rl_empty.visibility = View.VISIBLE
                     }
                 })
     }
+
+//    fun doRefresh(page: Int = 1) {
+//        when (site) {
+//            1 -> tv_title.text = "绝对领域"
+//            2 -> tv_title.text = "妹子图"
+//            3 -> tv_title.text = "192TT"
+//            4 -> tv_title.text = "4--后续添加"
+//        }
+//        //不同网站，不同url
+//        val url = handleUrlogic(page)
+//
+//        when (site) {
+//            1 -> JsoupUtil.mapJdlingyu(url)
+//            2 -> JsoupUtil.mapMzitu(url)
+//            3 -> JsoupUtil.map192TT(url)
+//        }
+//        val observable = object : Observable<List<HomeListBean>>() {
+//            override fun subscribeActual(observer: Observer<in List<HomeListBean>>) {
+//
+//            }
+//        }
+//        observable.observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(object : Consumer<List<HomeListBean>> {
+//                    @Throws(Exception::class)
+//                    override fun accept(@NonNull t: List<HomeListBean>) {
+//                        if (t.isNotEmpty()) currentPage++
+//                        rl_empty.visibility = View.GONE
+//                        if (page == 1) {
+//                            smartLayout.finishRefresh()
+//                            adpater?.setNewData(t)
+//                        } else {
+//                            smartLayout.finishLoadmore()
+//                            adpater?.addData(t)
+//                        }
+//
+//                        if (adpater?.data?.size == 0 || adpater?.data == null) {
+//                            rl_empty.visibility = View.VISIBLE
+//                        }
+//
+//                    }
+//                }, Consumer<Throwable> {
+//                    TU.cT(it.message.toString() + " ")
+//                    if (page == 1) smartLayout.finishRefresh()
+//                    else smartLayout.finishLoadmore()
+//                    if (adpater?.data?.size == 0 || adpater?.data == null) {
+//                        rl_empty.visibility = View.VISIBLE
+//                    }
+//                })
+//    }
 
     /**
      * 不同网站 不同地址
@@ -282,14 +330,18 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
 
         //Mzitu
             2 -> url = "http://www.mzitu.com"
-
+        //192tt
+            3 -> url = "http://www.192tt.com/new"
         }
 
         //页面判断
         var suffix = "/page/$page"
-        if (page == 0) {
+        if (page == 1) {
             currentPage = 1
             suffix = ""
+        } else if (url.contains("192tt.com")) {
+            url ="http://www.192tt.com/"
+            suffix = "/listinfo-1-$page.html"
         }
 
         return url + suffix
@@ -302,9 +354,9 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
         when (site) {
             1 -> JsoupUtil.mapJdlingyu(s, list)
             2 -> JsoupUtil.mapMzitu(s, list)
+            3 -> JsoupUtil.map192TT(s, list)
         }
     }
-
 
     @Subscribe(code = RxEventCodeType.SYNC_FAVORITE)
     fun syncFavorite(p: String) {

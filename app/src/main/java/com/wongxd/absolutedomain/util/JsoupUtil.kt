@@ -107,9 +107,25 @@ object JsoupUtil {
     }
 
 
+    /**
+     * 匹配 192tt
+     */
+    fun map192TT(s: String, list: ArrayList<HomeListBean>) {
+        val select = Jsoup.parse(s).select("body > div.mainer > div.piclist > ul > li")
+        for (element in select) {
+            val preview = element.select("a > img").attr("lazysrc")
+
+            val imgUrl = element.select("a").attr("href")
+
+            val description = element.select("a > span").text()
+
+            val date = element.select("b.b1").text()
+
+            list.add(HomeListBean(description, preview, imgUrl, date, "", ""))
+        }
 
 
-
+    }
 
 
     /**#############################################################二级页面#############################################################################**/
@@ -179,9 +195,62 @@ object JsoupUtil {
     }
 
     /**
-     * 递归调用 爬取
+     * meizi递归调用 爬取
      */
     fun getMeiziDeep(url: String, urls: ArrayList<String>) {
+        try {
+            val doc = Jsoup.parse(URL(url).readText())
+            val etTitle = doc!!.getElementsByClass("main-title").first()
+            val title = etTitle.text()
+            val es_item = doc.getElementsByClass("main-image").first()
+            val a = es_item.getElementsByTag("a").first()
+            val imgUrl = a.getElementsByTag("img").first().attr("src")
+            val href = a.attr("href")
+            urls.add(imgUrl)
+            if (url.length <= href.length) getMeiziDeep(href, urls)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+    }
+
+
+    /**
+     * 获取 192tt 某个图集的详情
+     *
+     * @param url: 图集的url
+     *
+     */
+    fun get192TTDetail(urlOrigin: String): ChildDetailBean? {
+        if (TextUtils.isEmpty(urlOrigin)) return null
+        var url = urlOrigin
+        if (url.contains("_1.html")) {
+            url = url.replace("_1.html", ".html")
+        }
+        if (!url.contains("192tt")) {
+            url = "http://www.192tt.com" + url
+        }
+        var doc: Document? = null
+        var childList: ChildDetailBean? = null
+        val urls = ArrayList<String>()
+        try {
+            doc = Jsoup.parse(URL(url).readText())
+            val imgUrl = doc.select("#p > center > img").first().attr("lazysrc")
+            urls.add(imgUrl)
+//            if (url.length <= href.length) getMeiziDeep(href, urls)
+//
+//            childList = ChildDetailBean(title, urls)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        return childList
+    }
+
+    /**
+     * 192tt 递归调用 爬取
+     */
+    fun get192TTDeep(url: String, urls: ArrayList<String>) {
         try {
             val doc = Jsoup.parse(URL(url).readText())
             val etTitle = doc!!.getElementsByClass("main-title").first()

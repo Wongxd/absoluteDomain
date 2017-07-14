@@ -100,7 +100,8 @@ class SeePicActivity : BaseSwipeActivity() {
             return JsoupUtil.getJdlingyuChildDetail(url)
         else if (url.contains("mzitu.com"))
             return JsoupUtil.getMeizituChildDetail(url)
-
+        else if (url.contains("192tt.com"))
+            return JsoupUtil.get192TTDetail(url)
         return null
     }
 

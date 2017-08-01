@@ -130,7 +130,7 @@ object JsoupUtil {
     /**
      * mmonly 图集列表
      */
-    fun mapMMonly(s: String,list: ArrayList<HomeListBean>){
+    fun mapMMonly(s: String, list: ArrayList<HomeListBean>) {
 
 
         val select = Jsoup.parse(s).select("#infinite_scroll > div.item > div.item_t > div > div.ABox > a")
@@ -145,7 +145,7 @@ object JsoupUtil {
 
             val description = element.select("img").attr("alt")
 
-            list.add(HomeListBean(description,preview,url,date,"",""))
+            list.add(HomeListBean(description, preview, url, date, "", ""))
 
         }
 
@@ -166,10 +166,9 @@ object JsoupUtil {
         var doc: Document? = null
         var childList: ChildDetailBean? = null
         try {
-            doc = Jsoup.parse(URL(url), 8000)
+            doc = Jsoup.parse(URL(url).readText())
             val etTitle = doc!!.getElementsByClass("main-title").first()
             val title = etTitle.text()
-            //            Logger.e("标题: " + title);
             val es_item = doc.getElementsByClass("main-body").first()
             val `as` = es_item.getElementsByTag("a")
             val urls = `as`.indices
@@ -185,6 +184,57 @@ object JsoupUtil {
         }
 
         return childList
+    }
+
+
+    /**
+     * 获取 mm131 某个图集的详情
+     *
+     * @param url: 图集的url
+     *
+     */
+    fun getMM131ChildDetail(url: String): ChildDetailBean? {
+        if (TextUtils.isEmpty(url)) return null
+        var doc: Document? = null
+        var childList: ChildDetailBean? = null
+        val urls = ArrayList<String>()
+        try {
+            doc = Jsoup.parse(URL(url).readText())
+            val etTitle = doc!!.getElementsByClass("main-title").first()
+            val title = etTitle.text()
+            val es_item = doc.getElementsByClass("main-image").first()
+            val a = es_item.getElementsByTag("a").first()
+            val imgUrl = a.getElementsByTag("img").first().attr("src")
+            val href = a.attr("href")
+            urls.add(imgUrl)
+            if (url.length <= href.length) getMeiziDeep(href, urls)
+
+            childList = ChildDetailBean(title, urls)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        return childList
+    }
+
+    /**
+     * mm131递归调用 爬取
+     */
+    fun getMM131Deep(url: String, urls: ArrayList<String>) {
+        try {
+            val doc = Jsoup.parse(URL(url).readText())
+            val etTitle = doc!!.getElementsByClass("main-title").first()
+            val es_item = doc.getElementsByClass("main-image").first()
+            val a = es_item.getElementsByTag("a").first()
+            val imgUrl = a.getElementsByTag("img").first().attr("src")
+            val href = a.attr("href")
+            Logger.e("妹子图 img  "+imgUrl)
+            urls.add(imgUrl)
+            if (url.length <= href.length) getMeiziDeep(href, urls)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
     }
 
 
@@ -229,6 +279,7 @@ object JsoupUtil {
             val a = es_item.getElementsByTag("a").first()
             val imgUrl = a.getElementsByTag("img").first().attr("src")
             val href = a.attr("href")
+            Logger.e("妹子图 img  "+imgUrl)
             urls.add(imgUrl)
             if (url.length <= href.length) getMeiziDeep(href, urls)
         } catch (e: Exception) {
@@ -236,7 +287,6 @@ object JsoupUtil {
         }
 
     }
-
 
     /**
      * 获取 192tt 某个图集的详情
@@ -247,17 +297,17 @@ object JsoupUtil {
     fun get192TTDetail(urlOrigin: String): ChildDetailBean? {
         if (TextUtils.isEmpty(urlOrigin)) return null
         var url = urlOrigin
-        var tagUrl =""
+        var tagUrl = ""
         if (url.contains("_1.html")) {
             url = url.replace("_1.html", ".html")
-            tagUrl = url.replace("http://www.192tt.com","").replace(".html","")
+            tagUrl = url.replace("http://www.192tt.com", "").replace(".html", "")
         }
 
         if (!url.contains("192tt")) {
-             tagUrl = url.replace(".html","")
+            tagUrl = url.replace(".html", "")
             url = "http://www.192tt.com" + url
-        }else{
-            tagUrl = url.replace(".html","").replace("http://www.192tt.com","")
+        } else {
+            tagUrl = url.replace(".html", "").replace("http://www.192tt.com", "")
         }
 
 //        Logger.e("$urlOrigin  +  $url   +  $tagUrl"  )
@@ -273,8 +323,8 @@ object JsoupUtil {
             var current = doc.select("#nownum").first().text().toInt()
             val total = doc.select("#allnum").first().text().toInt()
 
-            if(current<total){
-                JsoupUtil.get192TTDeep(tagUrl,current+1,urls)
+            if (current < total) {
+                JsoupUtil.get192TTDeep(tagUrl, current + 1, urls)
             }
             childList = ChildDetailBean(title, urls)
         } catch (e: Exception) {
@@ -287,16 +337,16 @@ object JsoupUtil {
     /**
      * 192tt 递归调用 爬取
      */
-    fun get192TTDeep(tagUrl: String, page:Int,urls: ArrayList<String>) {
+    fun get192TTDeep(tagUrl: String, page: Int, urls: ArrayList<String>) {
         try {
-            val url = "http://www.192tt.com"+tagUrl+"_$page.html"
-             val  doc = Jsoup.parse(URL(url).readText())
+            val url = "http://www.192tt.com" + tagUrl + "_$page.html"
+            val doc = Jsoup.parse(URL(url).readText())
             val imgUrl = doc.select("#p > center > img").first().attr("lazysrc")
             urls.add(imgUrl)
             var current = doc.select("#nownum").first().text().toInt()
             val total = doc.select("#allnum").first().text().toInt()
-            if(current<total){
-                JsoupUtil.get192TTDeep(tagUrl,current+1,urls)
+            if (current < total) {
+                JsoupUtil.get192TTDeep(tagUrl, current + 1, urls)
             }
 //            Logger.e("$imgUrl   $current  $total  $tagUrl")
         } catch (e: Exception) {
@@ -312,20 +362,20 @@ object JsoupUtil {
      * @param url: 图集的url
      *
      */
-    fun getMMonlyDetail(urlOrigin: String,title:String): ChildDetailBean? {
+    fun getMMonlyDetail(urlOrigin: String, title: String): ChildDetailBean? {
         if (TextUtils.isEmpty(urlOrigin)) return null
         var url = urlOrigin
-        var tagUrl =""
+        var tagUrl = ""
         if (url.contains("_1.html")) {
             url = url.replace("_1.html", ".html")
-            tagUrl = url.replace("http://www.mmonly.cc","").replace(".html","")
+            tagUrl = url.replace("http://www.mmonly.cc", "").replace(".html", "")
         }
 
         if (!url.contains("mmonly")) {
-            tagUrl = url.replace(".html","")
+            tagUrl = url.replace(".html", "")
             url = "http://www.mmonly.cc" + url
-        }else{
-            tagUrl = url.replace(".html","").replace("http://www.mmonly.cc","")
+        } else {
+            tagUrl = url.replace(".html", "").replace("http://www.mmonly.cc", "")
         }
 
 //        Logger.e("$urlOrigin  +  $url   +  $tagUrl"  )
@@ -341,8 +391,8 @@ object JsoupUtil {
             val current = doc.select("#picnum > span.nowpage").first().text().toInt()
             val total = doc.select("#picnum  > span.totalpage").first().text().toInt()
 //            Logger.e("$title  $total")
-            if(current<total){
-                JsoupUtil.getMMonlyDeep(tagUrl,current+1,urls)
+            if (current < total) {
+                JsoupUtil.getMMonlyDeep(tagUrl, current + 1, urls)
             }
             childList = ChildDetailBean(title, urls)
         } catch (e: Exception) {
@@ -355,17 +405,17 @@ object JsoupUtil {
     /**
      * mmonly 递归调用 爬取
      */
-    fun getMMonlyDeep(tagUrl: String, page:Int,urls: ArrayList<String>) {
+    fun getMMonlyDeep(tagUrl: String, page: Int, urls: ArrayList<String>) {
         try {
-            val url = "http://www.mmonly.cc"+tagUrl+"_$page.html"
-            val  doc = Jsoup.parse(URL(url).readText())
+            val url = "http://www.mmonly.cc" + tagUrl + "_$page.html"
+            val doc = Jsoup.parse(URL(url).readText())
             val imgUrl = doc.select("#big-pic > p > a > img").first().attr("src")
             urls.add(imgUrl)
 
             val current = doc.select("#picnum > span.nowpage").first().text().toInt()
             val total = doc.select("#picnum  > span.totalpage").first().text().toInt()
-            if(current<total){
-                JsoupUtil.getMMonlyDeep(tagUrl,current+1,urls)
+            if (current < total) {
+                JsoupUtil.getMMonlyDeep(tagUrl, current + 1, urls)
             }
 //            Logger.e("$imgUrl   $current  $total  $tagUrl")
         } catch (e: Exception) {

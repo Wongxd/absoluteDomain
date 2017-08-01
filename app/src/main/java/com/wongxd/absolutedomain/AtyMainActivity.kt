@@ -131,7 +131,7 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
             val intent = Intent(this, SeePicActivity::class.java)
             intent.putExtra("url", it.url)
             intent.putExtra("imgPath", it.imgPath)
-            intent.putExtra("title",it.title)
+            intent.putExtra("title", it.title)
             startActivity(intent)
         }
         adpater?.setEnableLoadMore(false)
@@ -167,7 +167,7 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
 
         rv_main.adapter = adpater
         rv_main.itemAnimator = LandingAnimator()
-        rv_main.layoutManager = GridLayoutManager(applicationContext, 3)
+        rv_main.layoutManager = GridLayoutManager(applicationContext, 2)
 
         smartLayout.setOnRefreshListener { doRefresh() }
         smartLayout.setOnLoadmoreListener { doLoadMore(currentPage) }
@@ -228,7 +228,7 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
     fun doRefresh(page: Int = 1) {
         when (site) {
             1 -> tv_title.text = "绝对领域"
-            2 -> tv_title.text = "妹子图"
+            2 -> tv_title.text = "mm131"
             3 -> tv_title.text = "192tt"
             4 -> tv_title.text = "mmonly"
         }
@@ -328,16 +328,16 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
      */
     private fun handleUrlogic(page: Int): String {
 
-        var url = "http://www.jdlingyu.moe"
+        var url = "http://www.jdlingyu.wang"
 
         when (site) {
 
-        //Mzitu
-            2 -> url = "http://www.mzitu.com"
+        //mm131
+            2 -> url = "http://www.mm131.com"
         //192tt
             3 -> url = "http://www.192tt.com/new"
 
-            4-> url ="http://www.mmonly.cc/mmtp"
+            4 -> url = "http://www.mmonly.cc/mmtp"
         }
 
         //页面判断
@@ -346,11 +346,11 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
             currentPage = 1
             suffix = ""
         } else if (url.contains("192tt.com")) {
-            url ="http://www.192tt.com"
+            url = "http://www.192tt.com"
             suffix = "/listinfo-1-$page.html"
-            if (currentPage==2) currentPage++
-        }else if(url.contains("mmonly.cc")){
-            suffix ="/list_9_$page.html"
+            if (currentPage == 2) currentPage++
+        } else if (url.contains("mmonly.cc")) {
+            suffix = "/list_9_$page.html"
         }
 
         return url + suffix
@@ -364,7 +364,7 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
             1 -> JsoupUtil.mapJdlingyu(s, list)
             2 -> JsoupUtil.mapMzitu(s, list)
             3 -> JsoupUtil.map192TT(s, list)
-            4->JsoupUtil.mapMMonly(s,list)
+            4 -> JsoupUtil.mapMMonly(s, list)
         }
     }
 
@@ -398,9 +398,9 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
                     R.id.circle_menu_button_2 -> {
                         site = 1
                     }
-                    R.id.circle_menu_button_3 -> {
-                        site = 2
-                    }
+//                    R.id.circle_menu_button_3 -> {
+//                        site = 2
+//                    }
                     R.id.circle_menu_button_4 -> {
                         site = 3
                     }
@@ -417,8 +417,11 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
     }
 
     //扇形菜单按钮
-    var res = arrayOf(R.id.circle_menu_button_1, R.id.circle_menu_button_2,
-            R.id.circle_menu_button_3, R.id.circle_menu_button_4, R.id.circle_menu_button_5)
+    var res = arrayOf(R.id.circle_menu_button_1,
+            R.id.circle_menu_button_2,
+            //            R.id.circle_menu_button_3,
+            R.id.circle_menu_button_4,
+            R.id.circle_menu_button_5)
     var imageViews = ArrayList<ImageView>()
     //菜单是否展开的flag,false表示没展开
     var mFlag = false

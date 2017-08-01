@@ -7,6 +7,7 @@ import com.chad.library.adapter.base.BaseViewHolder
 import com.wongxd.absolutedomain.App
 import com.wongxd.absolutedomain.R
 import com.wongxd.absolutedomain.bean.SeeBigPicBean
+import com.wongxd.absolutedomain.util.GlideRoundTransform
 
 /**
  * Created by wxd1 on 2017/7/10.
@@ -21,6 +22,7 @@ class RvSeePicAdapter(val click: (SeeBigPicBean) -> Unit) : BaseQuickAdapter<Str
                     .crossFade(700)
                     .placeholder(R.drawable.placeholder)
                     .error(R.drawable.error)
+                    .transform(GlideRoundTransform(mContext,5))
                     .into(iv)
             itemView.setOnClickListener { click(SeeBigPicBean(helper.layoutPosition, getView(R.id.iv))) }
         }

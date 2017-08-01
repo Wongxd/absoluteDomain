@@ -48,7 +48,7 @@ class SeePicActivity : BaseSwipeActivity() {
 
 
         rv_see_pic.adapter = adpater
-        rv_see_pic.layoutManager = StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL)
+        rv_see_pic.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
                 .apply { this.gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE }
         rv_see_pic.itemAnimator = LandingAnimator()
         rv_see_pic.addItemDecoration(SGSpacingItemDecoration(3, DensityUtil.dp2px(4f)))
@@ -96,13 +96,14 @@ class SeePicActivity : BaseSwipeActivity() {
      * 不同网站 不同逻辑
      */
     private fun handleUrlLogic(url: String): ChildDetailBean? {
-        if (url.contains("jdlingyu.moe"))
+        com.orhanobut.logger.Logger.e(url)
+        if (url.contains("jdlingyu."))
             return JsoupUtil.getJdlingyuChildDetail(url)
-        else if (url.contains("mzitu.com"))
-            return JsoupUtil.getMeizituChildDetail(url)
-        else if (url.contains("192tt.com"))
+        else if (url.contains("mm131."))
+            return JsoupUtil.getMM131ChildDetail(url)
+        else if (url.contains("192tt."))
             return JsoupUtil.get192TTDetail(url)
-        else if (url.contains("mmonly.cc")){
+        else if (url.contains("mmonly.")){
             val title = intent.getStringExtra("title")
             return JsoupUtil.getMMonlyDetail(url,title)
         }

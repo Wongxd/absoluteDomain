@@ -37,6 +37,7 @@ import com.wongxd.absolutedomain.util.TU
 import com.wongxd.absolutedomain.util.cache.DataCleanManager
 import com.wongxd.absolutedomain.util.cache.GlideCatchUtil
 import com.wongxd.wthing_kotlin.database.*
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.annotations.NonNull
 import io.reactivex.functions.Consumer
@@ -47,6 +48,7 @@ import kotlinx.android.synthetic.main.aty_main.*
 import org.jetbrains.anko.db.insert
 import org.jetbrains.anko.db.select
 import org.jetbrains.anko.db.transaction
+import java.net.URL
 
 
 class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -228,7 +230,7 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
     fun doRefresh(page: Int = 1) {
         when (site) {
             1 -> tv_title.text = "绝对领域"
-            2 -> tv_title.text = "mm131"
+            2 -> tv_title.text = "keke1234"
             3 -> tv_title.text = "192tt"
             4 -> tv_title.text = "mmonly"
         }
@@ -237,8 +239,14 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
         val url = handleUrlogic(page)
         Logger.e(url)
         val apiStore = RetrofitUtils.getStringInstance().create(ApiStore::class.java)
-        apiStore.getString(url)
-                .subscribeOn(Schedulers.io())
+        val observalble: Observable<String>
+        if (url.contains("keke1234.")) {
+            observalble = Observable.create {
+                it.onNext(URL(url).readText(charset("GBK")))
+                it.onComplete()
+            }
+        } else observalble = apiStore.getString(url)
+        observalble.subscribeOn(Schedulers.io())
                 .map(Function<String, List<HomeListBean>> { s ->
                     val list = ArrayList<HomeListBean>()
                     //不同网站 不同的匹配规则
@@ -332,14 +340,15 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
 
         when (site) {
 
-        //mm131
-            2 -> url = "http://www.mm131.com"
+        //keke1234
+            2 -> url = "http://www.keke1234.net"
         //192tt
             3 -> url = "http://www.192tt.com/new"
 
             4 -> url = "http://www.mmonly.cc/mmtp"
         }
 
+        //www.keke1234.net/gaoqing/list_5_2.html
         //页面判断
         var suffix = "/page/$page"
         if (page == 1) {
@@ -351,6 +360,8 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
             if (currentPage == 2) currentPage++
         } else if (url.contains("mmonly.cc")) {
             suffix = "/list_9_$page.html"
+        } else if (url.contains("keke1234")) {
+            suffix = "/gaoqing/list_5_$page.html"
         }
 
         return url + suffix
@@ -362,7 +373,7 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
     private fun mapSpecificSite(s: String, list: ArrayList<HomeListBean>) {
         when (site) {
             1 -> JsoupUtil.mapJdlingyu(s, list)
-            2 -> JsoupUtil.mapMzitu(s, list)
+            2 -> JsoupUtil.mapkeke(s, list)
             3 -> JsoupUtil.map192TT(s, list)
             4 -> JsoupUtil.mapMMonly(s, list)
         }
@@ -398,9 +409,9 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
                     R.id.circle_menu_button_2 -> {
                         site = 1
                     }
-//                    R.id.circle_menu_button_3 -> {
-//                        site = 2
-//                    }
+                    R.id.circle_menu_button_3 -> {
+                        site = 2
+                    }
                     R.id.circle_menu_button_4 -> {
                         site = 3
                     }
@@ -419,7 +430,7 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
     //扇形菜单按钮
     var res = arrayOf(R.id.circle_menu_button_1,
             R.id.circle_menu_button_2,
-            //            R.id.circle_menu_button_3,
+            R.id.circle_menu_button_3,
             R.id.circle_menu_button_4,
             R.id.circle_menu_button_5)
     var imageViews = ArrayList<ImageView>()
@@ -433,8 +444,8 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
         for (i in res.indices) {
             if (i == 0) continue
             val set = AnimatorSet()
-            var x = -Math.cos(0.5 / (res.size - 2) * (i - 1) * Math.PI) * DensityUtil.dp2px(dp.toFloat())
-            var y = -Math.sin(0.5 / (res.size - 2) * (i - 1) * Math.PI) * DensityUtil.dp2px(dp.toFloat())
+            val x = -Math.cos(0.5 / (res.size - 2) * (i - 1) * Math.PI) * DensityUtil.dp2px(dp.toFloat())
+            val y = -Math.sin(0.5 / (res.size - 2) * (i - 1) * Math.PI) * DensityUtil.dp2px(dp.toFloat())
             set.playTogether(
                     ObjectAnimator.ofFloat(imageViews[i], "translationX", (x * 0.25).toFloat(), x.toFloat()),
                     ObjectAnimator.ofFloat(imageViews[i], "translationY", (y * 0.25).toFloat(), y.toFloat()),

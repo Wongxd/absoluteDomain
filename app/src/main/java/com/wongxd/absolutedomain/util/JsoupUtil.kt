@@ -58,6 +58,41 @@ object JsoupUtil {
     /***###############################################################一级页面###############################################################################**/
 
     /**
+     * 匹配 kek1234.net
+     */
+    fun mapkeke(s: String, list: ArrayList<HomeListBean>) {
+
+        val doc = Jsoup.parse(s)
+        val ul = doc.getElementById("msy")
+        val lis = ul.getElementsByTag("div")
+        var isFirst = true
+        for (element in lis) {
+            try {
+                if (isFirst) {
+                    isFirst = false
+                    continue
+                }
+                val preview: String? = element.getElementsByClass("img").first().attr("src")
+                val a = element.getElementsByClass("title").first().getElementsByTag("a").first()
+
+                val title = a.attr("title")
+
+                val imgUrl = a.attr("href")
+
+                val date = ""
+                val view = ""
+                val like = " "
+//                Logger.e("$preview    $title  $imgUrl  $date  $view")
+
+                list.add(HomeListBean(title, preview!!, imgUrl, date, view, like))
+            } catch(e: Exception) {
+                continue
+            }
+        }
+
+    }
+
+    /**
      * 匹配 Mzitu.com
      */
     fun mapMzitu(s: String, list: ArrayList<HomeListBean>) {
@@ -154,6 +189,66 @@ object JsoupUtil {
 
 
     /**#############################################################二级页面#############################################################################**/
+
+
+    /**
+     * 获取 keke1234 某个图集的详情
+     *
+     * @param url: 图集的url
+     *
+     */
+    fun getkeke1234ChildDetail(url: String): ChildDetailBean? {
+        if (TextUtils.isEmpty(url)) return null
+        var doc: Document? = null
+        var childList: ChildDetailBean? = null
+        val urls = ArrayList<String>()
+        try {
+
+            doc = Jsoup.parse(URL(url).readText(charset("GBK")))
+            val etTitle = doc!!.getElementsByClass("pageheader entrypage").first().getElementsByTag("h2")
+            val title = etTitle.text()
+
+
+            val div = doc.select(".page-list").first()
+            val ps = div.select("p")
+
+
+            ps.mapTo(urls) { it.getElementsByTag("img").first().attr("src") }
+
+            val page = doc.select(".page")
+            val current = page.select(".current").first().text()
+
+            getkeke1234Deep(url, current, urls)
+
+            childList = ChildDetailBean(title, urls)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        return childList
+    }
+
+    /**
+     * 获取 keke1234 某个图集的详情
+     */
+    private fun getkeke1234Deep(path: String, currentPage: String, urls: ArrayList<String>) {
+        val pageNo: Int = currentPage.toInt() + 1
+
+        val url = path.replace(".html", "") + "_$pageNo.html"
+
+        try {
+            val doc = Jsoup.parse(URL(url).readText(charset("GBK")))
+            val div = doc.select(".page-list").first()
+            val ps = div.select("p")
+            ps.mapTo(urls) { it.getElementsByTag("img").first().attr("src") }
+            val page = doc.select(".page")
+            val current = page.select(".current").first().text()
+            getkeke1234Deep(path, current, urls)
+        } catch(e: Exception) {
+            return
+        }
+
+    }
 
 
     /**

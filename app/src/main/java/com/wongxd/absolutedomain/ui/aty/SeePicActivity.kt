@@ -106,6 +106,8 @@ class SeePicActivity : BaseSwipeActivity() {
         else if (url.contains("mmonly.")){
             val title = intent.getStringExtra("title")
             return JsoupUtil.getMMonlyDetail(url,title)
+        }else  if (url.contains("keke1234.")){
+            return JsoupUtil.getkeke1234ChildDetail(url)
         }
         return null
     }

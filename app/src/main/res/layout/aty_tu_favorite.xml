@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -11,8 +10,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="?attr/content_board_background_color"
-        app:srlEnableRefresh="false"
-        app:srlEnableLoadmore="false">
+        app:srlEnableLoadmore="false"
+        app:srlEnableRefresh="false">
+
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rv_favorite"
@@ -33,7 +33,9 @@
     <RelativeLayout
         android:id="@+id/rl_top"
         android:layout_width="match_parent"
-        android:layout_height="40dp">
+        android:layout_height="40dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp">
 
         <TextView
             android:id="@+id/tv_title"
@@ -42,6 +44,26 @@
             android:gravity="center"
             android:text="图集收藏"
             android:textColor="?attr/colorPrimary" />
+
+
+        <TextView
+            android:visibility="gone"
+            android:id="@+id/tv_import"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="导入"
+            android:textColor="?attr/colorPrimary" />
+
+        <TextView
+            android:id="@+id/tv_export"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:gravity="center"
+            android:text="导出"
+            android:textColor="?attr/colorPrimary" />
+
     </RelativeLayout>
 
     <RelativeLayout

@@ -7,6 +7,7 @@ import com.wongxd.absolutedomain.bean.HomeListBean
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import java.net.URL
+import java.util.*
 
 object JsoupUtil {
 
@@ -228,7 +229,7 @@ object JsoupUtil {
             val a = es_item.getElementsByTag("a").first()
             val imgUrl = a.getElementsByTag("img").first().attr("src")
             val href = a.attr("href")
-            Logger.e("妹子图 img  "+imgUrl)
+            Logger.e("妹子图 img  " + imgUrl)
             urls.add(imgUrl)
             if (url.length <= href.length) getMeiziDeep(href, urls)
         } catch (e: Exception) {
@@ -279,7 +280,7 @@ object JsoupUtil {
             val a = es_item.getElementsByTag("a").first()
             val imgUrl = a.getElementsByTag("img").first().attr("src")
             val href = a.attr("href")
-            Logger.e("妹子图 img  "+imgUrl)
+            Logger.e("妹子图 img  " + imgUrl)
             urls.add(imgUrl)
             if (url.length <= href.length) getMeiziDeep(href, urls)
         } catch (e: Exception) {
@@ -343,7 +344,7 @@ object JsoupUtil {
             val doc = Jsoup.parse(URL(url).readText())
             val imgUrl = doc.select("#p > center > img").first().attr("lazysrc")
             urls.add(imgUrl)
-            var current = doc.select("#nownum").first().text().toInt()
+            val current = doc.select("#nownum").first().text().toInt()
             val total = doc.select("#allnum").first().text().toInt()
             if (current < total) {
                 JsoupUtil.get192TTDeep(tagUrl, current + 1, urls)
@@ -383,14 +384,15 @@ object JsoupUtil {
         var childList: ChildDetailBean? = null
         val urls = ArrayList<String>()
         try {
-            doc = Jsoup.parse(URL(url).readText())
-            val imgUrl = doc.select("#big-pic > p > a > img").first().attr("src")
-//            val title =  doc.select("#big-pic > p > a > img").first().attr("alt").toString()
+            val html = URL(url).readText(charset = charset("GBK"))
+            doc = Jsoup.parse(html)
+
+            val imgUrl = doc.select("#ArticleBox > p >a >img").first().attr("src")
             urls.add(imgUrl)
 
-            val current = doc.select("#picnum > span.nowpage").first().text().toInt()
-            val total = doc.select("#picnum  > span.totalpage").first().text().toInt()
-//            Logger.e("$title  $total")
+            val total = doc.select("#pageAll").text().toInt()
+            val current = doc.select("#thisclass").text().toInt()
+            Logger.e("$title  $total  $current  $tagUrl")
             if (current < total) {
                 JsoupUtil.getMMonlyDeep(tagUrl, current + 1, urls)
             }
@@ -408,20 +410,23 @@ object JsoupUtil {
     fun getMMonlyDeep(tagUrl: String, page: Int, urls: ArrayList<String>) {
         try {
             val url = "http://www.mmonly.cc" + tagUrl + "_$page.html"
-            val doc = Jsoup.parse(URL(url).readText())
-            val imgUrl = doc.select("#big-pic > p > a > img").first().attr("src")
+            val html = URL(url).readText(charset = charset("GBK"))
+            val doc = Jsoup.parse(html)
+            Logger.e("递归调用 $html ")
+            val imgUrl = doc.select("#ArticleBox > p >a >img").first().attr("src")
             urls.add(imgUrl)
-
-            val current = doc.select("#picnum > span.nowpage").first().text().toInt()
-            val total = doc.select("#picnum  > span.totalpage").first().text().toInt()
+            val total = doc.select("#pageAll").text().toInt()
+            val current = doc.select("#thisclass").text().toInt()
             if (current < total) {
                 JsoupUtil.getMMonlyDeep(tagUrl, current + 1, urls)
             }
-//            Logger.e("$imgUrl   $current  $total  $tagUrl")
+            Logger.e("$imgUrl   $current  $total  $tagUrl")
         } catch (e: Exception) {
             e.printStackTrace()
         }
 
     }
 
+
 }
+

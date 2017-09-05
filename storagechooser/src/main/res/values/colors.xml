@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#2d6c55</color>
+    <color name="colorPrimaryDark">#235644</color>
+    <color name="colorAccent">#ff9c40</color>
+
+    <color name="colorCyanListClick">#d6c8f5f3</color>
+    <color name="colorListDivider">#89606060</color>
+
+    <color name="pathLayoutBgColor">#70ffffff</color>
+    <color name="chevronBgColor">#50ffffff</color>
+    <color name="inactiveGradientColor">#53000000</color>
+
+    <!-- dialog colors -->
+    <color name="memory_status_color">#de6565</color>
+    <color name="memory_bar_color">#7bde65</color>
+    <color name="new_folder_color">#c14b84</color>
+    <color name="select_color">#6b3fa1</color>
+    <color name="cancel_color">#3fa19f</color>
+</resources>

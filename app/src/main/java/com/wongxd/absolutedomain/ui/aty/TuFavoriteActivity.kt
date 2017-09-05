@@ -1,5 +1,6 @@
 package com.wongxd.absolutedomain.ui.aty
 
+import android.app.AlertDialog
 import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
@@ -17,16 +18,15 @@ import com.wongxd.absolutedomain.base.rx.RxBus
 import com.wongxd.absolutedomain.base.rx.RxEventCodeType
 import com.wongxd.absolutedomain.util.StatusBarUtil
 import com.wongxd.partymanage.base.kotin.extension.loadImg
-import com.wongxd.wthing_kotlin.database.Tu
-import com.wongxd.wthing_kotlin.database.TuTable
-import com.wongxd.wthing_kotlin.database.parseList
-import com.wongxd.wthing_kotlin.database.tuDB
+import com.wongxd.wthing_kotlin.database.*
 import jp.wasabeef.recyclerview.animators.LandingAnimator
 import kotlinx.android.synthetic.main.aty_tu_favorite.*
+import org.jetbrains.anko.db.insert
 import org.jetbrains.anko.db.select
 import org.jetbrains.anko.db.transaction
+import org.jetbrains.anko.toast
+import org.json.JSONObject
 import java.io.File
-import java.io.FileOutputStream
 import java.util.*
 
 
@@ -40,7 +40,65 @@ class TuFavoriteActivity : BaseSwipeActivity() {
         StatusBarUtil.setPaddingSmart(this, realtime_blur)
         StatusBarUtil.setPaddingSmart(this, rl_top)
         initRecycle()
+        if (intent != null&& intent.action == Intent.ACTION_VIEW) {
+            AlertDialog.Builder(this).setMessage("需要从文件中增量还原吗？")
+                    .setPositiveButton("需要", { dialog, which -> dialog.dismiss();doRestore() })
+                    .setNeutralButton("不需要", { dialog, which -> dialog.dismiss(); initData() })
+                    .setCancelable(false)
+                    .show()
 
+        } else {
+            initData()
+        }
+
+        tv_export.setOnClickListener { exportToFile() }
+    }
+
+    /**
+     * 从备份文件中还原
+     */
+    private fun doRestore() {
+        val uri = intent.data
+        val path = uri.path
+        if (!path.endsWith(".jdly")) {
+            toast("不是一个正确的备份文件！")
+        } else {
+            val pb = ProgressDialog(this)
+            pb.setMessage("还原备份中")
+            pb.setProgressStyle(ProgressDialog.STYLE_SPINNER)
+            pb.show()
+            try {
+                val file = File(path)
+                val info = file.readText()
+                val json = JSONObject(info)
+                val list = json.optJSONArray("list")
+                var i = 0
+                val length = list.length()
+
+                while (i < length) {
+                    val obj = list.optJSONObject(i)
+                    val name = obj.optString("name")
+                    val adress = obj.optString("adress")
+                    val imgPath = obj.optString("imgPath")
+                    restoreToDB(name, adress, imgPath)
+                    i++
+                }
+                toast("增量还原成功！")
+            } catch(e: Exception) {
+                e.printStackTrace()
+                toast("备份文件损坏！")
+            } finally {
+                pb.dismiss()
+            }
+
+            initData()
+        }
+    }
+
+    /**
+     * 从数据库加载东西
+     */
+    private fun initData() {
         tuDB.use {
             val list = select(TuTable.TABLE_NAME).parseList { (Tu(HashMap(it))) }
             if (list.isNotEmpty()) {
@@ -49,94 +107,90 @@ class TuFavoriteActivity : BaseSwipeActivity() {
                 rl_empty.visibility = View.GONE
             }
         }
+    }
 
-//
-//        tv_import.setOnClickListener {
-//            // Initialize Builder
-//            val chooser = StorageChooser.Builder()
-//                    .withActivity(this@TuFavoriteActivity)
-//                    .withFragmentManager(fragmentManager)
-//                    .withMemoryBar(true)
-//                    .allowCustomPath(true)
-//                    .setType(StorageChooser.FILE_PICKER)
-//                    .build()
-//
-//            // Show dialog whenever you want by
-//            chooser.show()
-//
-//            // get path that the user has chosen
-//            chooser.setOnSelectListener {  StorageChooser.OnSelectListener { path ->
-//                run {
-//                    Log.e("SELECTED_PATH", path)
-//                    if (!path.endsWith(".txt")) {
-//                        toast("不是一个正确的备份文件！")
-//                        return@OnSelectListener
-//                    }
-//                    val file = File(path)
-//                    val s = file.readText()
-//                    val json = JSONObject(s)
-//                  Logger.e(json.toString())
-//
-//
-//                }
-//            }
-//            } }
-//
-//
-        tv_export.setOnClickListener { v ->
-            run {
-                val pb = ProgressDialog(this@TuFavoriteActivity)
-                pb.setMessage("导出中")
-                pb.setProgressStyle(ProgressDialog.STYLE_SPINNER)
-                pb.show()
-                Thread(Runnable {
+    /**
+     * 导出收藏到文件中
+     */
+    private fun exportToFile() {
+        val pb = ProgressDialog(this@TuFavoriteActivity)
+        pb.setMessage("导出中")
+        pb.setProgressStyle(ProgressDialog.STYLE_SPINNER)
+        pb.show()
+        Thread(Runnable {
 
-                    tuDB.use {
-                        val list = select(TuTable.TABLE_NAME).parseList { (Tu(HashMap(it))) }
-                        if (list.isNotEmpty()) {
+            tuDB.use {
+                val list = select(TuTable.TABLE_NAME).parseList { (Tu(HashMap(it))) }
+                if (list.isNotEmpty()) {
 
-//                            val json = Gson().toJson(list)
-//                            Logger.e(json)
-                            val sb = StringBuilder()
-                            sb.append("{\"list\":[")
+                    val sb = StringBuilder()
+                    sb.append("{\"list\":[")
+                    val length = list.size - 1
 
-                            for (item in list){
-                                sb.append("{\"name\":\"")
-                                sb.append(item.name)
-                                sb.append("\",")
+                    for (i in list.indices) {
+                        sb.append("{\"name\":\"")
+                        sb.append(list[i].name)
+                        sb.append("\",")
 
-                                sb.append("\"address\":\"")
-                                sb.append(item.address)
-                                sb.append("\",")
+                        sb.append("\"address\":\"")
+                        sb.append(list[i].address)
+                        sb.append("\",")
 
-                                sb.append("{\"imgPath\":\"")
-                                sb.append(item.imgPath)
-                                sb.append("\"},")
-                            }
-                            sb.append("]}")
-                            Logger.e(sb.toString())
-                            saveFile(sb.toString(), "收藏备份-")
-                          runOnUiThread {  if (pb.isShowing) pb.dismiss() }
+                        sb.append("\"imgPath\":\"")
+                        sb.append(list[i].imgPath)
+                        if (i == length) {
+                            sb.append("\"}")
                         } else {
-                            runOnUiThread {  if (pb.isShowing) pb.dismiss() }
+                            sb.append("\"},")
                         }
                     }
-                }).start()
+
+                    sb.append("]}")
+                    Logger.e(sb.toString())
+                    saveFile(sb.toString(), getString(R.string.app_name) + "-收藏备份")
+                    runOnUiThread { if (pb.isShowing) pb.dismiss() }
+                } else {
+                    runOnUiThread { if (pb.isShowing) pb.dismiss() }
+                }
+            }
+        }).start()
+    }
+
+
+    /**
+     * 还原单条数据
+     * @param adress
+     * @param name
+     */
+    fun restoreToDB(name: String, adress: String, imgPath: String) {
+        tuDB.use {
+            transaction {
+                val items = select(TuTable.TABLE_NAME).whereSimple(TuTable.ADDRESS + "=?", adress)
+                        .parseList({ Tu(HashMap(it)) })
+                if (items.isEmpty()) {  //如果是空的
+                    val tu = Tu()
+                    tu.address = adress
+                    tu.name = name
+                    tu.imgPath = imgPath
+                    insert(TuTable.TABLE_NAME, *tu.map.toVarargArray())
+                }
+
             }
         }
     }
 
     /**
      * @param content
+     *
      */
     fun saveFile(content: String, fileName: String) {
         var filePath: String? = null
         val hasSDCard = Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED
         if (hasSDCard) {
-            filePath = Environment.getExternalStorageDirectory().toString() + File.separator + "绝对领域W" + File.separator + fileName + ".txt"
+            filePath = Environment.getExternalStorageDirectory().toString() + File.separator + getString(R.string.app_name) + File.separator + fileName + ".jdly"
         } else
         // 系统下载缓存根目录的hello.text
-            filePath = Environment.getDownloadCacheDirectory().toString() + File.separator + "绝对领域W" + File.separator + fileName + ".txt"
+            filePath = Environment.getDownloadCacheDirectory().toString() + File.separator + getString(R.string.app_name) + File.separator + fileName + ".jdly"
 
         try {
             val file = File(filePath)
@@ -147,11 +201,11 @@ class TuFavoriteActivity : BaseSwipeActivity() {
             } else {
                 file.delete()
             }
-            val outStream = FileOutputStream(file)
-            outStream.write(content.toByteArray())
-            outStream.close()
+            file.writeText(content)
+            runOnUiThread { toast("导出成功！位于《 " + getString(R.string.app_name) + " 》文件夹下") }
         } catch (e: Exception) {
             e.printStackTrace()
+            runOnUiThread { toast("导出失败！") }
         }
 
     }

@@ -29,7 +29,14 @@
         <activity android:name=".ui.aty.ViewBigImageActivity" />
         <activity android:name=".base.BaseSwipeActivity" />
         <activity android:name=".ui.aty.ThemeActivity" />
-        <activity android:name=".ui.aty.TuFavoriteActivity"></activity>
+        <activity android:name=".ui.aty.TuFavoriteActivity">
+            <intent-filter>
+                <data android:mimeType="jdly/*" android:scheme="file"/>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

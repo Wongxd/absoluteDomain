@@ -10,7 +10,6 @@ import android.view.View
 import android.widget.ImageView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
-import com.google.gson.Gson
 import com.orhanobut.logger.Logger
 import com.wongxd.absolutedomain.R
 import com.wongxd.absolutedomain.base.BaseSwipeActivity
@@ -96,16 +95,30 @@ class TuFavoriteActivity : BaseSwipeActivity() {
                         val list = select(TuTable.TABLE_NAME).parseList { (Tu(HashMap(it))) }
                         if (list.isNotEmpty()) {
 
+//                            val json = Gson().toJson(list)
+//                            Logger.e(json)
                             val sb = StringBuilder()
                             sb.append("{\"list\":[")
-                            val json = Gson().toJson(list)
-                            Logger.e(json)
+
+                            for (item in list){
+                                sb.append("{\"name\":\"")
+                                sb.append(item.name)
+                                sb.append("\",")
+
+                                sb.append("\"address\":\"")
+                                sb.append(item.address)
+                                sb.append("\",")
+
+                                sb.append("{\"imgPath\":\"")
+                                sb.append(item.imgPath)
+                                sb.append("\"},")
+                            }
                             sb.append("]}")
                             Logger.e(sb.toString())
                             saveFile(sb.toString(), "收藏备份-")
-                            if (pb.isShowing) pb.dismiss()
+                          runOnUiThread {  if (pb.isShowing) pb.dismiss() }
                         } else {
-                            if (pb.isShowing) pb.dismiss()
+                            runOnUiThread {  if (pb.isShowing) pb.dismiss() }
                         }
                     }
                 }).start()
@@ -132,8 +145,7 @@ class TuFavoriteActivity : BaseSwipeActivity() {
                 dir.mkdirs()
                 file.createNewFile()
             } else {
-//                file.delete()
-                return
+                file.delete()
             }
             val outStream = FileOutputStream(file)
             outStream.write(content.toByteArray())

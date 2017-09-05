@@ -81,7 +81,7 @@ class TuFavoriteActivity : BaseSwipeActivity() {
                     val adress = obj.optString("address")
                     val imgPath = obj.optString("imgPath")
                     restoreToDB(name, adress, imgPath)
-                    Logger.e(i.toString() + " " + length +" $obj")
+                    Logger.e(i.toString() + " " + length + " $obj")
                     i++
                 }
 
@@ -224,17 +224,17 @@ class TuFavoriteActivity : BaseSwipeActivity() {
         }
 
         adpater?.setOnItemLongClickListener { adapter1, view1, position ->
-            //收藏
+
+            //删除收藏
+            var isDelete = 0
             adpater?.data?.let {
                 val item = it[position]
                 tuDB.use {
-                    transaction {
-                        delete(TuTable.TABLE_NAME, TuTable.ADDRESS + "=?", arrayOf(item.address))
-                        it.removeAt(position)
-                        adpater?.notifyItemRemoved(position)
-
-                    }
+                    isDelete = delete(TuTable.TABLE_NAME, TuTable.ADDRESS + "=?", arrayOf(item.address))
                 }
+            }
+            if (isDelete != 0) {
+                adpater?.notifyItemRemoved(position)
             }
 
             return@setOnItemLongClickListener true

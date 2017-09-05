@@ -40,7 +40,7 @@ class TuFavoriteActivity : BaseSwipeActivity() {
         StatusBarUtil.setPaddingSmart(this, realtime_blur)
         StatusBarUtil.setPaddingSmart(this, rl_top)
         initRecycle()
-        if (intent != null&& intent.action == Intent.ACTION_VIEW) {
+        if (intent != null && intent.action == Intent.ACTION_VIEW) {
             AlertDialog.Builder(this).setMessage("需要从文件中增量还原吗？")
                     .setPositiveButton("需要", { dialog, which -> dialog.dismiss();doRestore() })
                     .setNeutralButton("不需要", { dialog, which -> dialog.dismiss(); initData() })
@@ -78,11 +78,13 @@ class TuFavoriteActivity : BaseSwipeActivity() {
                 while (i < length) {
                     val obj = list.optJSONObject(i)
                     val name = obj.optString("name")
-                    val adress = obj.optString("adress")
+                    val adress = obj.optString("address")
                     val imgPath = obj.optString("imgPath")
                     restoreToDB(name, adress, imgPath)
+                    Logger.e(i.toString() + " " + length +" $obj")
                     i++
                 }
+
                 toast("增量还原成功！")
             } catch(e: Exception) {
                 e.printStackTrace()
@@ -174,7 +176,7 @@ class TuFavoriteActivity : BaseSwipeActivity() {
                     tu.imgPath = imgPath
                     insert(TuTable.TABLE_NAME, *tu.map.toVarargArray())
                 }
-
+                Logger.e("还原单条数据  $name  $adress  $imgPath ")
             }
         }
     }
@@ -228,7 +230,7 @@ class TuFavoriteActivity : BaseSwipeActivity() {
                 tuDB.use {
                     transaction {
                         delete(TuTable.TABLE_NAME, TuTable.ADDRESS + "=?", arrayOf(item.address))
-                        adpater?.data?.removeAt(position)
+                        it.removeAt(position)
                         adpater?.notifyItemRemoved(position)
 
                     }

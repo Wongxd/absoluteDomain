@@ -1,6 +1,8 @@
 package com.wongxd.absolutedomain
 
 import android.app.Application
+import com.orhanobut.logger.LogLevel
+import com.orhanobut.logger.Logger
 import com.wongxd.absolutedomain.base.exception.CrashHandler
 import com.wongxd.absolutedomain.util.TU
 import me.jessyan.progressmanager.ProgressManager
@@ -26,10 +28,13 @@ class App : Application() {
                 .build()
 
         TU.register(this)
-
-        CrashHandler.getInstance().init(this)
+        if (BuildConfig.LOG_DEBUG) {
+            Logger.init().logLevel(LogLevel.FULL)
+        } else {
+            CrashHandler.getInstance().init(this)
+            Logger.init().logLevel(LogLevel.NONE)
+        }
     }
-
 
 
     fun getOkHttpClient() = mOkHttpClient

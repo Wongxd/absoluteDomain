@@ -234,7 +234,14 @@ class TuFavoriteActivity : BaseSwipeActivity() {
                 }
             }
             if (isDelete != 0) {
-                adpater?.notifyItemRemoved(position)
+                 initData()
+//                adpater?.notifyDataSetChanged()
+//                var newPos = 0
+//                if (position!=0){
+//                    newPos = position - 1
+//
+//                }
+//                rv_favorite.smoothScrollToPosition(newPos)
             }
 
             return@setOnItemLongClickListener true
@@ -259,6 +266,11 @@ class TuFavoriteActivity : BaseSwipeActivity() {
             helper?.getView<ImageView>(R.id.iv)?.loadImg(item?.imgPath!!)
             helper?.setText(R.id.tv_title, item?.name)
             helper?.itemView?.setOnClickListener { click(item?.address!!) }
+        }
+
+        fun re(pos: Int) {
+            data.removeAt(pos)
+            notifyItemRemoved(pos)
         }
     }
 }

@@ -105,7 +105,11 @@ class TuFavoriteActivity : BaseSwipeActivity() {
             val list = select(TuTable.TABLE_NAME).parseList { (Tu(HashMap(it))) }
             if (list.isNotEmpty()) {
                 val tuList = list.sortedByDescending { it._id }
-                adpater?.setNewData(tuList)
+                val arrayList = ArrayList<Tu>()
+                for (i in tuList) {
+                    arrayList.add(i)
+                }
+                adpater?.setNewData(arrayList)
                 rl_empty.visibility = View.GONE
             }
         }
@@ -234,14 +238,7 @@ class TuFavoriteActivity : BaseSwipeActivity() {
                 }
             }
             if (isDelete != 0) {
-                 initData()
-//                adpater?.notifyDataSetChanged()
-//                var newPos = 0
-//                if (position!=0){
-//                    newPos = position - 1
-//
-//                }
-//                rv_favorite.smoothScrollToPosition(newPos)
+                adpater?.remove(position)
             }
 
             return@setOnItemLongClickListener true

@@ -39,7 +39,6 @@ class SeePicActivity : BaseSwipeActivity() {
         StatusBarUtil.setPaddingSmart(this, rv_see_pic)
         StatusBarUtil.setPaddingSmart(this, realtime_blur)
         StatusBarUtil.setMargin(this, fl_top)
-        StatusBarUtil.setMargin(this, findViewById(R.id.gifview))
         RxBus.getDefault().register(this)
         adpater = RvSeePicAdapter {
             ViewBigImageActivity.startActivity(this, it.position, adpater?.data as ArrayList<String>?, it.v)

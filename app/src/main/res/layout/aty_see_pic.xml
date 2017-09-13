@@ -14,8 +14,16 @@
         android:layout_height="match_parent"
         android:background="?attr/content_board_background_color"
         app:srlDragRate="0.7"
-        app:srlEnableHeaderTranslationContent="true"
-        app:srlEnableLoadmore="false">
+        app:srlEnableLoadmore="false"
+        app:srlHeaderHeight="120dp"
+        app:srlHeaderMaxDragRate="1.3">
+
+        <com.scwang.smartrefresh.layout.header.ClassicsHeader
+            android:id="@+id/classic_header"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="40dp"
+            app:srlClassicsSpinnerStyle="Translate" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rv_see_pic"

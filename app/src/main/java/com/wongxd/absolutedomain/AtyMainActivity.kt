@@ -8,6 +8,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.provider.Settings
 import android.support.design.widget.NavigationView
 import android.support.v7.app.AlertDialog
@@ -16,8 +17,10 @@ import android.view.MenuItem
 import android.view.View
 import android.view.animation.BounceInterpolator
 import android.widget.ImageView
+import android.widget.Toast
 import com.jude.swipbackhelper.SwipeBackHelper
 import com.orhanobut.logger.Logger
+import com.qihoo360.replugin.RePlugin
 import com.scwang.smartrefresh.layout.util.DensityUtil
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.wongxd.absolutedomain.Retrofit.ApiStore
@@ -48,6 +51,7 @@ import kotlinx.android.synthetic.main.aty_main.*
 import org.jetbrains.anko.db.insert
 import org.jetbrains.anko.db.select
 import org.jetbrains.anko.db.transaction
+import org.jetbrains.anko.toast
 import java.net.URL
 
 
@@ -55,14 +59,48 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.menu_theme -> startActivity(Intent(this, ThemeActivity::class.java))
-            R.id.menu_cache -> cacheThing()
-            R.id.menu_about -> showAbout()
+//            R.id.menu_cache -> cacheThing()
+//            R.id.menu_about -> showAbout()
+            R.id.menu_cache -> unInstallVideoPlugin()
+            R.id.menu_about -> loadVideoPlugin()
             R.id.menu_tu_favorite -> {
                 startActivity(Intent(this, TuFavoriteActivity::class.java))
             }
         }
         drawerlayout.postDelayed({ drawerlayout.closeDrawer(nav_aty_main) }, 500)
         return true
+    }
+
+    /**
+     * 加载视频播放插件
+     */
+    private fun loadVideoPlugin() {
+
+        if (RePlugin.isPluginInstalled("com.apkfuns.jsbridgesample")) {
+            RePlugin.startActivity(this@AtyMainActivity,
+                    RePlugin.createIntent("com.apkfuns.jsbridgesample", "com.wongxd.jsbridgesample.view.MainActivity"))
+        } else {
+            Toast.makeText(this@AtyMainActivity, "You must install wongxd_video first!", Toast.LENGTH_SHORT).show()
+
+            val path = Environment.getExternalStorageDirectory().path + "/" + packageName + "/plugin/" + "wongxd_plugin_js.apk"
+            val info = RePlugin.install(path)
+            if (info != null) {
+                Logger.e("插件名  " + info.name)
+                RePlugin.startActivity(this@AtyMainActivity,
+                        RePlugin.createIntent(info.name, "com.wongxd.jsbridgesample.view.MainActivity"))
+            } else {
+                Toast.makeText(this@AtyMainActivity, "install external plugin failed", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+
+    }
+
+
+    private fun unInstallVideoPlugin() {
+        val b = RePlugin.uninstall("com.apkfuns.jsbridgesample")
+        if (b) toast("插件卸载成功！")
+        else toast("插件卸载失败！")
     }
 
     /**
@@ -153,10 +191,10 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
                             tu.name = bean.title
                             tu.imgPath = bean.imgPath
                             insert(TuTable.TABLE_NAME, *tu.map.toVarargArray())
-                            adpater?.notifyItemChanged(position)
+                            adpater?.notifyItemChanged(position,position)
                         } else {
                             delete(TuTable.TABLE_NAME, TuTable.ADDRESS + "=?", arrayOf(bean.url))
-                            adpater?.notifyItemChanged(position)
+                            adpater?.notifyItemChanged(position,position)
                         }
                     }
                 }

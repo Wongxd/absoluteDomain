@@ -8,7 +8,6 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
 import android.provider.Settings
 import android.support.design.widget.NavigationView
 import android.support.v7.app.AlertDialog
@@ -17,10 +16,8 @@ import android.view.MenuItem
 import android.view.View
 import android.view.animation.BounceInterpolator
 import android.widget.ImageView
-import android.widget.Toast
 import com.jude.swipbackhelper.SwipeBackHelper
 import com.orhanobut.logger.Logger
-import com.qihoo360.replugin.RePlugin
 import com.scwang.smartrefresh.layout.util.DensityUtil
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.wongxd.absolutedomain.Retrofit.ApiStore
@@ -51,7 +48,6 @@ import kotlinx.android.synthetic.main.aty_main.*
 import org.jetbrains.anko.db.insert
 import org.jetbrains.anko.db.select
 import org.jetbrains.anko.db.transaction
-import org.jetbrains.anko.toast
 import java.net.URL
 
 
@@ -59,10 +55,10 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.menu_theme -> startActivity(Intent(this, ThemeActivity::class.java))
-//            R.id.menu_cache -> cacheThing()
-//            R.id.menu_about -> showAbout()
-            R.id.menu_cache -> unInstallVideoPlugin()
-            R.id.menu_about -> loadVideoPlugin()
+            R.id.menu_cache -> cacheThing()
+            R.id.menu_about -> showAbout()
+//            R.id.menu_cache -> unInstallVideoPlugin()
+//            R.id.menu_about -> loadVideoPlugin()
             R.id.menu_tu_favorite -> {
                 startActivity(Intent(this, TuFavoriteActivity::class.java))
             }
@@ -74,34 +70,34 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
     /**
      * 加载视频播放插件
      */
-    private fun loadVideoPlugin() {
-
-        if (RePlugin.isPluginInstalled("com.apkfuns.jsbridgesample")) {
-            RePlugin.startActivity(this@AtyMainActivity,
-                    RePlugin.createIntent("com.apkfuns.jsbridgesample", "com.wongxd.jsbridgesample.view.MainActivity"))
-        } else {
-            Toast.makeText(this@AtyMainActivity, "You must install wongxd_video first!", Toast.LENGTH_SHORT).show()
-
-            val path = Environment.getExternalStorageDirectory().path + "/" + packageName + "/plugin/" + "wongxd_plugin_js.apk"
-            val info = RePlugin.install(path)
-            if (info != null) {
-                Logger.e("插件名  " + info.name)
-                RePlugin.startActivity(this@AtyMainActivity,
-                        RePlugin.createIntent(info.name, "com.wongxd.jsbridgesample.view.MainActivity"))
-            } else {
-                Toast.makeText(this@AtyMainActivity, "install external plugin failed", Toast.LENGTH_SHORT).show()
-            }
-        }
-
-
-    }
-
-
-    private fun unInstallVideoPlugin() {
-        val b = RePlugin.uninstall("com.apkfuns.jsbridgesample")
-        if (b) toast("插件卸载成功！")
-        else toast("插件卸载失败！")
-    }
+//    private fun loadVideoPlugin() {
+//
+//        if (RePlugin.isPluginInstalled("com.apkfuns.jsbridgesample")) {
+//            RePlugin.startActivity(this@AtyMainActivity,
+//                    RePlugin.createIntent("com.apkfuns.jsbridgesample", "com.wongxd.jsbridgesample.view.MainActivity"))
+//        } else {
+//            Toast.makeText(this@AtyMainActivity, "You must install wongxd_video first!", Toast.LENGTH_SHORT).show()
+//
+//            val path = Environment.getExternalStorageDirectory().path + "/" + packageName + "/plugin/" + "wongxd_plugin_js.apk"
+//            val info = RePlugin.install(path)
+//            if (info != null) {
+//                Logger.e("插件名  " + info.name)
+//                RePlugin.startActivity(this@AtyMainActivity,
+//                        RePlugin.createIntent(info.name, "com.wongxd.jsbridgesample.view.MainActivity"))
+//            } else {
+//                Toast.makeText(this@AtyMainActivity, "install external plugin failed", Toast.LENGTH_SHORT).show()
+//            }
+//        }
+//
+//
+//    }
+//
+//
+//    private fun unInstallVideoPlugin() {
+//        val b = RePlugin.uninstall("com.apkfuns.jsbridgesample")
+//        if (b) toast("插件卸载成功！")
+//        else toast("插件卸载失败！")
+//    }
 
     /**
      * 缓存
@@ -191,10 +187,10 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
                             tu.name = bean.title
                             tu.imgPath = bean.imgPath
                             insert(TuTable.TABLE_NAME, *tu.map.toVarargArray())
-                            adpater?.notifyItemChanged(position,position)
+                            adpater?.notifyItemChanged(position,1)
                         } else {
                             delete(TuTable.TABLE_NAME, TuTable.ADDRESS + "=?", arrayOf(bean.url))
-                            adpater?.notifyItemChanged(position,position)
+                            adpater?.notifyItemChanged(position,1)
                         }
                     }
                 }
@@ -268,7 +264,7 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
     fun doRefresh(page: Int = 1) {
         when (site) {
             1 -> tv_title.text = "绝对领域"
-            2 -> tv_title.text = "keke1234"
+            2 -> tv_title.text = "keke123"
             3 -> tv_title.text = "192tt"
             4 -> tv_title.text = "mmonly"
         }
@@ -278,7 +274,7 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
         Logger.e(url)
         val apiStore = RetrofitUtils.getStringInstance().create(ApiStore::class.java)
         val observalble: Observable<String>
-        if (url.contains("keke1234.")) {
+        if (url.contains("keke123.")) {
             observalble = Observable.create {
                 it.onNext(URL(url).readText(charset("GBK")))
                 it.onComplete()
@@ -320,73 +316,25 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
                 })
     }
 
-//    fun doRefresh(page: Int = 1) {
-//        when (site) {
-//            1 -> tv_title.text = "绝对领域"
-//            2 -> tv_title.text = "妹子图"
-//            3 -> tv_title.text = "192TT"
-//            4 -> tv_title.text = "4--后续添加"
-//        }
-//        //不同网站，不同url
-//        val url = handleUrlogic(page)
-//
-//        when (site) {
-//            1 -> JsoupUtil.mapJdlingyu(url)
-//            2 -> JsoupUtil.mapMzitu(url)
-//            3 -> JsoupUtil.map192TT(url)
-//        }
-//        val observable = object : Observable<List<HomeListBean>>() {
-//            override fun subscribeActual(observer: Observer<in List<HomeListBean>>) {
-//
-//            }
-//        }
-//        observable.observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(object : Consumer<List<HomeListBean>> {
-//                    @Throws(Exception::class)
-//                    override fun accept(@NonNull t: List<HomeListBean>) {
-//                        if (t.isNotEmpty()) currentPage++
-//                        rl_empty.visibility = View.GONE
-//                        if (page == 1) {
-//                            smartLayout.finishRefresh()
-//                            adpater?.setNewData(t)
-//                        } else {
-//                            smartLayout.finishLoadmore()
-//                            adpater?.addData(t)
-//                        }
-//
-//                        if (adpater?.data?.size == 0 || adpater?.data == null) {
-//                            rl_empty.visibility = View.VISIBLE
-//                        }
-//
-//                    }
-//                }, Consumer<Throwable> {
-//                    TU.cT(it.message.toString() + " ")
-//                    if (page == 1) smartLayout.finishRefresh()
-//                    else smartLayout.finishLoadmore()
-//                    if (adpater?.data?.size == 0 || adpater?.data == null) {
-//                        rl_empty.visibility = View.VISIBLE
-//                    }
-//                })
-//    }
 
     /**
      * 不同网站 不同地址
      */
     private fun handleUrlogic(page: Int): String {
 
-        var url = "http://www.jdlingyu.wang"
+        var url = "http://www.jdlingyu.xyz"
 
         when (site) {
 
-        //keke1234
-            2 -> url = "http://www.keke1234.net"
+        //keke123
+            2 -> url = "http://www.keke123.cc"
         //192tt
             3 -> url = "http://www.192tt.com/new"
 
             4 -> url = "http://www.mmonly.cc/mmtp"
         }
 
-        //www.keke1234.net/gaoqing/list_5_2.html
+        //www.keke123.cc/gaoqing/list_5_2.html
         //页面判断
         var suffix = "/page/$page"
         if (page == 1) {
@@ -398,7 +346,7 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
             if (currentPage == 2) currentPage++
         } else if (url.contains("mmonly.cc")) {
             suffix = "/list_9_$page.html"
-        } else if (url.contains("keke1234")) {
+        } else if (url.contains("keke123")) {
             suffix = "/gaoqing/list_5_$page.html"
         }
 

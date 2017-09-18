@@ -41,7 +41,7 @@ class RvHomeAdapter(val click: (HomeListBean) -> Unit) : BaseQuickAdapter<HomeLi
     }
 
     override fun onBindViewHolder(holder: BaseViewHolder?, position: Int, payloads: MutableList<Any>?) {
-        onBindViewHolder(holder, position)
+         onBindViewHolder(holder,position)
     }
 
 }

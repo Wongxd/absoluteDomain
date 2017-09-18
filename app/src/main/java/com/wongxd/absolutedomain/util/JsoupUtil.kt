@@ -192,7 +192,7 @@ object JsoupUtil {
 
 
     /**
-     * 获取 keke1234 某个图集的详情
+     * 获取 keke123 某个图集的详情
      *
      * @param url: 图集的url
      *
@@ -229,7 +229,7 @@ object JsoupUtil {
     }
 
     /**
-     * 获取 keke1234 某个图集的详情
+     * 获取 keke123 某个图集的详情
      */
     private fun getkeke1234Deep(path: String, currentPage: String, urls: ArrayList<String>) {
         val pageNo: Int = currentPage.toInt() + 1

@@ -9,8 +9,8 @@ import java.util.*
  */
 
 
-data class HomeListBean(val title: String, val imgPath: String, val url: String, val date: String, val view: String, val like: String)
-    : Serializable
+data class HomeListBean(val title: String, val imgPath: String, val url: String, val date: String, val view: String,
+                        val like: String) : Serializable
 
 data class ChildDetailBean(val title: String, val list: List<String>) : Serializable
 

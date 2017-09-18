@@ -12,6 +12,6 @@ fun ImageView.loadImg(imgPath: Any) {
     Glide.with(context.applicationContext).load(imgPath)
             .placeholder(R.drawable.placeholder)
             .error(R.drawable.error)
-            .crossFade(700)
+            .crossFade(500)
             .into(this)
 }

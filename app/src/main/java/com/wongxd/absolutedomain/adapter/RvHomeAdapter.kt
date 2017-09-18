@@ -27,21 +27,21 @@ class RvHomeAdapter(val click: (HomeListBean) -> Unit) : BaseQuickAdapter<HomeLi
                     .setText(R.id.tv_like, item.like + "次喜欢")
                     .setVisible(R.id.tv_like, false)
             getView<ImageView>(R.id.iv).loadImg(item.imgPath)
+
             mContext.tuDB.use {
-                val list = select(TuTable.TABLE_NAME).whereSimple(TuTable.ADDRESS + "=?", item.url)
-                        .parseList { Tu(HashMap(it)) }
+                val list = select(TuTable.TABLE_NAME).whereSimple(TuTable.ADDRESS + "=?", item.url).parseList { Tu(HashMap(it)) }
                 if (list.isNotEmpty())
                     helper.getView<TextView>(R.id.tv_title).setBackgroundColor(Color.parseColor("#f97198"))
                 else
                     helper.getView<TextView>(R.id.tv_title).setBackgroundColor(Color.WHITE)
             }
-//            Logger.e("标题 "+item.title +" 时间 "+item.date +" 浏览 "+item.view+" 喜欢 "+item.like+" 图片地址 "+item.imgPath)
+
             itemView.setOnClickListener { click(item) }
         }
     }
 
     override fun onBindViewHolder(holder: BaseViewHolder?, position: Int, payloads: MutableList<Any>?) {
-         onBindViewHolder(holder,position)
+        onBindViewHolder(holder,position)
     }
 
 }

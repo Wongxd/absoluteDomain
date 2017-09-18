@@ -70,7 +70,7 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
     /**
      * 加载视频播放插件
      */
-//    private fun loadVideoPlugin() {
+    //    private fun loadVideoPlugin() {
 //
 //        if (RePlugin.isPluginInstalled("com.apkfuns.jsbridgesample")) {
 //            RePlugin.startActivity(this@AtyMainActivity,
@@ -187,10 +187,10 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
                             tu.name = bean.title
                             tu.imgPath = bean.imgPath
                             insert(TuTable.TABLE_NAME, *tu.map.toVarargArray())
-                            adpater?.notifyItemChanged(position,1)
+                            adpater?.notifyItemChanged(position, "1")
                         } else {
                             delete(TuTable.TABLE_NAME, TuTable.ADDRESS + "=?", arrayOf(bean.url))
-                            adpater?.notifyItemChanged(position,1)
+                            adpater?.notifyItemChanged(position, "1")
                         }
                     }
                 }
@@ -291,7 +291,9 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
                 .subscribe(object : Consumer<List<HomeListBean>> {
                     @Throws(Exception::class)
                     override fun accept(@NonNull t: List<HomeListBean>) {
-                        if (t.isNotEmpty()) currentPage++
+                        if (t.isNotEmpty()) {
+                            currentPage++
+                        }
                         rl_empty.visibility = View.GONE
                         if (page == 1) {
                             smartLayout.finishRefresh()
@@ -306,7 +308,8 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
                         }
 
                     }
-                }, Consumer<Throwable> {
+                }, Consumer<Throwable>
+                {
                     TU.cT(it.message.toString() + " ")
                     if (page == 1) smartLayout.finishRefresh()
                     else smartLayout.finishLoadmore()
@@ -365,7 +368,7 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
         }
     }
 
-    @Subscribe(code = RxEventCodeType.SYNC_FAVORITE)
+    @Subscribe (code = RxEventCodeType.SYNC_FAVORITE)
     fun syncFavorite(p: String) {
         adpater?.notifyDataSetChanged()
     }

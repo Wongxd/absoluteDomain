@@ -13,12 +13,6 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         renderscriptSupportModeEnabled true
     }
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
 
     sourceSets {
         main {
@@ -43,6 +37,7 @@ android {
 
     buildTypes {
         release {
+//            shrinkResources true
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             // 不显示Log
@@ -58,7 +53,7 @@ android {
 }
 
 // ATTENTION!!! Must be PLACED AFTER "android{}" to read the applicationId
-apply plugin: 'replugin-host-gradle'
+//apply plugin: 'replugin-host-gradle'
 /**
  * 配置项均为可选配置，默认无需添加
  * 更多可选配置项参见replugin-host-gradle的RepluginConfig类
@@ -82,7 +77,7 @@ apply plugin: 'replugin-host-gradle'
 
 
 dependencies {
-    compile 'com.qihoo360.replugin:replugin-host-lib:2.2.0'
+//    compile 'com.qihoo360.replugin:replugin-host-lib:2.2.0'
 
     //    compile fileTree(include: ['*.jar'], dir: 'libs')
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {

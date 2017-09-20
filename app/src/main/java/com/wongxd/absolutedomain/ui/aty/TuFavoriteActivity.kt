@@ -105,11 +105,7 @@ class TuFavoriteActivity : BaseSwipeActivity() {
             val list = select(TuTable.TABLE_NAME).parseList { (Tu(HashMap(it))) }
             if (list.isNotEmpty()) {
                 val tuList = list.sortedByDescending { it._id }
-                val arrayList = ArrayList<Tu>()
-                for (i in tuList) {
-                    arrayList.add(i)
-                }
-                adpater?.setNewData(arrayList)
+                adpater?.setNewData(tuList.toMutableList())
                 rl_empty.visibility = View.GONE
             }
         }

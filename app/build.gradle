@@ -8,8 +8,8 @@ android {
         applicationId "com.wongxd.absolutedomain"
         minSdkVersion 19
         targetSdkVersion 25
-        versionCode 6
-        versionName "1.0.4"
+        versionCode 7
+        versionName "1.0.5"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         renderscriptSupportModeEnabled true
     }
@@ -27,7 +27,7 @@ android {
     signingConfigs {
         //在这里配置相关的签名信息
         keyStore {
-            storeFile file("wongxd.jks")
+            storeFile file("../../wongxd.jks")
             storePassword "wxd258032"
             keyAlias "wongxd"
             keyPassword "wxd258032"

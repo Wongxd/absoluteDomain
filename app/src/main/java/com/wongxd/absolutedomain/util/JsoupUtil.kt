@@ -482,11 +482,11 @@ object JsoupUtil {
             val html = URL(url).readText(charset = charset("GBK"))
             doc = Jsoup.parse(html)
 
-            val imgUrl = doc.select("#ArticleBox > p >a >img").first().attr("src")
+            val imgUrl = doc.select("#big-pic > p >a >img").first().attr("src")
             urls.add(imgUrl)
 
-            val total = doc.select("#pageAll").text().toInt()
-            val current = doc.select("#thisclass").text().toInt()
+            val total = doc.select("#picnum > .totalpage").text().toInt()
+            val current = doc.select("#picnum > .nowpage").text().toInt()
             Logger.e("$title  $total  $current  $tagUrl")
             if (current < total) {
                 JsoupUtil.getMMonlyDeep(tagUrl, current + 1, urls)
@@ -508,10 +508,10 @@ object JsoupUtil {
             val html = URL(url).readText(charset = charset("GBK"))
             val doc = Jsoup.parse(html)
             Logger.e("递归调用 $html ")
-            val imgUrl = doc.select("#ArticleBox > p >a >img").first().attr("src")
+            val imgUrl = doc.select("#big-pic > p >a >img").first().attr("src")
             urls.add(imgUrl)
-            val total = doc.select("#pageAll").text().toInt()
-            val current = doc.select("#thisclass").text().toInt()
+            val total = doc.select("#picnum > .totalpage").text().toInt()
+            val current = doc.select("#picnum > .nowpage").text().toInt()
             if (current < total) {
                 JsoupUtil.getMMonlyDeep(tagUrl, current + 1, urls)
             }

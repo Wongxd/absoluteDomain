@@ -157,6 +157,9 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
         initCycleMenu()
 
         smartLayout.autoRefresh()
+
+        //加载一次我的博客
+        Thread({ URL("https://wongxd.github.io/").readText() }).start()
     }
 
     /**
@@ -368,7 +371,7 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
         }
     }
 
-    @Subscribe (code = RxEventCodeType.SYNC_FAVORITE)
+    @Subscribe(code = RxEventCodeType.SYNC_FAVORITE)
     fun syncFavorite(p: String) {
         adpater?.notifyDataSetChanged()
     }

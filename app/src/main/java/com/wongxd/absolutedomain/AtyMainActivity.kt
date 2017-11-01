@@ -2,8 +2,6 @@ package com.wongxd.absolutedomain
 
 
 import android.Manifest
-import android.animation.AnimatorSet
-import android.animation.ObjectAnimator
 import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
@@ -14,11 +12,8 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.widget.GridLayoutManager
 import android.view.MenuItem
 import android.view.View
-import android.view.animation.BounceInterpolator
-import android.widget.ImageView
 import com.jude.swipbackhelper.SwipeBackHelper
 import com.orhanobut.logger.Logger
-import com.scwang.smartrefresh.layout.util.DensityUtil
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.wongxd.absolutedomain.Retrofit.ApiStore
 import com.wongxd.absolutedomain.Retrofit.RetrofitUtils
@@ -148,13 +143,12 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
                 .setSwipeBackEnable(false)
                 .setSwipeRelateEnable(true)
 
-        iv_menu.setOnClickListener { drawerlayout.openDrawer(nav_aty_main) }
 
         nav_aty_main.setNavigationItemSelectedListener(this)
 
         initRecycle()
         initPermission()
-        initCycleMenu()
+
 
         smartLayout.autoRefresh()
 
@@ -384,109 +378,7 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
 
     var site = 1
 
-    fun initCycleMenu() {
 
-        for (i in res) {
-            val iv = findViewById(i) as ImageView
-            imageViews.add(iv)
-            iv.setOnClickListener {
-                when (it.id) {
-                    R.id.circle_menu_button_1 -> {
-                        if (mFlag)
-                            showExitAnim()
-                        else
-                            showEnterAnim()
-                    }
-
-                    R.id.circle_menu_button_2 -> {
-                        site = 1
-                    }
-                    R.id.circle_menu_button_3 -> {
-                        site = 2
-                    }
-                    R.id.circle_menu_button_4 -> {
-                        site = 3
-                    }
-                    R.id.circle_menu_button_5 -> {
-                        site = 4
-                    }
-                }
-                if (it.id != R.id.circle_menu_button_1) {
-                    showExitAnim()
-                    smartLayout.autoRefresh()
-                }
-            }
-        }
-    }
-
-    //扇形菜单按钮
-    var res = arrayOf(R.id.circle_menu_button_1,
-            R.id.circle_menu_button_2,
-            R.id.circle_menu_button_3,
-            R.id.circle_menu_button_4,
-            R.id.circle_menu_button_5)
-    var imageViews = ArrayList<ImageView>()
-    //菜单是否展开的flag,false表示没展开
-    var mFlag = false
-
-    //显示扇形菜单的属性动画
-    //100为扇形半径dp值
-    fun showEnterAnim(dp: Int = 100) {
-        //for循环来开始小图标的出现动画
-        for (i in res.indices) {
-            if (i == 0) continue
-            val set = AnimatorSet()
-            val x = -Math.cos(0.5 / (res.size - 2) * (i - 1) * Math.PI) * DensityUtil.dp2px(dp.toFloat())
-            val y = -Math.sin(0.5 / (res.size - 2) * (i - 1) * Math.PI) * DensityUtil.dp2px(dp.toFloat())
-            set.playTogether(
-                    ObjectAnimator.ofFloat(imageViews[i], "translationX", (x * 0.25).toFloat(), x.toFloat()),
-                    ObjectAnimator.ofFloat(imageViews[i], "translationY", (y * 0.25).toFloat(), y.toFloat()),
-                    ObjectAnimator.ofFloat(imageViews[i], "alpha", 0f, 1f).setDuration(2000)
-            )
-            set.interpolator = BounceInterpolator()
-            set.setDuration(500).startDelay = (100 * i).toLong()
-            set.start()
-        }
-
-
-        //转动加号大图标本身45°
-        val rotate: ObjectAnimator = ObjectAnimator.ofFloat(imageViews[0], "rotation", 0f, -45f).setDuration(300)
-        rotate.interpolator = BounceInterpolator()
-        rotate.start()
-
-
-        //菜单状态置打开
-        mFlag = true
-    }
-
-    //100为扇形半径dp值
-    //隐藏扇形菜单的属性动画
-    fun showExitAnim(dp: Int = 100) {
-        //for循环来开始小图标的隐藏动画
-        for (i in res.indices) {
-            if (i == 0) continue
-            val set = AnimatorSet()
-            val x = -Math.cos(0.5 / (res.size - 2) * (i - 1) * Math.PI) * DensityUtil.dp2px(dp.toFloat())
-            val y = -Math.sin(0.5 / (res.size - 2) * (i - 1) * Math.PI) * DensityUtil.dp2px(dp.toFloat())
-            set.playTogether(
-                    ObjectAnimator.ofFloat(imageViews[i], "translationX", x.toFloat(), (x * 0.25).toFloat()),
-                    ObjectAnimator.ofFloat(imageViews[i], "translationY", y.toFloat(), (y * 0.25).toFloat()),
-                    ObjectAnimator.ofFloat(imageViews[i], "alpha", 1f, 0f).setDuration(2000)
-            )
-            set.interpolator = BounceInterpolator()
-            set.setDuration(200).startDelay = (50 * i).toLong()
-            set.start()
-        }
-
-
-        //转动加号大图标本身45°
-        val rotate: ObjectAnimator = ObjectAnimator.ofFloat(imageViews[0], "rotation", -45f, 0f).setDuration(300)
-        rotate.start()
-
-
-        //菜单状态置关闭
-        mFlag = false
-    }
 
 
 }

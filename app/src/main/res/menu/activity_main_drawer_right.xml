@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:menuCategory="container">
+        <item
+            android:id="@+id/menu_tu_favorite"
+            android:icon="@drawable/menu_tu_favorit"
+            android:title="收藏图集" />
+
+        <item
+            android:id="@+id/menu_theme"
+            android:icon="@drawable/menu_theme"
+            android:title="换肤" />
+        <item
+            android:id="@+id/menu_cache"
+            android:icon="@drawable/clean_cache"
+            android:title="查看缓存" />
+
+        <item
+            android:id="@+id/menu_about"
+            android:icon="@drawable/about"
+            android:title="关于" />
+    </group>
+</menu>

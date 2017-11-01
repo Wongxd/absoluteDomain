@@ -10,6 +10,7 @@
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
     <ImageView
+        android:scaleX="-1.0"
         android:id="@+id/iv_header"
         android:layout_width="80dp"
         android:layout_height="80dp"
@@ -17,7 +18,8 @@
         android:src="@drawable/icon" />
 
     <TextView
-        android:paddingLeft="10dp"
+        android:gravity="end"
+        android:paddingRight="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="15dp"

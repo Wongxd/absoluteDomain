@@ -2,22 +2,26 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group android:menuCategory="container">
         <item
-            android:id="@+id/menu_tu_favorite"
-            android:icon="@drawable/menu_tu_favorit"
-            android:title="收藏图集" />
+            android:id="@+id/menu_jdlingyu"
+            android:icon="@drawable/menu_cicle_jdlingyu"
+            android:title="jdlingyu" />
 
         <item
-            android:id="@+id/menu_theme"
-            android:icon="@drawable/menu_theme"
-            android:title="换肤" />
+            android:id="@+id/menu_keke123"
+            android:icon="@drawable/menu_cicle_keke1234"
+            android:title="keke123" />
         <item
-            android:id="@+id/menu_cache"
-            android:icon="@drawable/clean_cache"
-            android:title="查看缓存" />
+            android:id="@+id/menu_192tt"
+            android:icon="@drawable/menu_circle_192tt"
+            android:title="192tt" />
 
         <item
-            android:id="@+id/menu_about"
-            android:icon="@drawable/about"
-            android:title="关于" />
+            android:id="@+id/menu_mmonly"
+            android:icon="@drawable/menu_circle_mmonly"
+            android:title="mmonly" />
+        <item
+            android:id="@+id/menu_nvshens"
+            android:icon="@drawable/menu_cicle_nvshens"
+            android:title="nvshens" />
     </group>
 </menu>

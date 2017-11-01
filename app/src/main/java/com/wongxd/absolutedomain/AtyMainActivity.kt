@@ -57,8 +57,24 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
             R.id.menu_tu_favorite -> {
                 startActivity(Intent(this, TuFavoriteActivity::class.java))
             }
+
+        //右边
+            R.id.menu_jdlingyu -> site = 1
+            R.id.menu_keke123 -> site = 2
+            R.id.menu_192tt -> site = 3
+            R.id.menu_mmonly -> site = 4
+            R.id.menu_nvshens -> site = 5
+
+
         }
-        drawerlayout.postDelayed({ drawerlayout.closeDrawer(nav_aty_main) }, 500)
+        drawerlayout.postDelayed({
+            if (drawerlayout.isDrawerOpen(nav_aty_main))
+                drawerlayout.closeDrawer(nav_aty_main)
+            if (drawerlayout.isDrawerOpen(nav_aty_main_right)) {
+                smartLayout.autoRefresh()
+                drawerlayout.closeDrawer(nav_aty_main_right)
+            }
+        }, 500)
         return true
     }
 
@@ -125,6 +141,7 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
 
     var adpater: RvHomeAdapter? = null
 
+    var site = 1 //当前站点标记
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -145,6 +162,7 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
 
 
         nav_aty_main.setNavigationItemSelectedListener(this)
+        nav_aty_main_right.setNavigationItemSelectedListener(this)
 
         initRecycle()
         initPermission()
@@ -153,7 +171,12 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
         smartLayout.autoRefresh()
 
         //加载一次我的博客
-        Thread({ URL("https://wongxd.github.io/").readText() }).start()
+        val apiStore = RetrofitUtils.getStringInstance().create(ApiStore::class.java)
+        apiStore.getString("https://wongxd.github.io")
+                .subscribeOn(Schedulers.io())
+                .subscribe()
+
+
     }
 
     /**
@@ -260,10 +283,11 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
 
     fun doRefresh(page: Int = 1) {
         when (site) {
-            1 -> tv_title.text = "绝对领域"
+            1 -> tv_title.text = "jdlingyu"
             2 -> tv_title.text = "keke123"
             3 -> tv_title.text = "192tt"
             4 -> tv_title.text = "mmonly"
+            5 -> tv_title.text = "nvshens"
         }
 
         //不同网站，不同url
@@ -332,6 +356,8 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
             3 -> url = "http://www.192tt.com/new"
 
             4 -> url = "http://www.mmonly.cc/mmtp"
+
+            5 -> url = "https://www.nvshens.com/gallery"
         }
 
         //www.keke123.cc/gaoqing/list_5_2.html
@@ -348,6 +374,8 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
             suffix = "/list_9_$page.html"
         } else if (url.contains("keke123")) {
             suffix = "/gaoqing/list_5_$page.html"
+        } else if (url.contains("nvshens.com")) {
+            suffix = "/$page.html"
         }
 
         return url + suffix
@@ -362,6 +390,9 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
             2 -> JsoupUtil.mapkeke(s, list)
             3 -> JsoupUtil.map192TT(s, list)
             4 -> JsoupUtil.mapMMonly(s, list)
+            5 -> JsoupUtil.mapNvShens(s, list)
+
+
         }
     }
 
@@ -374,11 +405,6 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
         RxBus.getDefault().unRegister(this)
         super.onDestroy()
     }
-
-
-    var site = 1
-
-
 
 
 }

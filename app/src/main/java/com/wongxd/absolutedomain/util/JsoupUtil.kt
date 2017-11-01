@@ -2,12 +2,13 @@ package com.wongxd.absolutedomain.util
 
 import android.text.TextUtils
 import com.orhanobut.logger.Logger
+import com.wongxd.absolutedomain.Retrofit.ApiStore
+import com.wongxd.absolutedomain.Retrofit.RetrofitUtils
 import com.wongxd.absolutedomain.bean.ChildDetailBean
 import com.wongxd.absolutedomain.bean.HomeListBean
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import java.net.URL
-import java.util.*
 
 object JsoupUtil {
 
@@ -85,7 +86,7 @@ object JsoupUtil {
 //                Logger.e("$preview    $title  $imgUrl  $date  $view")
 
                 list.add(HomeListBean(title, preview!!, imgUrl, date, view, like))
-            } catch(e: Exception) {
+            } catch (e: Exception) {
                 continue
             }
         }
@@ -188,6 +189,37 @@ object JsoupUtil {
     }
 
 
+    /**
+     * https://www.nvshens.com/gallery/
+     *
+     * nvshens 图集列表
+     */
+    fun mapNvShens(s: String, list: ArrayList<HomeListBean>) {
+
+        val doc = Jsoup.parse(s)
+
+        val select = doc.select("div.entry_box_arena > div.box_entry > div.post_entry > div#listdiv.listdiv > ul > li")
+
+        Logger.e(select.toString())
+
+        for (i in select) {
+
+            val element = i.select("a").first()
+
+            val date = ""
+            val preview = element.select("img").attr("data-original")
+
+            val url = "https://www.nvshens.com" + element.attr("href")
+
+            val description = element.select("img").attr("alt")
+
+            list.add(HomeListBean(description, preview, url, date, "", ""))
+//            Logger.e("女神 $preview   $url  $description")
+        }
+
+    }
+
+
     /**#############################################################二级页面#############################################################################**/
 
 
@@ -244,7 +276,7 @@ object JsoupUtil {
             val page = doc.select(".page")
             val current = page.select(".current").first().text()
             getkeke1234Deep(path, current, urls)
-        } catch(e: Exception) {
+        } catch (e: Exception) {
             return
         }
 
@@ -516,6 +548,93 @@ object JsoupUtil {
                 JsoupUtil.getMMonlyDeep(tagUrl, current + 1, urls)
             }
             Logger.e("$imgUrl   $current  $total  $tagUrl")
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+    }
+
+
+    /**
+     * 获取 nvshens 某个图集的详情
+     *
+     * @param url: 图集的url
+     *
+     */
+    fun getNvShensChildDetail(urlOrigin: String): ChildDetailBean? {
+        if (TextUtils.isEmpty(urlOrigin)) return null
+        var url = urlOrigin
+        var tagUrl = ""
+        tagUrl = url.replace(".html", "").replace("https://www.nvshens.com/g/", "")
+
+
+        var doc: Document? = null
+        var childList: ChildDetailBean? = null
+        val urls = ArrayList<String>()
+        try {
+            val apiStore = RetrofitUtils.getStringInstance().create(ApiStore::class.java)
+            apiStore.getString(url).subscribe({
+                doc = Jsoup.parse(it)
+            })
+
+            if (doc == null) return null
+
+
+
+            val imgs = doc!!.getElementById("hgallery").getElementsByTag("img")
+
+            val title = doc!!.getElementById("htilte").text()
+
+            Logger.e(imgs.toString())
+
+            imgs.mapTo(urls) { it.attr("src") }
+
+
+            val pages = doc!!.getElementById("pages")
+            var current = pages.getElementsByTag("span").text().toInt()
+
+            val listA = pages.getElementsByTag("a")
+            val total = listA[listA.size - 2].text().toInt()
+
+            Logger.e("total $total  current $current")
+
+            if (current < total) {
+                JsoupUtil.getNvShensDeep(tagUrl, current + 1,total, urls)
+            }
+            childList = ChildDetailBean(title, urls)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        return childList
+    }
+
+    /**
+     * nvshens 递归调用 爬取
+     */
+    fun getNvShensDeep(tagUrl: String, page: Int,total: Int, urls: ArrayList<String>) {
+        try {
+            val url = "https://www.nvshens.com/g/" + tagUrl + "_$page.html"
+            var doc: Document? = null
+            val apiStore = RetrofitUtils.getStringInstance().create(ApiStore::class.java)
+            apiStore.getString(url).subscribe({
+                doc = Jsoup.parse(it)
+            })
+
+
+            val imgs = doc!!.getElementById("hgallery").getElementsByTag("img")
+
+            Logger.e(imgs.toString())
+
+            imgs.mapTo(urls) { it.attr("src") }
+
+
+
+
+            if (page < total) {
+                JsoupUtil.getNvShensDeep(tagUrl, page + 1,total, urls)
+            }
+            Logger.e("   $page  $total  $tagUrl")
         } catch (e: Exception) {
             e.printStackTrace()
         }

@@ -5,6 +5,7 @@ import android.os.SystemClock
 import android.support.v7.widget.StaggeredGridLayoutManager
 import android.text.TextUtils
 import android.view.View
+import com.orhanobut.logger.Logger
 import com.scwang.smartrefresh.layout.util.DensityUtil
 import com.wongxd.absolutedomain.R
 import com.wongxd.absolutedomain.adapter.RvSeePicAdapter
@@ -26,7 +27,7 @@ import org.jetbrains.anko.db.select
 import org.jetbrains.anko.db.transaction
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
-import java.util.*
+
 
 class SeePicActivity : BaseSwipeActivity() {
 
@@ -95,18 +96,20 @@ class SeePicActivity : BaseSwipeActivity() {
      * 不同网站 不同逻辑
      */
     private fun handleUrlLogic(url: String): ChildDetailBean? {
-        com.orhanobut.logger.Logger.e(url)
+        Logger.e(url)
         if (url.contains("jdlingyu."))
             return JsoupUtil.getJdlingyuChildDetail(url)
         else if (url.contains("mm131."))
             return JsoupUtil.getMM131ChildDetail(url)
         else if (url.contains("192tt."))
             return JsoupUtil.get192TTDetail(url)
-        else if (url.contains("mmonly.")){
+        else if (url.contains("mmonly.")) {
             val title = intent.getStringExtra("title")
-            return JsoupUtil.getMMonlyDetail(url,title)
-        }else  if (url.contains("keke123.")){
+            return JsoupUtil.getMMonlyDetail(url, title)
+        } else if (url.contains("keke123.")) {
             return JsoupUtil.getkeke1234ChildDetail(url)
+        } else if (url.contains("nvshens.")) {
+            return JsoupUtil.getNvShensChildDetail(url)
         }
         return null
     }

@@ -300,6 +300,11 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
                 it.onNext(URL(url).readText(charset("GBK")))
                 it.onComplete()
             }
+        } else if (url.contains("mmonly.")) {
+            observalble = Observable.create {
+                it.onNext(URL(url).readText(charset("GBK")))
+                it.onComplete()
+            }
         } else observalble = apiStore.getString(url)
         observalble.subscribeOn(Schedulers.io())
                 .map(Function<String, List<HomeListBean>> { s ->

@@ -32,6 +32,7 @@ import com.wongxd.absolutedomain.base.rx.RxBus
 import com.wongxd.absolutedomain.base.rx.RxEventCodeType
 import com.wongxd.absolutedomain.util.TU
 import com.wongxd.absolutedomain.widget.pinchImageview.PinchImageView
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Consumer
 import me.jessyan.progressmanager.ProgressListener
@@ -207,11 +208,11 @@ class ViewBigImageActivity : BaseSwipeActivity(), ViewPager.OnPageChangeListener
         ProgressManager.getInstance().addResponseListener(url, object : ProgressListener {
             override fun onProgress(progressInfo: ProgressInfo?) {
 
-                RxBus.getDefault().post(position, progressInfo?.percent)
-                if(progressInfo?.isFinish!!) {
+                if (progressInfo?.isFinish!!) {
                     RxBus.getDefault().post(position, -1)
                     disposeMap[position]?.dispose()
-                }
+                } else
+                    RxBus.getDefault().post(position, progressInfo?.percent)
             }
 
             override fun onError(id: Long, e: Exception?) {
@@ -244,11 +245,13 @@ class ViewBigImageActivity : BaseSwipeActivity(), ViewPager.OnPageChangeListener
             //进度相关
             addProgressListener(position, adapter_image_Entity)
 
-            val dis = RxBus.getDefault().toObservable(position, Integer::class.java).subscribe(Consumer {
-                if (it.toInt() == -1) {
-                    spinner.visibility = View.GONE
-                } else spinner.progress = it.toInt()
-            })
+            val dis = RxBus.getDefault().toObservable(position, Integer::class.java)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(Consumer {
+                        if (it.toInt() == -1) {
+                            spinner.visibility = View.GONE
+                        } else spinner.progress = it.toInt()
+                    })
             disposeMap.put(position, dis)
 
             Glide.with(this@ViewBigImageActivity)

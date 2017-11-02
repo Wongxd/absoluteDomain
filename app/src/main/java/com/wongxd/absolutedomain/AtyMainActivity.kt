@@ -172,9 +172,11 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
 
         //加载一次我的博客
         val apiStore = RetrofitUtils.getStringInstance().create(ApiStore::class.java)
-        apiStore.getString("https://wongxd.github.io")
+        apiStore.getString("https://wongxd.github.io/tags/android/")
                 .subscribeOn(Schedulers.io())
-                .subscribe()
+                .subscribe({
+                    Logger.e("加载博客 ${it.substring(0,10)}")
+                })
 
 
     }

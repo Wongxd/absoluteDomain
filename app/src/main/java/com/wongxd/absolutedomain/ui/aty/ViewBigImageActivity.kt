@@ -208,15 +208,13 @@ class ViewBigImageActivity : BaseSwipeActivity(), ViewPager.OnPageChangeListener
         ProgressManager.getInstance().addResponseListener(url, object : ProgressListener {
             override fun onProgress(progressInfo: ProgressInfo?) {
 
-                if (progressInfo?.isFinish!!) {
-                    RxBus.getDefault().post(position, -1)
+                if (progressInfo?.isFinish!!)
                     disposeMap[position]?.dispose()
-                } else
+                else
                     RxBus.getDefault().post(position, progressInfo?.percent)
             }
 
             override fun onError(id: Long, e: Exception?) {
-                RxBus.getDefault().post(position, -1)
                 disposeMap[position]?.dispose()
             }
         })
@@ -248,9 +246,7 @@ class ViewBigImageActivity : BaseSwipeActivity(), ViewPager.OnPageChangeListener
             val dis = RxBus.getDefault().toObservable(position, Integer::class.java)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(Consumer {
-                        if (it.toInt() == -1) {
-                            spinner.visibility = View.GONE
-                        } else spinner.progress = it.toInt()
+                        spinner.progress = it.toInt()
                     })
             disposeMap.put(position, dis)
 

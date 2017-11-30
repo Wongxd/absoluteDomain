@@ -38,7 +38,6 @@ class SeePicActivity : BaseSwipeActivity() {
         //状态栏透明和间距处理
         StatusBarUtil.immersive(this)
         StatusBarUtil.setPaddingSmart(this, rv_see_pic)
-        StatusBarUtil.setPaddingSmart(this, realtime_blur)
         StatusBarUtil.setMargin(this, fl_top)
         RxBus.getDefault().register(this)
         adpater = RvSeePicAdapter {

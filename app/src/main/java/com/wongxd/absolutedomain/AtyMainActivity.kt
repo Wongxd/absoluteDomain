@@ -8,227 +8,107 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.support.design.widget.NavigationView
+import android.support.design.widget.TabLayout
 import android.support.v7.app.AlertDialog
-import android.support.v7.widget.GridLayoutManager
 import android.view.MenuItem
-import android.view.View
 import com.jude.swipbackhelper.SwipeBackHelper
 import com.orhanobut.logger.Logger
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.wongxd.absolutedomain.Retrofit.ApiStore
 import com.wongxd.absolutedomain.Retrofit.RetrofitUtils
-import com.wongxd.absolutedomain.adapter.RvHomeAdapter
 import com.wongxd.absolutedomain.base.BaseSwipeActivity
 import com.wongxd.absolutedomain.base.rx.RxBus
 import com.wongxd.absolutedomain.base.rx.RxEventCodeType
-import com.wongxd.absolutedomain.base.rx.Subscribe
-import com.wongxd.absolutedomain.bean.HomeListBean
-import com.wongxd.absolutedomain.ui.aty.SeePicActivity
+import com.wongxd.absolutedomain.bean.TypeBean
+import com.wongxd.absolutedomain.fgt.BaseTypeFragment
+import com.wongxd.absolutedomain.fgt.jdlingyu.JdlingyuFgt
+import com.wongxd.absolutedomain.fgt.keke123.KeKe123Fgt
+import com.wongxd.absolutedomain.fgt.mmonly.MMonlyFgt
+import com.wongxd.absolutedomain.fgt.nvshens.NvshensFgt
+import com.wongxd.absolutedomain.fgt.t192tt.t192ttFgt
 import com.wongxd.absolutedomain.ui.aty.ThemeActivity
 import com.wongxd.absolutedomain.ui.aty.TuFavoriteActivity
-import com.wongxd.absolutedomain.util.JsoupUtil
-import com.wongxd.absolutedomain.util.StatusBarUtil
 import com.wongxd.absolutedomain.util.TU
 import com.wongxd.absolutedomain.util.cache.DataCleanManager
 import com.wongxd.absolutedomain.util.cache.GlideCatchUtil
-import com.wongxd.wthing_kotlin.database.*
-import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.annotations.NonNull
-import io.reactivex.functions.Consumer
-import io.reactivex.functions.Function
 import io.reactivex.schedulers.Schedulers
-import jp.wasabeef.recyclerview.animators.LandingAnimator
 import kotlinx.android.synthetic.main.aty_main.*
-import org.jetbrains.anko.db.insert
-import org.jetbrains.anko.db.select
-import org.jetbrains.anko.db.transaction
 import java.net.URL
 
 
 class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSelectedListener {
+
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.menu_theme -> startActivity(Intent(this, ThemeActivity::class.java))
             R.id.menu_cache -> cacheThing()
             R.id.menu_about -> showAbout()
-//            R.id.menu_cache -> unInstallVideoPlugin()
-//            R.id.menu_about -> loadVideoPlugin()
-            R.id.menu_tu_favorite -> {
-                startActivity(Intent(this, TuFavoriteActivity::class.java))
-            }
+            R.id.menu_tu_favorite -> startActivity(Intent(this, TuFavoriteActivity::class.java))
+
 
         //右边
-            R.id.menu_jdlingyu -> site = 1
-            R.id.menu_keke123 -> site = 2
-            R.id.menu_192tt -> site = 3
-            R.id.menu_mmonly -> site = 4
-            R.id.menu_nvshens -> site = 5
+            R.id.menu_jdlingyu -> switchSite(1)
+            R.id.menu_keke123 -> switchSite(2)
+            R.id.menu_192tt -> switchSite(3)
+//            R.id.menu_mmonly -> switchSite(4)
+            R.id.menu_nvshens -> switchSite(5)
 
 
         }
+
+
         drawerlayout.postDelayed({
             if (drawerlayout.isDrawerOpen(nav_aty_main))
                 drawerlayout.closeDrawer(nav_aty_main)
             if (drawerlayout.isDrawerOpen(nav_aty_main_right)) {
-                smartLayout.autoRefresh()
                 drawerlayout.closeDrawer(nav_aty_main_right)
             }
         }, 500)
+
         return true
     }
 
-    /**
-     * 加载视频播放插件
-     */
-    //    private fun loadVideoPlugin() {
-//
-//        if (RePlugin.isPluginInstalled("com.apkfuns.jsbridgesample")) {
-//            RePlugin.startActivity(this@AtyMainActivity,
-//                    RePlugin.createIntent("com.apkfuns.jsbridgesample", "com.wongxd.jsbridgesample.view.MainActivity"))
-//        } else {
-//            Toast.makeText(this@AtyMainActivity, "You must install wongxd_video first!", Toast.LENGTH_SHORT).show()
-//
-//            val path = Environment.getExternalStorageDirectory().path + "/" + packageName + "/plugin/" + "wongxd_plugin_js.apk"
-//            val info = RePlugin.install(path)
-//            if (info != null) {
-//                Logger.e("插件名  " + info.name)
-//                RePlugin.startActivity(this@AtyMainActivity,
-//                        RePlugin.createIntent(info.name, "com.wongxd.jsbridgesample.view.MainActivity"))
-//            } else {
-//                Toast.makeText(this@AtyMainActivity, "install external plugin failed", Toast.LENGTH_SHORT).show()
-//            }
-//        }
-//
-//
-//    }
-//
-//
-//    private fun unInstallVideoPlugin() {
-//        val b = RePlugin.uninstall("com.apkfuns.jsbridgesample")
-//        if (b) toast("插件卸载成功！")
-//        else toast("插件卸载失败！")
-//    }
 
-    /**
-     * 缓存
-     */
-    private fun cacheThing() {
-        val imgCache = GlideCatchUtil.getInstance().cacheSize
-        val totalCache = DataCleanManager.getTotalCacheSize(applicationContext)
-        AlertDialog.Builder(this)
-                .setTitle("缓存信息")
-                .setMessage("图片缓存: $imgCache \n全部缓存: $totalCache")
-                .setNeutralButton("清除全部缓存", object : DialogInterface.OnClickListener {
-                    override fun onClick(dialog: DialogInterface?, which: Int) {
-                        DataCleanManager.clearAllCache(applicationContext)
-                        dialog?.dismiss()
-                    }
+    private lateinit var currentFgt: BaseTypeFragment
 
-                })
-                .setNegativeButton("清除图片缓存", object : DialogInterface.OnClickListener {
-                    override fun onClick(dialog: DialogInterface?, which: Int) {
-                        GlideCatchUtil.getInstance().clearCacheDiskSelf()
-                        dialog?.dismiss()
-                    }
+    private fun switchSite(flag: Int) {
 
-                })
-                .create()
-                .show()
-    }
+        currentFgt.onDestroyView()
+        currentFgt.onDetach()
 
-    var currentPage = 1
+        when (flag) {
+            1 -> {
+                tv_title.text = "jdlingyu"
+                currentTypeList = JdlingyuFgt.typeList
+                currentFgt = JdlingyuFgt()
+            }
+            2 -> {
+                tv_title.text = "keke123"
+                currentTypeList = KeKe123Fgt.typeList
+                currentFgt = KeKe123Fgt()
+            }
+            3 -> {
+                tv_title.text = "192tt"
+                currentTypeList = t192ttFgt.typeList
+                currentFgt = t192ttFgt()
+            }
+            4 -> {
 
-    var adpater: RvHomeAdapter? = null
-
-    var site = 1 //当前站点标记
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.aty_main)
-
-        RxBus.getDefault().register(this)
-        //状态栏透明和间距处理
-        StatusBarUtil.immersive(this)
-        StatusBarUtil.setPaddingSmart(this, rv_main)
-        StatusBarUtil.setPaddingSmart(this, realtime_blur)
-        StatusBarUtil.setMargin(this, findViewById(R.id.fl_top))
-        StatusBarUtil.setMargin(this, findViewById(R.id.classic_header))
-
-
-        SwipeBackHelper.getCurrentPage(this)
-                .setSwipeBackEnable(false)
-                .setSwipeRelateEnable(true)
-
-
-        nav_aty_main.setNavigationItemSelectedListener(this)
-        nav_aty_main_right.setNavigationItemSelectedListener(this)
-
-        initRecycle()
-        initPermission()
-
-
-        smartLayout.autoRefresh()
-
-        //加载一次我的博客
-        val apiStore = RetrofitUtils.getStringInstance().create(ApiStore::class.java)
-        apiStore.getString("https://wongxd.github.io/tags/android/")
-                .subscribeOn(Schedulers.io())
-                .subscribe({
-                    Logger.e("加载博客 ${it.substring(0,10)}")
-                })
-
-
-    }
-
-    /**
-     * recycleView and smartRefreshLayout
-     */
-    private fun initRecycle() {
-        adpater = RvHomeAdapter {
-            val intent = Intent(this, SeePicActivity::class.java)
-            intent.putExtra("url", it.url)
-            intent.putExtra("imgPath", it.imgPath)
-            intent.putExtra("title", it.title)
-            startActivity(intent)
-        }
-        adpater?.setEnableLoadMore(false)
-
-        adpater?.setOnItemLongClickListener { adapter1, view1, position ->
-            //收藏
-            adpater?.data?.let {
-                val bean = it[position]
-                tuDB.use {
-                    transaction {
-                        val items = select(TuTable.TABLE_NAME).whereSimple(TuTable.ADDRESS + "=?", bean.url)
-                                .parseList({ Tu(HashMap(it)) })
-
-                        if (items.isEmpty()) {  //如果是空的
-                            val tu = Tu()
-                            tu.address = bean.url
-                            tu.name = bean.title
-                            tu.imgPath = bean.imgPath
-                            insert(TuTable.TABLE_NAME, *tu.map.toVarargArray())
-                            adpater?.notifyItemChanged(position, "1")
-                        } else {
-                            delete(TuTable.TABLE_NAME, TuTable.ADDRESS + "=?", arrayOf(bean.url))
-                            adpater?.notifyItemChanged(position, "1")
-                        }
-                    }
-                }
+                tv_title.text = "mmonly"
+                currentTypeList = MMonlyFgt.typeList
+                currentFgt = MMonlyFgt()
+            }
+            5 -> {
+                tv_title.text = "nvshens"
+                currentTypeList = NvshensFgt.typeList
+                currentFgt = NvshensFgt()
             }
 
-            return@setOnItemLongClickListener true
         }
 
-
-
-        rv_main.adapter = adpater
-        rv_main.itemAnimator = LandingAnimator()
-        rv_main.layoutManager = GridLayoutManager(applicationContext, 2)
-
-        smartLayout.setOnRefreshListener { doRefresh() }
-        smartLayout.setOnLoadmoreListener { doLoadMore(currentPage) }
+        initTablayout()
+        supportFragmentManager.beginTransaction().replace(R.id.fl_container_aty_main, currentFgt)
+                .commitNow()
     }
 
     private fun eMailMe() {
@@ -279,138 +159,122 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
                 }
     }
 
-    fun doLoadMore(page: Int) {
-        doRefresh(page)
-    }
-
-    fun doRefresh(page: Int = 1) {
-        when (site) {
-            1 -> tv_title.text = "jdlingyu"
-            2 -> tv_title.text = "keke123"
-            3 -> tv_title.text = "192tt"
-            4 -> tv_title.text = "mmonly"
-            5 -> tv_title.text = "nvshens"
-        }
-
-        //不同网站，不同url
-        val url = handleUrlogic(page)
-        Logger.e(url)
-        val apiStore = RetrofitUtils.getStringInstance().create(ApiStore::class.java)
-        val observalble: Observable<String>
-        if (url.contains("keke123.")) {
-            observalble = Observable.create {
-                it.onNext(URL(url).readText(charset("GBK")))
-                it.onComplete()
-            }
-        } else if (url.contains("mmonly.")) {
-            observalble = Observable.create {
-                it.onNext(URL(url).readText(charset("GBK")))
-                it.onComplete()
-            }
-        } else observalble = apiStore.getString(url)
-        observalble.subscribeOn(Schedulers.io())
-                .map(Function<String, List<HomeListBean>> { s ->
-                    val list = ArrayList<HomeListBean>()
-                    //不同网站 不同的匹配规则
-                    mapSpecificSite(s, list)
-                    list
-                })
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Consumer<List<HomeListBean>> {
-                    @Throws(Exception::class)
-                    override fun accept(@NonNull t: List<HomeListBean>) {
-                        if (t.isNotEmpty()) {
-                            currentPage++
-                        }
-                        rl_empty.visibility = View.GONE
-                        if (page == 1) {
-                            smartLayout.finishRefresh()
-                            adpater?.setNewData(t)
-                        } else {
-                            smartLayout.finishLoadmore()
-                            adpater?.addData(t)
-                        }
-
-                        if (adpater?.data?.size == 0 || adpater?.data == null) {
-                            rl_empty.visibility = View.VISIBLE
-                        }
-
-                    }
-                }, Consumer<Throwable>
-                {
-                    TU.cT(it.message.toString() + " ")
-                    if (page == 1) smartLayout.finishRefresh()
-                    else smartLayout.finishLoadmore()
-                    if (adpater?.data?.size == 0 || adpater?.data == null) {
-                        rl_empty.visibility = View.VISIBLE
-                    }
-                })
-    }
-
-
     /**
-     * 不同网站 不同地址
+     * 缓存
      */
-    private fun handleUrlogic(page: Int): String {
+    private fun cacheThing() {
+        val imgCache = GlideCatchUtil.getInstance().cacheSize
+        val totalCache = DataCleanManager.getTotalCacheSize(applicationContext)
+        AlertDialog.Builder(this)
+                .setTitle("缓存信息")
+                .setMessage("图片缓存: $imgCache \n全部缓存: $totalCache")
+                .setNeutralButton("清除全部缓存", object : DialogInterface.OnClickListener {
+                    override fun onClick(dialog: DialogInterface?, which: Int) {
+                        DataCleanManager.clearAllCache(applicationContext)
+                        dialog?.dismiss()
+                    }
 
-        var url = "http://www.jdlingyu.xyz"
+                })
+                .setNegativeButton("清除图片缓存", object : DialogInterface.OnClickListener {
+                    override fun onClick(dialog: DialogInterface?, which: Int) {
+                        GlideCatchUtil.getInstance().clearCacheDiskSelf()
+                        dialog?.dismiss()
+                    }
 
-        when (site) {
-
-        //keke123
-            2 -> url = "http://www.keke123.cc"
-        //192tt
-            3 -> url = "http://www.192tt.com/new"
-
-            4 -> url = "http://www.mmonly.cc/mmtp"
-
-            5 -> url = "https://www.nvshens.com/gallery"
-        }
-
-        //www.keke123.cc/gaoqing/list_5_2.html
-        //页面判断
-        var suffix = "/page/$page"
-        if (page == 1) {
-            currentPage = 1
-            suffix = ""
-        } else if (url.contains("192tt.com")) {
-            url = "http://www.192tt.com"
-            suffix = "/listinfo-1-$page.html"
-            if (currentPage == 2) currentPage++
-        } else if (url.contains("mmonly.cc")) {
-            suffix = "/list_9_$page.html"
-        } else if (url.contains("keke123")) {
-            suffix = "/gaoqing/list_5_$page.html"
-        } else if (url.contains("nvshens.com")) {
-            suffix = "/$page.html"
-        }
-
-        return url + suffix
+                })
+                .create()
+                .show()
     }
 
-    /**
-     * 特定的匹配规则 获取列表
-     */
-    private fun mapSpecificSite(s: String, list: ArrayList<HomeListBean>) {
-        when (site) {
-            1 -> JsoupUtil.mapJdlingyu(s, list)
-            2 -> JsoupUtil.mapkeke(s, list)
-            3 -> JsoupUtil.map192TT(s, list)
-            4 -> JsoupUtil.mapMMonly(s, list)
-            5 -> JsoupUtil.mapNvShens(s, list)
-
-
-        }
-    }
-
-    @Subscribe(code = RxEventCodeType.SYNC_FAVORITE)
-    fun syncFavorite(p: String) {
-        adpater?.notifyDataSetChanged()
-    }
 
     override fun onDestroy() {
+        currentFgt.onDestroy()
         RxBus.getDefault().unRegister(this)
         super.onDestroy()
+    }
+
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.aty_main)
+
+        RxBus.getDefault().register(this)
+        //状态栏透明和间距处理
+
+
+        SwipeBackHelper.getCurrentPage(this)
+                .setSwipeBackEnable(false)
+                .setSwipeRelateEnable(true)
+
+        tv_menu_aty_main.setOnClickListener {
+            if (drawerlayout.isDrawerOpen(nav_aty_main))
+                drawerlayout.closeDrawer(nav_aty_main)
+            else
+                drawerlayout.openDrawer(nav_aty_main)
+        }
+
+
+        tv_switch_aty_main.setOnClickListener {
+            if (drawerlayout.isDrawerOpen(nav_aty_main_right))
+                drawerlayout.closeDrawer(nav_aty_main_right)
+            else
+                drawerlayout.openDrawer(nav_aty_main_right)
+
+        }
+
+
+        nav_aty_main.setNavigationItemSelectedListener(this)
+        nav_aty_main_right.setNavigationItemSelectedListener(this)
+
+        initPermission()
+
+        //加载一次我的博客
+        val apiStore = RetrofitUtils.getStringInstance().create(ApiStore::class.java)
+        apiStore.getString("https://wongxd.github.io/")
+                .subscribeOn(Schedulers.io())
+                .subscribe({
+                    Logger.e("加载博客 ${it.substring(0, 100)}")
+                })
+
+
+        Thread({ URL("https://wongxd.github.io").readText() }).start()
+
+        currentTypeList = JdlingyuFgt.typeList
+        initTablayout()
+        currentFgt = JdlingyuFgt()
+        supportFragmentManager.beginTransaction().replace(R.id.fl_container_aty_main, currentFgt)
+                .commit()
+
+
+    }
+
+
+    lateinit var currentTypeList: ArrayList<TypeBean>
+
+    fun initTablayout() {
+        tablayout_main.removeAllTabs()
+        for (t in currentTypeList) {
+            val tab = tablayout_main.newTab()
+            tab.text = t.title
+            tab.tag = t.url
+
+            tablayout_main.addTab(tab)
+        }
+
+        tablayout_main.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+            }
+
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                val url = tab?.tag as String
+                RxBus.getDefault().post(RxEventCodeType.SITE_SWITCH, url)
+//                Logger.e("发送具体分类的url地址--$url")
+            }
+
+        })
     }
 
 

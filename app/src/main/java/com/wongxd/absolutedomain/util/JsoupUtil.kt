@@ -194,11 +194,43 @@ object JsoupUtil {
      *
      * nvshens 图集列表
      */
+    fun mapNvShensNormal(s: String, list: ArrayList<HomeListBean>) {
+
+        val doc = Jsoup.parse(s)
+
+        val select = doc.select("div#gallerydiv div.ck-initem")
+
+        Logger.e(select.toString())
+
+        for (i in select) {
+
+            val a = i.select("a").first()
+
+            val url = a.attr("href")
+            val date = ""
+            val element = i.select("mip-img")
+            val preview = element.attr("src")
+
+
+            val description = element.attr("alt")
+
+            list.add(HomeListBean(description, preview, url, date, "", ""))
+//            Logger.e("女神 $preview   $url  $description")
+        }
+
+    }
+
+
     fun mapNvShens(s: String, list: ArrayList<HomeListBean>) {
 
         val doc = Jsoup.parse(s)
 
-        val select = doc.select("div.entry_box_arena > div.box_entry > div.post_entry > div#listdiv.listdiv > ul > li")
+        val select = doc.select("ul.clearfix > li")
+
+        if (select.isEmpty()) {
+            mapNvShensNormal(s, list)
+            return
+        }
 
         Logger.e(select.toString())
 
@@ -207,7 +239,7 @@ object JsoupUtil {
             val element = i.select("a").first()
 
             val date = ""
-            val preview = element.select("img").attr("data-original")
+            val preview = element.select("img").attr("lazysrc")
 
             val url = "https://www.nvshens.com" + element.attr("href")
 
@@ -218,7 +250,6 @@ object JsoupUtil {
         }
 
     }
-
 
     /**#############################################################二级页面#############################################################################**/
 
@@ -565,7 +596,7 @@ object JsoupUtil {
         if (TextUtils.isEmpty(urlOrigin)) return null
         var url = urlOrigin
         var tagUrl = ""
-        tagUrl = url.replace(".html", "").replace("https://www.nvshens.com/g/", "")
+        tagUrl = url.replace(".html", "")
 
 
         var doc: Document? = null
@@ -580,26 +611,27 @@ object JsoupUtil {
             if (doc == null) return null
 
 
+            val imgs = doc!!.getElementById("idiv").getElementsByTag("img")
 
-            val imgs = doc!!.getElementById("hgallery").getElementsByTag("img")
-
-            val title = doc!!.getElementById("htilte").text()
+            val title = imgs[0].attr("alt")
 
             Logger.e(imgs.toString())
 
             imgs.mapTo(urls) { it.attr("src") }
 
 
-            val pages = doc!!.getElementById("pages")
-            var current = pages.getElementsByTag("span").text().toInt()
+            val pages = doc!!.getElementById("pagediv")
 
-            val listA = pages.getElementsByTag("a")
-            val total = listA[listA.size - 2].text().toInt()
+            val pageText = pages.getElementsByClass("page").text()
+            var current = pageText.split("/")[0].toInt()
+
+
+            val total = pageText.split("/")[1].toInt()
 
             Logger.e("total $total  current $current")
 
             if (current < total) {
-                JsoupUtil.getNvShensDeep(tagUrl, current + 1,total, urls)
+                JsoupUtil.getNvShensDeep(tagUrl, current + 1, total, urls)
             }
             childList = ChildDetailBean(title, urls)
         } catch (e: Exception) {
@@ -612,9 +644,11 @@ object JsoupUtil {
     /**
      * nvshens 递归调用 爬取
      */
-    fun getNvShensDeep(tagUrl: String, page: Int,total: Int, urls: ArrayList<String>) {
+    fun getNvShensDeep(tagUrl: String, page: Int, total: Int, urls: ArrayList<String>) {
         try {
-            val url = "https://www.nvshens.com/g/" + tagUrl + "_$page.html"
+
+            //https://m.nvshens.com/g/24724/2.html
+            val url =  tagUrl + "/$page.html"
             var doc: Document? = null
             val apiStore = RetrofitUtils.getStringInstance().create(ApiStore::class.java)
             apiStore.getString(url).subscribe({
@@ -622,7 +656,7 @@ object JsoupUtil {
             })
 
 
-            val imgs = doc!!.getElementById("hgallery").getElementsByTag("img")
+            val imgs = doc!!.getElementById("idiv").getElementsByTag("img")
 
             Logger.e(imgs.toString())
 
@@ -632,7 +666,7 @@ object JsoupUtil {
 
 
             if (page < total) {
-                JsoupUtil.getNvShensDeep(tagUrl, page + 1,total, urls)
+                JsoupUtil.getNvShensDeep(tagUrl, page + 1, total, urls)
             }
             Logger.e("   $page  $total  $tagUrl")
         } catch (e: Exception) {

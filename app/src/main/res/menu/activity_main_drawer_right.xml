@@ -15,10 +15,10 @@
             android:icon="@drawable/menu_circle_192tt"
             android:title="192tt" />
 
-        <item
-            android:id="@+id/menu_mmonly"
-            android:icon="@drawable/menu_circle_mmonly"
-            android:title="mmonly" />
+        <!--<item-->
+            <!--android:id="@+id/menu_mmonly"-->
+            <!--android:icon="@drawable/menu_circle_mmonly"-->
+            <!--android:title="mmonly" />-->
         <item
             android:id="@+id/menu_nvshens"
             android:icon="@drawable/menu_cicle_nvshens"

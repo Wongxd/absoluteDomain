@@ -10,5 +10,9 @@ public class RxEventCodeType {
 
     public static final int SYNC_FAVORITE = 1001;
 
+    /**
+     * 网站切换
+     */
+    public static final int SITE_SWITCH = 1002;
 
 }

@@ -34,12 +34,7 @@
             android:paddingTop="40dp" />
     </com.scwang.smartrefresh.layout.SmartRefreshLayout>
 
-    <com.github.mmin18.widget.RealtimeBlurView
-        android:id="@+id/realtime_blur"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:visibility="visible"
-        app:realtimeBlurRadius="5dp" />
+
 
     <FrameLayout
         android:id="@+id/fl_top"

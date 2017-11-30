@@ -9,6 +9,9 @@ import java.util.*
  */
 
 
+
+data class TypeBean(val url: String, val title: String)
+
 data class HomeListBean(val title: String, val imgPath: String, val url: String, val date: String, val view: String,
                         val like: String) : Serializable
 

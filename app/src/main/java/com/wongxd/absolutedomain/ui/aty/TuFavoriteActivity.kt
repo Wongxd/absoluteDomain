@@ -37,7 +37,6 @@ class TuFavoriteActivity : BaseSwipeActivity() {
         setContentView(R.layout.aty_tu_favorite)
         StatusBarUtil.immersive(this)
         StatusBarUtil.setPaddingSmart(this, rv_favorite)
-        StatusBarUtil.setPaddingSmart(this, realtime_blur)
         StatusBarUtil.setPaddingSmart(this, rl_top)
         initRecycle()
         if (intent != null && intent.action == Intent.ACTION_VIEW) {

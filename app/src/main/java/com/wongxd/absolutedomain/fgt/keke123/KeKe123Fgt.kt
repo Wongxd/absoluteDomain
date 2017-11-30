@@ -23,17 +23,6 @@ import java.net.URL
 class KeKe123Fgt : BaseTypeFragment() {
 
 
-    override fun onResume() {
-        super.onResume()
-        RxBus.getDefault().register(this)
-    }
-
-
-    override fun onPause() {
-        super.onPause()
-        RxBus.getDefault().unRegister(this)
-    }
-
     @Subscribe(code = RxEventCodeType.SITE_SWITCH, threadMode = ThreadMode.MAIN)
     override fun siteSwitch(url: String) {
         super.siteSwitch(url)

@@ -156,9 +156,9 @@ class ViewBigImageActivity : BaseSwipeActivity(), ViewPager.OnPageChangeListener
      */
     private fun getView() {
         /************************* 接收控件  */
-        very_image_viewpager_text = findViewById(R.id.very_image_viewpager_text) as TextView
-        tv_save_big_image = findViewById(R.id.tv_save_big_image) as TextView
-        very_image_viewpager = findViewById(R.id.very_image_viewpager) as ViewPager
+        very_image_viewpager_text = findViewById(R.id.very_image_viewpager_text)
+        tv_save_big_image = findViewById(R.id.tv_save_big_image)
+        very_image_viewpager = findViewById(R.id.very_image_viewpager)
 
         tv_save_big_image!!.setOnClickListener {
             TU.cT("开始下载图片")
@@ -230,9 +230,9 @@ class ViewBigImageActivity : BaseSwipeActivity(), ViewPager.OnPageChangeListener
         var inflater: LayoutInflater = layoutInflater
         override fun instantiateItem(container: ViewGroup, position: Int): Any {
             val view = inflater.inflate(R.layout.viewpager_very_image, container, false)
-            val zoom_image_view = view.findViewById(R.id.zoom_image_view) as PinchImageView
+            val zoom_image_view = view.findViewById<PinchImageView>(R.id.zoom_image_view)
 
-            val spinner = view.findViewById(R.id.loading) as ProgressPieView
+            val spinner = view.findViewById<ProgressPieView>(R.id.loading)
             // 保存网络图片的路径
             val adapter_image_Entity = getItem(position) as String
 

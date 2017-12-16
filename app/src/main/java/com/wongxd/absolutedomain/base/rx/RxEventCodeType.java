@@ -15,4 +15,7 @@ public class RxEventCodeType {
      */
     public static final int SITE_SWITCH = 1002;
 
+
+    public static final int GET_USER_INFO = 1003;
+
 }

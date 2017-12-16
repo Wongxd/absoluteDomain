@@ -23,7 +23,9 @@ class App : Application() {
         var instance: App by Delegates.notNull()
         //这里我就不写管理类了,捡个懒,直接在 Application 中管理单例 Okhttp
         private var mOkHttpClient: OkHttpClient by Delegates.notNull()
+        var user: Any?=null
     }
+
 
     override fun onCreate() {
         super.onCreate()
@@ -44,8 +46,12 @@ class App : Application() {
         SmartRefreshLayout.setDefaultRefreshHeaderCreater(DefaultRefreshHeaderCreater { context, layout -> ClassicsHeader(context) })
 
         SmartRefreshLayout.setDefaultRefreshFooterCreater(DefaultRefreshFooterCreater { context, layout -> ClassicsFooter(context) })
+
+
     }
 
 
     fun getOkHttpClient() = mOkHttpClient
+
+
 }

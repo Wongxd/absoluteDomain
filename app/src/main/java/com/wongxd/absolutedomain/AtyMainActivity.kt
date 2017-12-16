@@ -5,12 +5,16 @@ import android.Manifest
 import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.support.design.widget.NavigationView
 import android.support.design.widget.TabLayout
 import android.support.v7.app.AlertDialog
+import android.transition.Explode
 import android.view.MenuItem
+import android.widget.ImageView
+import android.widget.TextView
 import com.jude.swipbackhelper.SwipeBackHelper
 import com.orhanobut.logger.Logger
 import com.tbruyelle.rxpermissions2.RxPermissions
@@ -198,8 +202,17 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
         super.onCreate(savedInstanceState)
         setContentView(R.layout.aty_main)
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            val explode = Explode()
+            explode.duration = 500
+            window.exitTransition = explode
+            window.enterTransition = explode
+        }
+
+
+
+
         RxBus.getDefault().register(this)
-        //状态栏透明和间距处理
 
 
         SwipeBackHelper.getCurrentPage(this)
@@ -223,6 +236,7 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
         }
 
 
+        initUserHeader()
         nav_aty_main.setNavigationItemSelectedListener(this)
         nav_aty_main_right.setNavigationItemSelectedListener(this)
 
@@ -245,6 +259,7 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
         supportFragmentManager.beginTransaction().replace(R.id.fl_container_aty_main, currentFgt)
                 .commit()
 
+//        App.user = BmobUser.getCurrentUser(this)
 
     }
 
@@ -275,6 +290,35 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
             }
 
         })
+    }
+
+
+
+
+
+    private lateinit var ivHeader: ImageView
+    private lateinit var tvUserName: TextView
+    private fun initUserHeader() {
+        val header = nav_aty_main.getHeaderView(0)
+        ivHeader = header.findViewById(R.id.iv_user_header)
+        tvUserName = header.findViewById(R.id.tv_user_name)
+
+        header.setOnClickListener {
+            if (App.user == null)
+                startActivity(Intent(this, LoginActivity::class.java))
+            else
+                startActivity(Intent(this, UserInfoActivity::class.java))
+        }
+    }
+
+
+    override fun onResume() {
+        super.onResume()
+        showUserInfo()
+    }
+
+    private fun showUserInfo() {
+
     }
 
 

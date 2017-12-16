@@ -41,7 +41,6 @@
 
 
         <TextView
-            android:visibility="gone"
             android:id="@+id/tv_import"
             android:layout_width="40dp"
             android:layout_height="match_parent"

@@ -33,7 +33,7 @@ abstract class BaseTypeFragment : BaseLazyFragment() {
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val v = inflater?.inflate(R.layout.fgt_type, container, false)
-        StatusBarUtil.setPadding(activity, rv_fgt_type)
+
         return v
     }
 
@@ -42,6 +42,8 @@ abstract class BaseTypeFragment : BaseLazyFragment() {
         super.onActivityCreated(savedInstanceState)
         initRecycle()
         initRefreshLayout()
+
+        rv_fgt_type.setPadding(0, rv_fgt_type.paddingTop + StatusBarUtil.getStatusBarHeight(activity), 0, 0)
 
         if (tempObservalble != null)
             loadData(tempObservalble!!)

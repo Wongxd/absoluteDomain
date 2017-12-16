@@ -6,10 +6,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
+    <FrameLayout
+        android:id="@+id/fl_root"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
+
+
+        <FrameLayout
+            android:id="@+id/fl_container_aty_main"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="40dp" />
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar_aty_main"
@@ -32,36 +39,30 @@
                     android:textColor="?attr/colorPrimary" />
 
                 <TextView
-                    android:textColor="?attr/colorPrimary"
                     android:id="@+id/tv_menu_aty_main"
                     android:layout_width="50dp"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:text="菜单" />
+                    android:text="菜单"
+                    android:textColor="?attr/colorPrimary" />
 
 
                 <TextView
-                    android:textColor="?attr/colorPrimary"
                     android:id="@+id/tv_switch_aty_main"
                     android:layout_width="50dp"
                     android:layout_height="match_parent"
                     android:layout_alignParentRight="true"
                     android:gravity="center"
-                    android:text="换源" />
+                    android:text="换源"
+                    android:textColor="?attr/colorPrimary" />
             </RelativeLayout>
         </android.support.v7.widget.Toolbar>
-
-
-        <FrameLayout
-            android:id="@+id/fl_container_aty_main"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
 
         <android.support.design.widget.TabLayout
             android:id="@+id/tablayout_main"
             android:layout_width="match_parent"
             android:layout_height="40dp"
+            android:layout_gravity="bottom"
             app:tabBackground="@color/white"
             app:tabIndicatorColor="?attr/colorPrimary"
             app:tabIndicatorHeight="3dp"
@@ -71,7 +72,7 @@
 
         </android.support.design.widget.TabLayout>
 
-    </LinearLayout>
+    </FrameLayout>
 
     <com.wongxd.absolutedomain.widget.arcNavigationView.ArcNavigationView
         android:id="@+id/nav_aty_main"

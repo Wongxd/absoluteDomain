@@ -11,6 +11,7 @@ import com.wongxd.absolutedomain.adapter.RvHomeAdapter
 import com.wongxd.absolutedomain.base.BaseLazyFragment
 import com.wongxd.absolutedomain.bean.HomeListBean
 import com.wongxd.absolutedomain.ui.aty.SeePicActivity
+import com.wongxd.absolutedomain.util.StatusBarUtil
 import com.wongxd.absolutedomain.util.TU
 import com.wongxd.wthing_kotlin.database.*
 import io.reactivex.Observable
@@ -32,7 +33,7 @@ abstract class BaseTypeFragment : BaseLazyFragment() {
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val v = inflater?.inflate(R.layout.fgt_type, container, false)
-
+        StatusBarUtil.setPadding(activity, rv_fgt_type)
         return v
     }
 

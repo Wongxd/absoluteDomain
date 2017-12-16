@@ -2,6 +2,7 @@ package com.wongxd.absolutedomain
 
 
 import android.Manifest
+import android.annotation.TargetApi
 import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
@@ -32,6 +33,7 @@ import com.wongxd.absolutedomain.fgt.nvshens.NvshensFgt
 import com.wongxd.absolutedomain.fgt.t192tt.t192ttFgt
 import com.wongxd.absolutedomain.ui.aty.ThemeActivity
 import com.wongxd.absolutedomain.ui.aty.TuFavoriteActivity
+import com.wongxd.absolutedomain.util.StatusBarUtil
 import com.wongxd.absolutedomain.util.TU
 import com.wongxd.absolutedomain.util.cache.DataCleanManager
 import com.wongxd.absolutedomain.util.cache.GlideCatchUtil
@@ -198,6 +200,7 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
     }
 
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.aty_main)
@@ -209,7 +212,9 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
             window.enterTransition = explode
         }
 
-
+        //状态栏透明和间距处理
+        StatusBarUtil.immersive(this)
+        StatusBarUtil.setMargin(this,toolbar_aty_main)
 
 
         RxBus.getDefault().register(this)

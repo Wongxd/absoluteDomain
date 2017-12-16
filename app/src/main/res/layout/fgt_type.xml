@@ -24,6 +24,7 @@
             app:srlClassicsSpinnerStyle="Translate" />
 
         <android.support.v7.widget.RecyclerView
+            android:paddingTop="40dp"
             android:id="@+id/rv_fgt_type"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

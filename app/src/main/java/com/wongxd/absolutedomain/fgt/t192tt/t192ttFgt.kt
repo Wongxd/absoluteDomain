@@ -2,6 +2,7 @@ package com.wongxd.absolutedomain.fgt.t192tt
 
 import android.os.Bundle
 import com.orhanobut.logger.Logger
+import com.wongxd.absolutedomain.base.aCache.AcacheUtil
 import com.wongxd.absolutedomain.base.rx.RxBus
 import com.wongxd.absolutedomain.base.rx.RxEventCodeType
 import com.wongxd.absolutedomain.base.rx.Subscribe
@@ -10,6 +11,7 @@ import com.wongxd.absolutedomain.bean.HomeListBean
 import com.wongxd.absolutedomain.bean.TypeBean
 import com.wongxd.absolutedomain.fgt.BaseTypeFragment
 import com.wongxd.absolutedomain.util.JsoupUtil
+import com.wongxd.absolutedomain.util.NetworkAvailableUtils
 import io.reactivex.Observable
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
@@ -38,7 +40,12 @@ class t192ttFgt : BaseTypeFragment() {
         doAsync {
             val s: String
             try {
-                s = URL(rUrl).readText()
+
+                if (NetworkAvailableUtils.isNetworkAvailable(activity)) {
+                    s = URL(rUrl).readText()
+                    AcacheUtil.getDefault(activity, AcacheUtil.StringCache).put(url, s)
+                } else s = AcacheUtil.getDefault(activity, AcacheUtil.StringCache).getAsString(url)
+
                 val list = ArrayList<HomeListBean>()
                 JsoupUtil.map192TT(s, list)
 

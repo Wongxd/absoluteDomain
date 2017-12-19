@@ -3,7 +3,6 @@ package com.wongxd.absolutedomain
 import android.app.Application
 import android.content.Context
 import android.support.multidex.MultiDex
-import cn.bmob.v3.BmobUser
 import com.orhanobut.logger.LogLevel
 import com.orhanobut.logger.Logger
 import com.scwang.smartrefresh.layout.SmartRefreshLayout
@@ -12,6 +11,7 @@ import com.scwang.smartrefresh.layout.api.DefaultRefreshHeaderCreater
 import com.scwang.smartrefresh.layout.footer.ClassicsFooter
 import com.scwang.smartrefresh.layout.header.ClassicsHeader
 import com.wongxd.absolutedomain.base.exception.CrashHandler
+import com.wongxd.absolutedomain.bean.UserBean
 import com.wongxd.absolutedomain.util.TU
 import me.jessyan.progressmanager.ProgressManager
 import okhttp3.OkHttpClient
@@ -26,7 +26,7 @@ class App : Application() {
         var instance: App by Delegates.notNull()
         //这里我就不写管理类了,捡个懒,直接在 Application 中管理单例 Okhttp
         private var mOkHttpClient: OkHttpClient by Delegates.notNull()
-        var user: BmobUser? = null
+        var user: UserBean? = null
         val BMOB_ID: String = "33c3293abda15ed00bbb74776573e9be"
     }
 

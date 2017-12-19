@@ -1,7 +1,6 @@
 package com.wongxd.absolutedomain.ui.aty
 
 import android.app.AlertDialog
-import android.app.ProgressDialog
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -13,13 +12,17 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import cn.bmob.v3.BmobUser
+import cn.bmob.v3.listener.UpdateListener
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
+import com.ontbee.legacyforks.cn.pedant.SweetAlert.SweetAlertDialog
 import com.orhanobut.logger.Logger
 import com.wongxd.absolutedomain.R
 import com.wongxd.absolutedomain.base.BaseSwipeActivity
 import com.wongxd.absolutedomain.base.rx.RxBus
 import com.wongxd.absolutedomain.base.rx.RxEventCodeType
+import com.wongxd.absolutedomain.bean.UserBean
 import com.wongxd.absolutedomain.util.StatusBarUtil
 import com.wongxd.absolutedomain.util.SystemUtils
 import com.wongxd.absolutedomain.util.TU
@@ -33,7 +36,9 @@ import kotlinx.android.synthetic.main.aty_tu_favorite.*
 import org.jetbrains.anko.db.insert
 import org.jetbrains.anko.db.select
 import org.jetbrains.anko.db.transaction
+import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.toast
+import org.jetbrains.anko.uiThread
 import org.json.JSONObject
 import java.io.File
 import java.text.SimpleDateFormat
@@ -50,9 +55,10 @@ class TuFavoriteActivity : BaseSwipeActivity() {
         StatusBarUtil.setPaddingSmart(this, rv_favorite)
         StatusBarUtil.setPaddingSmart(this, rl_top)
         initRecycle()
+
         if (intent != null && intent.action == Intent.ACTION_VIEW) {
-            AlertDialog.Builder(this).setMessage("需要从文件中增量还原吗？")
-                    .setPositiveButton("需要", { dialog, which -> dialog.dismiss();doRestore() })
+            AlertDialog.Builder(this).setMessage("需要从 文件 中增量还原吗？").setTitle("警告")
+                    .setPositiveButton("需要", { dialog, which -> dialog.dismiss();doRestoreFromFile() })
                     .setNeutralButton("不需要", { dialog, which -> dialog.dismiss(); initData() })
                     .setCancelable(false)
                     .show()
@@ -61,17 +67,162 @@ class TuFavoriteActivity : BaseSwipeActivity() {
             initData()
         }
 
-        tv_import.setOnClickListener { inportFromFile() }
+        tv_import.setOnClickListener {
+            AlertDialog.Builder(this).setTitle("警告").setMessage("需要从 文件 或 云 中增量还原吗？")
+                    .setPositiveButton("从文件", { dialog, which -> dialog.dismiss();inportFromFile() })
+                    .setNegativeButton("从云中", { dialog, which -> dialog.dismiss();doRestoreFromBmob() })
+                    .setNeutralButton("不需要", { dialog, which -> dialog.dismiss(); })
+                    .setCancelable(false)
+                    .show()
+        }
 
         tv_export.setOnClickListener {
-            AlertDialog.Builder(this).setMessage("需要备份收藏到文件中吗？")
-                    .setPositiveButton("需要", { dialog, which -> dialog.dismiss();exportToFile() })
+            AlertDialog.Builder(this).setMessage("需要备份收藏到 文件 或 云  中吗？").setTitle("警告")
+                    .setPositiveButton("到文件", { dialog, which -> dialog.dismiss();exportToFile() })
+                    .setNegativeButton("到云中", { dialog, which -> dialog.dismiss();exportToBmob() })
                     .setNeutralButton("不需要", { dialog, which -> dialog.dismiss(); })
                     .setCancelable(false)
                     .show()
         }
     }
 
+    /**
+     * 从云中还原
+     */
+    private fun doRestoreFromBmob() {
+
+        val pDialog = SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE)
+        pDialog.titleText = "从云端同步"
+        pDialog.setCancelable(false)
+        pDialog.show()
+
+        val current = BmobUser.getCurrentUser(this@TuFavoriteActivity, UserBean::class.java)
+        if (current == null) {
+            pDialog.changeAlertType(SweetAlertDialog.ERROR_TYPE)
+            pDialog.contentText = "请先登录"
+            pDialog.setCancelClickListener {
+                pDialog.dismissWithAnimation()
+            }
+            return
+        }
+
+        val info = current.favorite
+
+        doAsync {
+            val json = JSONObject(info)
+            val list = json.optJSONArray("list")
+            var i = 0
+            val length = list.length()
+
+            if (list.length() == 0) {
+                uiThread {
+                    pDialog.changeAlertType(SweetAlertDialog.NORMAL_TYPE)
+                    pDialog.contentText = "云中没有备份"
+                    pDialog.setCancelClickListener { pDialog.dismissWithAnimation() }
+                }
+                return@doAsync
+            }
+
+            while (i < length) {
+                val obj = list.optJSONObject(i)
+                val name = obj.optString("name")
+                val adress = obj.optString("address")
+                val imgPath = obj.optString("imgPath")
+                restoreToDB(name, adress, imgPath)
+                i++
+            }
+
+            uiThread {
+                pDialog.changeAlertType(SweetAlertDialog.SUCCESS_TYPE)
+                pDialog.contentText = "从云端同步完成"
+                pDialog.setCancelClickListener { pDialog.dismissWithAnimation() }
+                initData()
+            }
+
+        }
+
+    }
+
+    /**
+     *把收藏信息同步到云
+     */
+    private fun exportToBmob() {
+        val pDialog = SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE)
+        pDialog.titleText = "同步到云端"
+        pDialog.setCancelable(false)
+        pDialog.show()
+
+        val current = BmobUser.getCurrentUser(this@TuFavoriteActivity, UserBean::class.java)
+        if (current == null) {
+            pDialog.changeAlertType(SweetAlertDialog.ERROR_TYPE)
+            pDialog.contentText = "请先登录"
+            pDialog.setCancelClickListener {
+                pDialog.dismissWithAnimation()
+            }
+            return
+        }
+
+        doAsync {
+            tuDB.use {
+                val list = select(TuTable.TABLE_NAME).parseList { (Tu(HashMap(it))) }
+                if (list.isNotEmpty()) {
+
+                    val sb = StringBuilder()
+                    sb.append("{\"list\":[")
+                    val length = list.size - 1
+
+                    for (i in list.indices) {
+                        sb.append("{\"name\":\"")
+                        sb.append(list[i].name)
+                        sb.append("\",")
+
+                        sb.append("\"address\":\"")
+                        sb.append(list[i].address)
+                        sb.append("\",")
+
+                        sb.append("\"imgPath\":\"")
+                        sb.append(list[i].imgPath)
+                        if (i == length) {
+                            sb.append("\"}")
+                        } else {
+                            sb.append("\"},")
+                        }
+                    }
+
+                    sb.append("]}")
+
+
+                    val user = UserBean()
+                    user.favorite = sb.toString()
+                    user.update(this@TuFavoriteActivity, current.objectId, object : UpdateListener() {
+                        override fun onSuccess() {
+                            uiThread {
+                                pDialog.changeAlertType(SweetAlertDialog.SUCCESS_TYPE)
+                                pDialog.contentText = "成功备份到云端"
+                                pDialog.setCancelClickListener { pDialog.dismissWithAnimation() }
+                            }
+                        }
+
+                        override fun onFailure(p0: Int, p1: String?) {
+                            uiThread {
+                                pDialog.changeAlertType(SweetAlertDialog.ERROR_TYPE)
+                                pDialog.contentText = p1
+                                pDialog.setCancelClickListener { pDialog.dismissWithAnimation() }
+                            }
+                        }
+                    })
+
+
+                } else {
+                    uiThread {
+                        pDialog.changeAlertType(SweetAlertDialog.NORMAL_TYPE)
+                        pDialog.contentText = "没有收藏的图集"
+                        pDialog.setCancelClickListener { pDialog.dismissWithAnimation() }
+                    }
+                }
+            }
+        }
+    }
 
     /**
      * 查找所有的备份文件
@@ -116,12 +267,7 @@ class TuFavoriteActivity : BaseSwipeActivity() {
             return
         }
 
-        AlertDialog.Builder(this).setMessage("需要从文件中增量还原吗？")
-                .setPositiveButton("需要", { dialog, which -> dialog.dismiss();showPop(baks) })
-                .setNeutralButton("不需要", { dialog, which -> dialog.dismiss(); initData() })
-                .setCancelable(false)
-                .show()
-
+        showPop(baks)
     }
 
 
@@ -134,7 +280,7 @@ class TuFavoriteActivity : BaseSwipeActivity() {
         val adapter = LvAdapter(baks)
         adapter.setItemClick(object : LvListener {
             override fun onClick(data: JDLY) {
-                doRestore(data.path)
+                doRestoreFromFile(data.path)
                 if (pop.isShowing) pop.dismiss()
             }
         })
@@ -282,46 +428,63 @@ class TuFavoriteActivity : BaseSwipeActivity() {
     /**
      * 从备份文件中还原
      */
-    private fun doRestore(sPaht: String = "") {
+    private fun doRestoreFromFile(sPaht: String = "") {
         var path = sPaht
         if (sPaht == "") {
             val uri = intent.data
             path = uri.path
         }
+        if (path.isBlank()) return
         if (!path.endsWith(".jdly")) {
             toast("不是一个正确的备份文件！")
         } else {
-            val pb = ProgressDialog(this)
-            pb.setMessage("还原备份中")
-            pb.setProgressStyle(ProgressDialog.STYLE_SPINNER)
-            pb.show()
-            try {
-                val file = File(path)
-                val info = file.readText()
-                val json = JSONObject(info)
-                val list = json.optJSONArray("list")
-                var i = 0
-                val length = list.length()
+            val pDialog = SweetAlertDialog(this@TuFavoriteActivity, SweetAlertDialog.PROGRESS_TYPE)
+            pDialog.titleText = "从文件中还原"
+            pDialog.setCancelable(false)
+            pDialog.show()
+            doAsync {
+                try {
+                    val file = File(path)
+                    val info = file.readText()
+                    val json = JSONObject(info)
+                    val list = json.optJSONArray("list")
+                    var i = 0
+                    val length = list.length()
 
-                while (i < length) {
-                    val obj = list.optJSONObject(i)
-                    val name = obj.optString("name")
-                    val adress = obj.optString("address")
-                    val imgPath = obj.optString("imgPath")
-                    restoreToDB(name, adress, imgPath)
-                    Logger.e(i.toString() + " " + length + " $obj")
-                    i++
+                    if (list.length() == 0) {
+                        uiThread {
+                            pDialog.changeAlertType(SweetAlertDialog.NORMAL_TYPE)
+                            pDialog.contentText = "文件中没有备份"
+                            pDialog.setCancelClickListener { pDialog.dismissWithAnimation() }
+                        }
+                        return@doAsync
+                    }
+
+                    while (i < length) {
+                        val obj = list.optJSONObject(i)
+                        val name = obj.optString("name")
+                        val adress = obj.optString("address")
+                        val imgPath = obj.optString("imgPath")
+                        restoreToDB(name, adress, imgPath)
+                        i++
+                    }
+
+                    uiThread {
+                        pDialog.changeAlertType(SweetAlertDialog.SUCCESS_TYPE)
+                        pDialog.contentText = "增量还原成功"
+                        pDialog.setCancelClickListener { pDialog.dismissWithAnimation() }
+                        initData()
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    uiThread {
+                        pDialog.changeAlertType(SweetAlertDialog.ERROR_TYPE)
+                        pDialog.contentText = "备份文件损坏"
+                        pDialog.setCancelClickListener { pDialog.dismissWithAnimation() }
+                    }
                 }
 
-                toast("增量还原成功！")
-            } catch (e: Exception) {
-                e.printStackTrace()
-                toast("备份文件损坏！")
-            } finally {
-                pb.dismiss()
             }
-
-            initData()
         }
     }
 
@@ -334,7 +497,6 @@ class TuFavoriteActivity : BaseSwipeActivity() {
             if (list.isNotEmpty()) {
                 val tuList = list.sortedByDescending { it._id }
                 adpater?.setNewData(tuList.toMutableList())
-                rl_empty.visibility = View.GONE
             }
         }
     }
@@ -343,12 +505,12 @@ class TuFavoriteActivity : BaseSwipeActivity() {
      * 导出收藏到文件中
      */
     private fun exportToFile() {
-        val pb = ProgressDialog(this@TuFavoriteActivity)
-        pb.setMessage("导出中")
-        pb.setProgressStyle(ProgressDialog.STYLE_SPINNER)
-        pb.show()
-        Thread(Runnable {
+        val pDialog = SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE)
+        pDialog.titleText = "导出收藏到本地文件"
+        pDialog.setCancelable(false)
+        pDialog.show()
 
+        doAsync {
             tuDB.use {
                 val list = select(TuTable.TABLE_NAME).parseList { (Tu(HashMap(it))) }
                 if (list.isNotEmpty()) {
@@ -376,14 +538,22 @@ class TuFavoriteActivity : BaseSwipeActivity() {
                     }
 
                     sb.append("]}")
-                    Logger.e(sb.toString())
-                    saveFile(sb.toString(), getString(R.string.app_name) + "-收藏备份" + stampToDate(System.currentTimeMillis()))
-                    runOnUiThread { if (pb.isShowing) pb.dismiss() }
+                    Logger.d(sb.toString())
+                    val result = saveFile(sb.toString(), getString(R.string.app_name) + "-收藏备份" + stampToDate(System.currentTimeMillis()))
+                    uiThread {
+                        pDialog.changeAlertType(if (result) SweetAlertDialog.SUCCESS_TYPE else SweetAlertDialog.ERROR_TYPE)
+                        pDialog.contentText = if (result) "导出成功！位于《 绝对领域 》文件夹下" else "导出失败"
+                        pDialog.setCancelClickListener { pDialog.dismissWithAnimation() }
+                    }
                 } else {
-                    runOnUiThread { if (pb.isShowing) pb.dismiss() }
+                    uiThread {
+                        pDialog.changeAlertType(SweetAlertDialog.NORMAL_TYPE)
+                        pDialog.contentText = "没有收藏的图集"
+                        pDialog.setCancelClickListener { pDialog.dismissWithAnimation() }
+                    }
                 }
             }
-        }).start()
+        }
     }
 
     /*
@@ -412,7 +582,7 @@ class TuFavoriteActivity : BaseSwipeActivity() {
                     tu.imgPath = imgPath
                     insert(TuTable.TABLE_NAME, *tu.map.toVarargArray())
                 }
-                Logger.e("还原单条数据  $name  $adress  $imgPath ")
+                Logger.d("还原单条数据  $name  $adress  $imgPath ")
             }
         }
     }
@@ -421,7 +591,7 @@ class TuFavoriteActivity : BaseSwipeActivity() {
      * @param content
      *
      */
-    fun saveFile(content: String, fileName: String) {
+    fun saveFile(content: String, fileName: String): Boolean {
         var filePath: String? = null
         val hasSDCard = Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED
         if (hasSDCard) {
@@ -439,15 +609,15 @@ class TuFavoriteActivity : BaseSwipeActivity() {
                 file.delete()
             }
             file.writeText(content)
-            runOnUiThread { toast("导出成功！位于《 " + getString(R.string.app_name) + " 》文件夹下") }
+            return true
         } catch (e: Exception) {
             e.printStackTrace()
-            runOnUiThread { toast("导出失败！") }
+            return false
         }
 
     }
 
-    var adpater: TuAdapter? = null
+    private lateinit var adpater: TuAdapter
     /**
      * recycleView and smartRefreshLayout
      */
@@ -461,7 +631,17 @@ class TuFavoriteActivity : BaseSwipeActivity() {
 
         rv_favorite.adapter = adpater
         rv_favorite.itemAnimator = LandingAnimator()
-        rv_favorite.layoutManager = GridLayoutManager(applicationContext, 2)
+        val layoutManager = GridLayoutManager(applicationContext, 2)
+        layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int): Int {
+                if (adpater.data.size == 0) return 2
+                return 1
+            }
+
+        }
+        rv_favorite.layoutManager = layoutManager
+        adpater.setEmptyView(R.layout.item_rv_empty, rv_favorite)
+
 
     }
 

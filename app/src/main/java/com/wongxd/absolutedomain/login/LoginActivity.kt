@@ -61,8 +61,11 @@ class LoginActivity : BaseSwipeActivity() {
                 if (p0 != null) {
                     pDialog.titleText = "你好---$userName"
                     pDialog.changeAlertType(SweetAlertDialog.SUCCESS_TYPE)
-                    loginSuccessed()
-                    pDialog.dismiss()
+                    pDialog.setConfirmClickListener {
+                        pDialog.dismissWithAnimation()
+                        loginSuccessed()
+                    }
+
                 } else {
                     pDialog.contentText = p1?.message
                     pDialog.changeAlertType(SweetAlertDialog.ERROR_TYPE)
@@ -79,7 +82,7 @@ class LoginActivity : BaseSwipeActivity() {
     fun loginSuccessed() {
 
         val i2 = Intent(this, AtyMainActivity::class.java)
-        i2.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or  Intent.FLAG_ACTIVITY_NEW_TASK)
+        i2.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             val explode = Explode()
             explode.duration = 500

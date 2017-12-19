@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.os.SystemClock
 import android.support.v7.widget.StaggeredGridLayoutManager
 import android.text.TextUtils
-import android.view.View
 import com.orhanobut.logger.Logger
 import com.scwang.smartrefresh.layout.util.DensityUtil
 import com.wongxd.absolutedomain.R
@@ -47,10 +46,16 @@ class SeePicActivity : BaseSwipeActivity() {
 
 
         rv_see_pic.adapter = adpater
-        rv_see_pic.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+        val layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
                 .apply { this.gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE }
+
+        rv_see_pic.layoutManager = layoutManager
+
         rv_see_pic.itemAnimator = LandingAnimator()
         rv_see_pic.addItemDecoration(SGSpacingItemDecoration(3, DensityUtil.dp2px(4f)))
+
+        adpater?.setEmptyView(R.layout.item_rv_empty,rv_see_pic)
+
 
         val url = intent.getStringExtra("url")
         smartLayout.setOnRefreshListener { doGetDetail(url) }
@@ -58,7 +63,6 @@ class SeePicActivity : BaseSwipeActivity() {
             val childCache: ChildDetailBean? = AcacheUtil.getDefault(applicationContext, AcacheUtil.ObjCache).getAsObject(url) as ChildDetailBean?
             uiThread {
                 if (childCache != null && childCache.list.isNotEmpty()) {
-                    rl_empty.visibility = View.GONE
                     tv_title.text = childCache.title
                     adpater?.setNewData(childCache.list)
                     doFavoriteLogic(url, childCache.title)
@@ -81,7 +85,6 @@ class SeePicActivity : BaseSwipeActivity() {
             uiThread {
                 smartLayout.finishRefresh()
                 if (list != null && list.list.isNotEmpty()) {
-                    rl_empty.visibility = View.GONE
                     tv_title.text = list.title
                     adpater?.setNewData(list.list)
 

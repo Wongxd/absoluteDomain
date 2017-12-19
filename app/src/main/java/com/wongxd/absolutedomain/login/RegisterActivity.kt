@@ -162,8 +162,11 @@ class RegisterActivity : BaseActivity() {
             override fun onSuccess() {
                 pDialog.changeAlertType(SweetAlertDialog.SUCCESS_TYPE)
                 pDialog.titleText = "注册成功，请登录"
-                finish()
-                pDialog.dismiss()
+                pDialog.setConfirmClickListener {
+                    pDialog.dismissWithAnimation()
+                    finish()
+                }
+
             }
 
             override fun onFailure(p0: Int, p1: String?) {

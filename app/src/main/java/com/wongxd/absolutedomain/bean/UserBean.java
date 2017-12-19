@@ -8,4 +8,14 @@ import cn.bmob.v3.BmobUser;
 
 public class UserBean extends BmobUser {
 
+    //图集收藏
+    private String favorite;
+
+    public String getFavorite() {
+        return favorite;
+    }
+
+    public void setFavorite(String favorite) {
+        this.favorite = favorite;
+    }
 }

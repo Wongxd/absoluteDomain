@@ -49,6 +49,7 @@
             android:layout_marginLeft="10dp" />
 
         <com.wongxd.wthing_kotlin.MarqueeTextView
+            android:text="图集详情"
             android:id="@+id/tv_title"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -61,27 +62,4 @@
             android:textColor="?attr/colorPrimary" />
     </FrameLayout>
 
-    <RelativeLayout
-        android:id="@+id/rl_empty"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="60dp">
-
-        <ImageView
-            android:id="@+id/iv_empty"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:scaleType="centerInside"
-            android:src="@drawable/ic_empty" />
-
-        <TextView
-            android:id="@+id/tv_empty_tip"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/iv_empty"
-            android:gravity="center"
-            android:paddingTop="10dp"
-            android:text="暂无数据，请下拉重试" />
-    </RelativeLayout>
 </FrameLayout>

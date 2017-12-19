@@ -24,6 +24,7 @@ import com.wongxd.absolutedomain.base.BaseSwipeActivity
 import com.wongxd.absolutedomain.base.rx.RxBus
 import com.wongxd.absolutedomain.base.rx.RxEventCodeType
 import com.wongxd.absolutedomain.bean.TypeBean
+import com.wongxd.absolutedomain.bean.UserBean
 import com.wongxd.absolutedomain.fgt.BaseTypeFragment
 import com.wongxd.absolutedomain.fgt.jdlingyu.JdlingyuFgt
 import com.wongxd.absolutedomain.fgt.keke123.KeKe123Fgt
@@ -254,7 +255,7 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
                 .commit()
 
         Bmob.initialize(this, App.BMOB_ID)
-        App.user = BmobUser.getCurrentUser(this)
+        App.user = BmobUser.getCurrentUser(this,UserBean::class.java)
 
         RxBus.getDefault().toObservable(RxEventCodeType.LOGOUT, String::class.java)
                 .subscribe {

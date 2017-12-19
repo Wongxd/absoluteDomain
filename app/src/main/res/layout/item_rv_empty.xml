@@ -19,5 +19,5 @@
         android:layout_below="@+id/iv_empty"
         android:paddingTop="10dp"
         android:gravity="center"
-        android:text="暂无数据，请下拉重试" />
+        android:text="暂无数据" />
 </RelativeLayout>

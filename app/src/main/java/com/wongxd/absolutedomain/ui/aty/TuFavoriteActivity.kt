@@ -15,7 +15,6 @@ import android.widget.*
 import cn.bmob.v3.BmobUser
 import cn.bmob.v3.datatype.BmobFile
 import cn.bmob.v3.listener.DeleteListener
-import cn.bmob.v3.listener.DownloadFileListener
 import cn.bmob.v3.listener.UpdateListener
 import cn.bmob.v3.listener.UploadFileListener
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -46,6 +45,7 @@ import org.jetbrains.anko.toast
 import org.jetbrains.anko.uiThread
 import org.json.JSONObject
 import java.io.File
+import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -105,9 +105,7 @@ class TuFavoriteActivity : BaseSwipeActivity() {
         if (current == null) {
             pDialog.changeAlertType(SweetAlertDialog.ERROR_TYPE)
             pDialog.contentText = "请先登录"
-            pDialog.setCancelClickListener {
-                pDialog.dismissWithAnimation()
-            }
+            pDialog.setCancelClickListener { pDialog.dismissWithAnimation() }
             return
         }
 
@@ -118,62 +116,42 @@ class TuFavoriteActivity : BaseSwipeActivity() {
             pDialog.setCancelClickListener { pDialog.dismissWithAnimation() }
             return
         }
+        Logger.e("从云端还原备份文件--" + bmobF.getFileUrl(this))
 
-        val file = File(FileUtils.getRootDirPath() + "temp.ttt")
-        if (!file.exists()) {
-            val dir = File(file.parent)
-            dir.mkdirs()
-            file.createNewFile()
-        } else {
-            file.delete()
-        }
+        doAsync {
+            val info = URL(bmobF.getFileUrl(this@TuFavoriteActivity)).readText() ?: " "
 
-        bmobF.download(this, file, object : DownloadFileListener() {
-            override fun onSuccess(p0: String?) {
+            val json = JSONObject(info)
+            val list = json.optJSONArray("list")
+            var i = 0
+            val length = list.length()
 
-                val info = file.readText() ?: " "
-                doAsync {
-                    val json = JSONObject(info)
-                    val list = json.optJSONArray("list")
-                    var i = 0
-                    val length = list.length()
-
-                    if (list.length() == 0) {
-                        uiThread {
-                            pDialog.changeAlertType(SweetAlertDialog.NORMAL_TYPE)
-                            pDialog.contentText = "云中没有备份"
-                            pDialog.setCancelClickListener { pDialog.dismissWithAnimation() }
-                        }
-                        return@doAsync
-                    }
-
-                    while (i < length) {
-                        val obj = list.optJSONObject(i)
-                        val name = obj.optString("name")
-                        val adress = obj.optString("address")
-                        val imgPath = obj.optString("imgPath")
-                        restoreToDB(name, adress, imgPath)
-                        i++
-                    }
-
-                    uiThread {
-                        pDialog.changeAlertType(SweetAlertDialog.SUCCESS_TYPE)
-                        pDialog.contentText = "从云端同步完成"
-                        pDialog.setCancelClickListener { pDialog.dismissWithAnimation() }
-                        initData()
-                    }
-
+            if (list.length() == 0) {
+                uiThread {
+                    pDialog.changeAlertType(SweetAlertDialog.NORMAL_TYPE)
+                    pDialog.contentText = "云中没有备份"
+                    pDialog.setCancelClickListener { pDialog.dismissWithAnimation() }
                 }
-
+                return@doAsync
             }
 
-            override fun onFailure(p0: Int, p1: String?) {
-                pDialog.changeAlertType(SweetAlertDialog.ERROR_TYPE)
-                pDialog.contentText = "从云端同步失败---" + p1
+            while (i < length) {
+                val obj = list.optJSONObject(i)
+                val name = obj.optString("name")
+                val adress = obj.optString("address")
+                val imgPath = obj.optString("imgPath")
+                restoreToDB(name, adress, imgPath)
+                i++
+            }
+
+            uiThread {
+                pDialog.changeAlertType(SweetAlertDialog.SUCCESS_TYPE)
+                pDialog.contentText = "从云端同步完成"
                 pDialog.setCancelClickListener { pDialog.dismissWithAnimation() }
+                initData()
             }
-        })
 
+        }
 
     }
 
@@ -225,7 +203,7 @@ class TuFavoriteActivity : BaseSwipeActivity() {
 
                     sb.append("]}")
 
-                    val file = File(FileUtils.getRootDirPath() + "temp.ttt")
+                    val file = File(FileUtils.getRootDirPath() + current.username + "--cloud-temp.ttt")
                     if (!file.exists()) {
                         val dir = File(file.parent)
                         dir.mkdirs()

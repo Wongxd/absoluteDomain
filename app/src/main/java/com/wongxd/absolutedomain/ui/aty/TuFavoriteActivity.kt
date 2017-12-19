@@ -13,11 +13,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import cn.bmob.v3.BmobUser
+import cn.bmob.v3.datatype.BmobFile
+import cn.bmob.v3.listener.DeleteListener
+import cn.bmob.v3.listener.DownloadFileListener
 import cn.bmob.v3.listener.UpdateListener
+import cn.bmob.v3.listener.UploadFileListener
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.ontbee.legacyforks.cn.pedant.SweetAlert.SweetAlertDialog
 import com.orhanobut.logger.Logger
+import com.wongxd.absolutedomain.App
 import com.wongxd.absolutedomain.R
 import com.wongxd.absolutedomain.base.BaseSwipeActivity
 import com.wongxd.absolutedomain.base.rx.RxBus
@@ -106,40 +111,69 @@ class TuFavoriteActivity : BaseSwipeActivity() {
             return
         }
 
-        val info = current.favorite
-
-        doAsync {
-            val json = JSONObject(info)
-            val list = json.optJSONArray("list")
-            var i = 0
-            val length = list.length()
-
-            if (list.length() == 0) {
-                uiThread {
-                    pDialog.changeAlertType(SweetAlertDialog.NORMAL_TYPE)
-                    pDialog.contentText = "云中没有备份"
-                    pDialog.setCancelClickListener { pDialog.dismissWithAnimation() }
-                }
-                return@doAsync
-            }
-
-            while (i < length) {
-                val obj = list.optJSONObject(i)
-                val name = obj.optString("name")
-                val adress = obj.optString("address")
-                val imgPath = obj.optString("imgPath")
-                restoreToDB(name, adress, imgPath)
-                i++
-            }
-
-            uiThread {
-                pDialog.changeAlertType(SweetAlertDialog.SUCCESS_TYPE)
-                pDialog.contentText = "从云端同步完成"
-                pDialog.setCancelClickListener { pDialog.dismissWithAnimation() }
-                initData()
-            }
-
+        val bmobF = current.favorite
+        if (bmobF == null) {
+            pDialog.changeAlertType(SweetAlertDialog.NORMAL_TYPE)
+            pDialog.contentText = "云端没有备份"
+            pDialog.setCancelClickListener { pDialog.dismissWithAnimation() }
+            return
         }
+
+        val file = File(FileUtils.getRootDirPath() + "temp.ttt")
+        if (!file.exists()) {
+            val dir = File(file.parent)
+            dir.mkdirs()
+            file.createNewFile()
+        } else {
+            file.delete()
+        }
+
+        bmobF.download(this, file, object : DownloadFileListener() {
+            override fun onSuccess(p0: String?) {
+
+                val info = file.readText() ?: " "
+                doAsync {
+                    val json = JSONObject(info)
+                    val list = json.optJSONArray("list")
+                    var i = 0
+                    val length = list.length()
+
+                    if (list.length() == 0) {
+                        uiThread {
+                            pDialog.changeAlertType(SweetAlertDialog.NORMAL_TYPE)
+                            pDialog.contentText = "云中没有备份"
+                            pDialog.setCancelClickListener { pDialog.dismissWithAnimation() }
+                        }
+                        return@doAsync
+                    }
+
+                    while (i < length) {
+                        val obj = list.optJSONObject(i)
+                        val name = obj.optString("name")
+                        val adress = obj.optString("address")
+                        val imgPath = obj.optString("imgPath")
+                        restoreToDB(name, adress, imgPath)
+                        i++
+                    }
+
+                    uiThread {
+                        pDialog.changeAlertType(SweetAlertDialog.SUCCESS_TYPE)
+                        pDialog.contentText = "从云端同步完成"
+                        pDialog.setCancelClickListener { pDialog.dismissWithAnimation() }
+                        initData()
+                    }
+
+                }
+
+            }
+
+            override fun onFailure(p0: Int, p1: String?) {
+                pDialog.changeAlertType(SweetAlertDialog.ERROR_TYPE)
+                pDialog.contentText = "从云端同步失败---" + p1
+                pDialog.setCancelClickListener { pDialog.dismissWithAnimation() }
+            }
+        })
+
 
     }
 
@@ -191,16 +225,54 @@ class TuFavoriteActivity : BaseSwipeActivity() {
 
                     sb.append("]}")
 
+                    val file = File(FileUtils.getRootDirPath() + "temp.ttt")
+                    if (!file.exists()) {
+                        val dir = File(file.parent)
+                        dir.mkdirs()
+                        file.createNewFile()
+                    } else {
+                        file.delete()
+                    }
+                    file.writeText(sb.toString())
 
-                    val user = UserBean()
-                    user.favorite = sb.toString()
-                    user.update(this@TuFavoriteActivity, current.objectId, object : UpdateListener() {
+                    val bmobFile = BmobFile(file)
+                    //上传新的备份文件
+                    bmobFile.uploadblock(this@TuFavoriteActivity, object : UploadFileListener() {
                         override fun onSuccess() {
-                            uiThread {
-                                pDialog.changeAlertType(SweetAlertDialog.SUCCESS_TYPE)
-                                pDialog.contentText = "成功备份到云端"
-                                pDialog.setCancelClickListener { pDialog.dismissWithAnimation() }
-                            }
+
+                            //删除旧的备份文件
+                            val oldFile = current.favorite
+                            oldFile?.delete(this@TuFavoriteActivity, object : DeleteListener() {
+                                override fun onSuccess() {
+                                    Logger.d("图集备份到云端", "清除历史备份成功")
+                                }
+
+                                override fun onFailure(p0: Int, p1: String?) {
+                                    TU.cT("清除历史备份失败---$p1")
+                                }
+                            })
+
+                            //备份文件与用户关联
+                            val user = UserBean()
+                            user.favorite = bmobFile
+                            user.update(this@TuFavoriteActivity, current.objectId, object : UpdateListener() {
+                                override fun onSuccess() {
+                                    uiThread {
+                                        App.user = BmobUser.getCurrentUser(this@TuFavoriteActivity, UserBean::class.java)
+                                        pDialog.changeAlertType(SweetAlertDialog.SUCCESS_TYPE)
+                                        pDialog.contentText = "成功备份到云端"
+                                        pDialog.setCancelClickListener { pDialog.dismissWithAnimation() }
+                                    }
+                                }
+
+                                override fun onFailure(p0: Int, p1: String?) {
+                                    uiThread {
+                                        pDialog.changeAlertType(SweetAlertDialog.ERROR_TYPE)
+                                        pDialog.contentText = p1
+                                        pDialog.setCancelClickListener { pDialog.dismissWithAnimation() }
+                                    }
+                                }
+                            })
                         }
 
                         override fun onFailure(p0: Int, p1: String?) {

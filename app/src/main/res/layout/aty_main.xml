@@ -30,12 +30,13 @@
 
 
                 <TextView
-                    android:id="@+id/tv_title"
+                    android:id="@+id/tv_title_aty_main"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
                     android:clickable="false"
                     android:gravity="center"
-                    android:text="@string/app_name"
                     android:textColor="?attr/colorPrimary" />
 
                 <TextView

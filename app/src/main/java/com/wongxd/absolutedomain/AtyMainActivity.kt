@@ -85,28 +85,28 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
 
         when (flag) {
             1 -> {
-                tv_title.text = "jdlingyu"
+                tv_title_aty_main.text = "jdlingyu"
                 currentTypeList = JdlingyuFgt.typeList
                 currentFgt = JdlingyuFgt()
             }
             2 -> {
-                tv_title.text = "keke123"
+                tv_title_aty_main.text = "keke123"
                 currentTypeList = KeKe123Fgt.typeList
                 currentFgt = KeKe123Fgt()
             }
             3 -> {
-                tv_title.text = "192tt"
+                tv_title_aty_main.text = "192tt"
                 currentTypeList = t192ttFgt.typeList
                 currentFgt = t192ttFgt()
             }
             4 -> {
 
-                tv_title.text = "mmonly"
+                tv_title_aty_main.text = "mmonly"
                 currentTypeList = MMonlyFgt.typeList
                 currentFgt = MMonlyFgt()
             }
             5 -> {
-                tv_title.text = "nvshens"
+                tv_title_aty_main.text = "nvshens"
                 currentTypeList = NvshensFgt.typeList
                 currentFgt = NvshensFgt()
             }
@@ -248,6 +248,7 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
 
         initPermission()
 
+        tv_title_aty_main.text="jdlingyu"
         currentTypeList = JdlingyuFgt.typeList
         initTablayout()
         currentFgt = JdlingyuFgt()

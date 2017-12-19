@@ -34,7 +34,7 @@ fun ImageView.loadImgByPath(imgPath: String) {
 }
 
 
-fun ImageView.loadHeader(imgPath: String) {
+fun ImageView.loadHeader(imgPath: Any) {
     Glide.with(context.applicationContext).load(imgPath)
             .placeholder(R.drawable.not_login_img)
             .crossFade(500)

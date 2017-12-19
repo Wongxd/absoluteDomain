@@ -18,20 +18,22 @@
     <!--允许读取手机状态 用于创建BmobInstallation-->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
+
     <application
         android:name=".App"
         android:allowBackup="true"
         android:icon="@drawable/icon"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/SwipeTheme">
+        android:theme="@style/SwipeTheme"
+        tools:replace="android:icon">
 
         <provider
-            tools:replace="android:authorities"
             android:name="android.support.v4.content.FileProvider"
             android:authorities="com.wongxd.absolutedomain.fileProvider"
             android:exported="false"
-            android:grantUriPermissions="true">
+            android:grantUriPermissions="true"
+            tools:replace="android:authorities">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
@@ -58,16 +60,18 @@
                     android:mimeType="*/*"
                     android:scheme="file" />
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
             </intent-filter>
         </activity>
-        <activity android:name=".UserInfoActivity" />
-        <activity android:name=".LoginActivity" />
-        <activity android:name=".RegisterActivity" />
+        <activity android:name=".user.UserInfoActivity" />
+        <activity android:name=".login.LoginActivity" />
+        <activity android:name=".login.RegisterActivity" />
         <activity
             android:name=".photo.TakeImgActivity"
             android:theme="@style/transeparent" />
+        <activity android:name=".user.UpdatePwdActivity" />
     </application>
 
 </manifest>

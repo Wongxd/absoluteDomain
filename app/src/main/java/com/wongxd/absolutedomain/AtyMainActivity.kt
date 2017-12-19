@@ -16,11 +16,10 @@ import android.transition.Explode
 import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.TextView
+import cn.bmob.v3.Bmob
+import cn.bmob.v3.BmobUser
 import com.jude.swipbackhelper.SwipeBackHelper
-import com.orhanobut.logger.Logger
 import com.tbruyelle.rxpermissions2.RxPermissions
-import com.wongxd.absolutedomain.Retrofit.ApiStore
-import com.wongxd.absolutedomain.Retrofit.RetrofitUtils
 import com.wongxd.absolutedomain.base.BaseSwipeActivity
 import com.wongxd.absolutedomain.base.rx.RxBus
 import com.wongxd.absolutedomain.base.rx.RxEventCodeType
@@ -31,15 +30,16 @@ import com.wongxd.absolutedomain.fgt.keke123.KeKe123Fgt
 import com.wongxd.absolutedomain.fgt.mmonly.MMonlyFgt
 import com.wongxd.absolutedomain.fgt.nvshens.NvshensFgt
 import com.wongxd.absolutedomain.fgt.t192tt.t192ttFgt
+import com.wongxd.absolutedomain.login.LoginActivity
 import com.wongxd.absolutedomain.ui.aty.ThemeActivity
 import com.wongxd.absolutedomain.ui.aty.TuFavoriteActivity
+import com.wongxd.absolutedomain.user.UserInfoActivity
 import com.wongxd.absolutedomain.util.StatusBarUtil
 import com.wongxd.absolutedomain.util.TU
 import com.wongxd.absolutedomain.util.cache.DataCleanManager
 import com.wongxd.absolutedomain.util.cache.GlideCatchUtil
-import io.reactivex.schedulers.Schedulers
+import com.wongxd.partymanage.base.kotin.extension.loadHeader
 import kotlinx.android.synthetic.main.aty_main.*
-import java.net.URL
 
 
 class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -214,7 +214,7 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
 
         //状态栏透明和间距处理
         StatusBarUtil.immersive(this)
-        StatusBarUtil.setMargin(this,toolbar_aty_main)
+        StatusBarUtil.setMargin(this, toolbar_aty_main)
 
 
         RxBus.getDefault().register(this)
@@ -247,24 +247,19 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
 
         initPermission()
 
-        //加载一次我的博客
-        val apiStore = RetrofitUtils.getStringInstance().create(ApiStore::class.java)
-        apiStore.getString("https://wongxd.github.io/")
-                .subscribeOn(Schedulers.io())
-                .subscribe({
-                    Logger.e("加载博客 ${it.substring(0, 100)}")
-                })
-
-
-        Thread({ URL("https://wongxd.github.io").readText() }).start()
-
         currentTypeList = JdlingyuFgt.typeList
         initTablayout()
         currentFgt = JdlingyuFgt()
         supportFragmentManager.beginTransaction().replace(R.id.fl_container_aty_main, currentFgt)
                 .commit()
 
-//        App.user = BmobUser.getCurrentUser(this)
+        Bmob.initialize(this, App.BMOB_ID)
+        App.user = BmobUser.getCurrentUser(this)
+
+        RxBus.getDefault().toObservable(RxEventCodeType.LOGOUT, String::class.java)
+                .subscribe {
+                   showUserInfo()
+                }
 
     }
 
@@ -298,9 +293,6 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
     }
 
 
-
-
-
     private lateinit var ivHeader: ImageView
     private lateinit var tvUserName: TextView
     private fun initUserHeader() {
@@ -324,6 +316,13 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
 
     private fun showUserInfo() {
 
+        tvUserName.text = "未登录用户"
+        ivHeader.loadHeader(R.drawable.not_login_img)
+
+        App.user?.let {
+            tvUserName.text = it.username
+            ivHeader.loadHeader(R.drawable.login_suc)
+        }
     }
 
 

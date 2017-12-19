@@ -80,16 +80,21 @@ class TuFavoriteActivity : BaseSwipeActivity() {
 
         val list: MutableList<JDLY> = ArrayList()
 
-        val files = JDLYFileFilter.getAllFilePath(FileUtils.getRootDirPath())
+        try {
+            val files = JDLYFileFilter.getAllFilePath(FileUtils.getRootDirPath())
 
-        files.sortByDescending { it.lastModified() }
+            files.sortByDescending { it.lastModified() }
 
-        for (f in files) {
-            val path = f.path
-            val size = f.length()
-            val dot = path.lastIndexOf("/");
-            val name = path.substring(dot + 1);
-            list.add(JDLY(name, path, FileUtils.getFileSize(size)))
+            for (f in files) {
+                val path = f.path
+                val size = f.length()
+                val dot = path.lastIndexOf("/");
+                val name = path.substring(dot + 1);
+                list.add(JDLY(name, path, FileUtils.getFileSize(size)))
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            TU.cT("读取存储卡失败！")
         }
 
         return list
@@ -99,7 +104,8 @@ class TuFavoriteActivity : BaseSwipeActivity() {
 
     private fun inportFromFile() {
 
-        val baks: MutableList<JDLY> = queryFilesByJava()
+        val baks: MutableList<JDLY> = ArrayList()
+        baks.addAll(queryFilesByJava())
 
 //        for (i in baks) {
 //            Logger.e("baks大小---${baks.size}---${i.path}----${i.name}----${i.size}")

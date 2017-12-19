@@ -10,6 +10,7 @@ import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.text.ClipboardManager;
+import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 import android.view.WindowManager;
@@ -104,6 +105,21 @@ public class SystemUtils {
         Intent intent = new Intent(thisActivity, clazz)
                 .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         thisActivity.startActivity(intent);
+    }
+
+    /**
+     * 判断是否有字符串 为 empty
+     *
+     * @param txts
+     * @return
+     */
+    public static boolean isHadEmptyText(String... txts) {
+        for (String s : txts) {
+            if (TextUtils.isEmpty(s)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 

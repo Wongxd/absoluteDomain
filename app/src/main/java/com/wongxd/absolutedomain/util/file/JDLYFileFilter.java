@@ -2,6 +2,7 @@ package com.wongxd.absolutedomain.util.file;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,8 +33,17 @@ public class JDLYFileFilter implements FileFilter {
         List<File> results = new ArrayList<>();
 
         File file = new File(rootPath);
+        if (!file.exists()) try {
+            File dir = file.getParentFile();
+            dir.mkdirs();
+            file.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         File[] files = file.listFiles(new JDLYFileFilter());
+        if (files == null) return null;
         for (File f : files) {
+            if (f == null) continue;
             if (f.isDirectory()) {
                 getAllFilePath(f.getPath());
             } else {

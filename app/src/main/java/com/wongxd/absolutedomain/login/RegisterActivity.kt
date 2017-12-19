@@ -1,7 +1,8 @@
-package com.wongxd.absolutedomain
+package com.wongxd.absolutedomain.login
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.support.annotation.RequiresApi
@@ -11,7 +12,12 @@ import android.transition.TransitionInflater
 import android.view.View
 import android.view.ViewAnimationUtils
 import android.view.animation.AccelerateInterpolator
+import cn.bmob.v3.listener.SaveListener
+import com.ontbee.legacyforks.cn.pedant.SweetAlert.SweetAlertDialog
+import com.wongxd.absolutedomain.R
 import com.wongxd.absolutedomain.base.BaseActivity
+import com.wongxd.absolutedomain.bean.UserBean
+import com.wongxd.absolutedomain.util.StatusBarUtil
 import com.wongxd.absolutedomain.util.TU
 import kotlinx.android.synthetic.main.aty_register.*
 
@@ -29,6 +35,7 @@ class RegisterActivity : BaseActivity() {
         setContentView(R.layout.aty_register)
         cvAdd = cv_add_aty_register
 
+        StatusBarUtil.immersive(this)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             ShowEnterAnimation()
@@ -58,7 +65,7 @@ class RegisterActivity : BaseActivity() {
                 return@setOnClickListener
             }
 
-            doRegister(userName,pwd)
+            doRegister(userName, pwd)
         }
     }
 
@@ -140,5 +147,32 @@ class RegisterActivity : BaseActivity() {
 
 
     fun doRegister(userName: String, pwd: String) {
+
+        val pDialog = SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE)
+        pDialog.progressHelper.barColor = Color.parseColor("#A5DC86")
+        pDialog.titleText = "注册中"
+        pDialog.setCancelable(false)
+        pDialog.show()
+
+        val bu = UserBean()
+        bu.username = userName
+        bu.setPassword(pwd)
+        //注意：不能用save方法进行注册
+        bu.signUp(this, object : SaveListener() {
+            override fun onSuccess() {
+                pDialog.changeAlertType(SweetAlertDialog.SUCCESS_TYPE)
+                pDialog.titleText = "注册成功，请登录"
+                finish()
+                pDialog.dismiss()
+            }
+
+            override fun onFailure(p0: Int, p1: String?) {
+                pDialog.changeAlertType(SweetAlertDialog.ERROR_TYPE)
+                pDialog.contentText = p1
+                pDialog.setConfirmClickListener {
+                    pDialog.dismissWithAnimation()
+                }
+            }
+        })
     }
 }

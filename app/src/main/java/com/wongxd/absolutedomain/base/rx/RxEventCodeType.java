@@ -18,4 +18,6 @@ public class RxEventCodeType {
 
     public static final int GET_USER_INFO = 1003;
 
+
+    public static final int LOGOUT = 1004;
 }

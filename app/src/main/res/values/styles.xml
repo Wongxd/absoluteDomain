@@ -1,5 +1,32 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="QMUI.Compat.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary_d</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark_d</item>
+        <item name="colorAccent">@color/colorAccent_d</item>
+
+        <!-- set Can use Activity transitions -->
+        <item name="android:windowContentTransitions" tools:targetApi="lollipop">true</item>
+
+        <!-- 配置qmui提供的theme -->
+        <item name="qmui_config_color_blue">?attr/colorPrimary</item>
+        <item name="qmui_topbar_title_color">@color/qmui_config_color_white</item>
+        <item name="qmui_topbar_subtitle_color">@color/qmui_config_color_white</item>
+        <item name="qmui_topbar_text_btn_color_state_list">?attr/colorPrimary</item>
+        <item name="qmui_topbar_height">48dp</item>
+        <item name="qmui_topbar_image_btn_height">48dp</item>
+        <item name="qmui_round_btn_bg_color">@color/gray_btn_bg_color</item>
+        <item name="qmui_round_btn_border_color">?attr/colorPrimary</item>
+        <item name="qmui_round_btn_text_color">?attr/colorPrimary</item>
+        <item name="qmui_content_spacing_horizontal">20dp</item>
+        <item name="qmui_content_padding_horizontal">@dimen/qmui_content_spacing_horizontal</item>
+
+        <item name="android:windowSoftInputMode">adjustPan</item>
+    </style>
+
     <style name="transeparent" parent="AppTheme">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
@@ -10,16 +37,17 @@
         <item name="colorControlActivated">#FFCC00</item>
     </style>
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary_d</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark_d</item>
-        <item name="colorAccent">@color/colorAccent_d</item>
+    <!--&lt;!&ndash; Base application theme. &ndash;&gt;-->
+    <!--<style name="AppTheme" parent="Theme.AppCompat.Light">-->
+        <!--&lt;!&ndash; Customize your theme here. &ndash;&gt;-->
+        <!--<item name="colorPrimary">@color/colorPrimary_d</item>-->
+        <!--<item name="colorPrimaryDark">@color/colorPrimaryDark_d</item>-->
+        <!--<item name="colorAccent">@color/colorAccent_d</item>-->
 
-        <!-- set Can use Activity transitions -->
-        <item name="android:windowContentTransitions" tools:targetApi="lollipop">true</item>
-    </style>
+        <!--&lt;!&ndash; set Can use Activity transitions &ndash;&gt;-->
+        <!--<item name="android:windowContentTransitions" tools:targetApi="lollipop">true</item>-->
+    <!--<item name="android:windowSoftInputMode">adjustPan</item>-->
+    <!--</style>-->
 
     <style name="AppTheme.NoActionBar" parent="SwipeTheme">
         <!-- Customize your theme here. -->
@@ -38,7 +66,7 @@
     </style>
 
 
-    <style name="SwipeTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="SwipeTheme" parent="AppTheme">
         <!-- Customize your theme here. -->
         <!--//背景透明，不设滑动关闭时背景就是黑的。-->
         <item name="android:windowIsTranslucent">true</item>
@@ -48,7 +76,7 @@
         <item name="colorAccent">@color/colorAccent_d</item>
     </style>
 
-    <style name="MainActivityTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="MainActivityTheme" parent="AppTheme">
         <!-- Customize your theme here. -->
         <!--//背景透明，不设滑动关闭时背景就是黑的。-->
         <item name="android:windowIsTranslucent">false</item>
@@ -269,12 +297,5 @@
         <item name="material_drawer_selected_text">@color/ThemeDarkBlack</item>
     </style>
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
-
-    <style name="ThemeLime.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-
-    <style name="ThemeLime.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
 </resources>

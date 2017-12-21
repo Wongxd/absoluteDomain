@@ -20,25 +20,42 @@ import org.jetbrains.anko.db.select
 
 class RvHomeAdapter(val click: (HomeListBean) -> Unit) : BaseQuickAdapter<HomeListBean, BaseViewHolder>(R.layout.item_rv_main) {
     override fun convert(helper: BaseViewHolder, item: HomeListBean) {
-        with(helper) {
-            setText(R.id.tv_title, item.title)
-                    .setText(R.id.tv_time, item.date)
-            getView<MaskImageView>(R.id.iv).loadImg(item.imgPath)
-
-            mContext.tuDB.use {
-                val list = select(TuTable.TABLE_NAME).whereSimple(TuTable.ADDRESS + "=?", item.url).parseList { Tu(HashMap(it)) }
-                if (list.isNotEmpty())
-                    helper.getView<TextView>(R.id.tv_title).setBackgroundColor(Color.parseColor("#f97198"))
-                else
-                    helper.getView<TextView>(R.id.tv_title).setBackgroundColor(Color.WHITE)
-            }
-
-            itemView.setOnClickListener { click(item) }
-        }
+        setData(helper, item, null)
     }
 
     override fun onBindViewHolder(holder: BaseViewHolder?, position: Int, payloads: MutableList<Any>?) {
-        onBindViewHolder(holder,position)
+        setData(holder!!, mData[holder.layoutPosition - headerLayoutCount], payloads)
+    }
+
+
+    private fun setData(helper: BaseViewHolder, item: HomeListBean, payloads: MutableList<Any>?) {
+        if (payloads == null || payloads.isEmpty()) {  //适配局部刷新
+            with(helper) {
+                setText(R.id.tv_title, item.title)
+                        .setText(R.id.tv_time, item.date)
+                getView<MaskImageView>(R.id.iv).loadImg(item.imgPath)
+
+                changeFavoriteState(item, helper)
+
+                itemView.setOnClickListener { click(item) }
+            }
+        } else {
+            changeFavoriteState(item, helper)
+        }
+    }
+
+
+    /**
+     * 改变收藏状态
+     */
+    private fun changeFavoriteState(item: HomeListBean, helper: BaseViewHolder) {
+        mContext.tuDB.use {
+            val list = select(TuTable.TABLE_NAME).whereSimple(TuTable.ADDRESS + "=?", item.url).parseList { Tu(HashMap(it)) }
+            if (list.isNotEmpty())
+                helper.getView<TextView>(R.id.tv_title).setBackgroundColor(Color.parseColor("#f97198"))
+            else
+                helper.getView<TextView>(R.id.tv_title).setBackgroundColor(Color.WHITE)
+        }
     }
 
 }

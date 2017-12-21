@@ -56,7 +56,7 @@ class ViewBigImageActivity : BaseSwipeActivity(), ViewPager.OnPageChangeListener
 
     companion object {
         // 保存图片
-        var tv_save_big_image: TextView? = null
+        var tv_save_big_image: TextView by Delegates.notNull()
         // 接收传过来的uri地址
         var imageurl: List<String>? = null
         // 用于管理图片的滑动
@@ -198,6 +198,9 @@ class ViewBigImageActivity : BaseSwipeActivity(), ViewPager.OnPageChangeListener
 
     }
 
+
+
+
     /**
      * 添加进度监听
      * @param position
@@ -255,17 +258,17 @@ class ViewBigImageActivity : BaseSwipeActivity(), ViewPager.OnPageChangeListener
                     .placeholder(R.drawable.placeholder)
                     .error(R.drawable.error)
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .crossFade(700)
+                    .crossFade(500)
                     .listener(object : RequestListener<String, GlideDrawable> {
                         override fun onResourceReady(resource: GlideDrawable?, model: String?, target: Target<GlideDrawable>?,
                                                      isFromMemoryCache: Boolean, isFirstResource: Boolean): Boolean {
                             spinner.visibility = View.GONE
 
-                            /**这里应该是加载成功后图片的高 */
-                            val height = zoom_image_view.height
+                            /**这里应该是加载成功后图片的宽 */
+                            val imgWidth = zoom_image_view.width
 
-                            val wHeight = windowManager.defaultDisplay.height
-                            if (height > wHeight) {
+                            val defWidth = windowManager.defaultDisplay.width
+                            if (imgWidth > defWidth) {
                                 zoom_image_view.scaleType = ImageView.ScaleType.CENTER_CROP
                             } else {
                                 zoom_image_view.scaleType = ImageView.ScaleType.FIT_CENTER

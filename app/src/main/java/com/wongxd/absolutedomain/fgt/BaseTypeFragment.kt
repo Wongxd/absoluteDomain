@@ -6,6 +6,7 @@ import android.support.v7.widget.GridLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.chad.library.adapter.base.BaseQuickAdapter
 import com.wongxd.absolutedomain.R
 import com.wongxd.absolutedomain.adapter.RvHomeAdapter
 import com.wongxd.absolutedomain.base.BaseLazyFragment
@@ -18,7 +19,6 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.annotations.NonNull
 import io.reactivex.functions.Consumer
-import jp.wasabeef.recyclerview.animators.LandingAnimator
 import kotlinx.android.synthetic.main.fgt_type.*
 import org.jetbrains.anko.db.insert
 import org.jetbrains.anko.db.select
@@ -77,11 +77,10 @@ abstract class BaseTypeFragment : BaseLazyFragment() {
                             tu.name = bean.title
                             tu.imgPath = bean.imgPath
                             insert(TuTable.TABLE_NAME, *tu.map.toVarargArray())
-                            adpater.notifyItemChanged(position, "1")
                         } else {
                             delete(TuTable.TABLE_NAME, TuTable.ADDRESS + "=?", arrayOf(bean.url))
-                            adpater.notifyItemChanged(position, "1")
                         }
+                        adpater.notifyItemChanged(position, "changeFavorite")
                     }
                 }
             }
@@ -91,8 +90,8 @@ abstract class BaseTypeFragment : BaseLazyFragment() {
 
 
         rv_fgt_type.adapter = adpater
-        rv_fgt_type.itemAnimator = LandingAnimator()
         rv_fgt_type.layoutManager = GridLayoutManager(context, 2)
+        adpater.openLoadAnimation(BaseQuickAdapter.SLIDEIN_BOTTOM)
 
     }
 

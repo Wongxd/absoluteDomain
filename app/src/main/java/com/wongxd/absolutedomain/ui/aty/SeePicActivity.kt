@@ -5,6 +5,8 @@ import android.os.SystemClock
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.StaggeredGridLayoutManager
 import android.text.TextUtils
+import com.chad.library.adapter.base.BaseQuickAdapter
+import com.ontbee.legacyforks.cn.pedant.SweetAlert.SweetAlertDialog
 import com.orhanobut.logger.Logger
 import com.scwang.smartrefresh.layout.util.DensityUtil
 import com.wongxd.absolutedomain.R
@@ -18,7 +20,6 @@ import com.wongxd.absolutedomain.base.rx.Subscribe
 import com.wongxd.absolutedomain.bean.ChildDetailBean
 import com.wongxd.absolutedomain.util.JsoupUtil
 import com.wongxd.absolutedomain.util.StatusBarUtil
-import com.wongxd.absolutedomain.util.TU
 import com.wongxd.wthing_kotlin.database.*
 import jp.wasabeef.recyclerview.animators.LandingAnimator
 import kotlinx.android.synthetic.main.aty_see_pic.*
@@ -67,6 +68,7 @@ class SeePicActivity : BaseSwipeActivity() {
         })
 
         adpater?.setEmptyView(R.layout.item_rv_empty, rv_see_pic)
+        adpater?.openLoadAnimation(BaseQuickAdapter.SLIDEIN_BOTTOM)
 
 
         val url = intent.getStringExtra("url")
@@ -86,7 +88,11 @@ class SeePicActivity : BaseSwipeActivity() {
 
     fun doGetDetail(url: String) {
         if (TextUtils.isEmpty(url)) {
-            TU.cT("没有获取到 该图集 的 url")
+            val dia = SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE)
+            dia.contentText = "没有获取到 该图集 的 url"
+            dia.setCancelable(false)
+            dia.setCancelClickListener { dia.dismissWithAnimation() }
+            dia.show()
             smartLayout.finishRefresh()
             return
         }

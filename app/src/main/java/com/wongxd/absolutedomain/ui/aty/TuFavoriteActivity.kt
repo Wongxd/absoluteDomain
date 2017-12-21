@@ -691,6 +691,7 @@ class TuFavoriteActivity : BaseSwipeActivity() {
         }
         rv_favorite.layoutManager = layoutManager
         adpater.setEmptyView(R.layout.item_rv_empty, rv_favorite)
+        adpater.openLoadAnimation(BaseQuickAdapter.SLIDEIN_BOTTOM)
 
 
     }

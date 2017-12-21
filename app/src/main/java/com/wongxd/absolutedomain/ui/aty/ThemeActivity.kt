@@ -12,14 +12,14 @@ import com.chad.library.adapter.base.BaseViewHolder
 import com.orhanobut.logger.Logger
 import com.wongxd.absolutedomain.AtyMainActivity
 import com.wongxd.absolutedomain.R
-import com.wongxd.absolutedomain.base.BaseActivity
+import com.wongxd.absolutedomain.base.BaseSwipeActivity
 import com.wongxd.absolutedomain.base.exception.AppManager
 import com.wongxd.absolutedomain.bean.ThemeBean
 import com.wongxd.absolutedomain.util.ConfigUtils
 import jp.wasabeef.recyclerview.animators.LandingAnimator
 import kotlinx.android.synthetic.main.aty_theme.*
 
-class ThemeActivity : BaseActivity() {
+class ThemeActivity : BaseSwipeActivity() {
 
     var last = 0
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,15 +67,18 @@ class ThemeActivity : BaseActivity() {
         return themes
     }
 
-    override fun onBackPressed() {
-        Logger.e(ConfigUtils.getTheme(applicationContext).toString() +"  "+ last.toString())
-        if (ConfigUtils.getTheme(applicationContext) == last) finish()
+
+    override fun finish() {
+        Logger.e(ConfigUtils.getTheme(applicationContext).toString() +"---"+ last.toString())
+        if (ConfigUtils.getTheme(applicationContext) == last)  super.finish()
         else {
             AppManager.getAppManager().finishActivity(AtyMainActivity::class.java)
             startActivity(Intent(this, AtyMainActivity::class.java))
-            finish()
+            super.finish()
         }
+
     }
+
 
     class ThemeAdapter : BaseQuickAdapter<ThemeBean, BaseViewHolder>(R.layout.item_rv_theme) {
         override fun convert(helper: BaseViewHolder?, item: ThemeBean?) {

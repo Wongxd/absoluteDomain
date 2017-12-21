@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.text.ClipboardManager;
@@ -94,6 +95,19 @@ public class SystemUtils {
         return false;
     }
 
+    /**
+     * 获取状态栏高度
+     * @param res
+     * @return
+     */
+    public int getStatusBarHeight(Resources res) {
+        int result = 0;
+        int resourceId = res.getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = res.getDimensionPixelSize(resourceId);
+        }
+        return result;
+    }
 
     /**
      * 跳转到指定activity 并且清空任务栈

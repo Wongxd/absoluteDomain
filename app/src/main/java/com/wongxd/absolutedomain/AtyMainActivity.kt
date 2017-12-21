@@ -248,10 +248,10 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
 
         initPermission()
 
-        tv_title_aty_main.text="jdlingyu"
-        currentTypeList = JdlingyuFgt.typeList
+        tv_title_aty_main.text="nvshens"
+        currentTypeList = NvshensFgt.typeList
         initTablayout()
-        currentFgt = JdlingyuFgt()
+        currentFgt = NvshensFgt()
         supportFragmentManager.beginTransaction().replace(R.id.fl_container_aty_main, currentFgt)
                 .commit()
 

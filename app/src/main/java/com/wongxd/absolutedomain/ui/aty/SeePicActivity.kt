@@ -2,6 +2,7 @@ package com.wongxd.absolutedomain.ui.aty
 
 import android.os.Bundle
 import android.os.SystemClock
+import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.StaggeredGridLayoutManager
 import android.text.TextUtils
 import com.orhanobut.logger.Logger
@@ -47,14 +48,25 @@ class SeePicActivity : BaseSwipeActivity() {
 
         rv_see_pic.adapter = adpater
         val layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
-                .apply { this.gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE }
+                .apply { this.gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE }// gapStrategy 解决 RecycleView做瀑布流滚动时，已加载item的位置来回变动
 
         rv_see_pic.layoutManager = layoutManager
 
         rv_see_pic.itemAnimator = LandingAnimator()
         rv_see_pic.addItemDecoration(SGSpacingItemDecoration(3, DensityUtil.dp2px(4f)))
 
-        adpater?.setEmptyView(R.layout.item_rv_empty,rv_see_pic)
+
+//        RecyclerView滑动过程中不断请求layout的Request，不断调整item见的间隙，并且是在item尺寸显示前预处理，因此解决RecyclerView滑动到顶部时仍会出现移动问题
+        rv_see_pic.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+
+            override fun onScrollStateChanged(recyclerView: RecyclerView?, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                layoutManager.invalidateSpanAssignments() //防止第一行到顶部有空白区域
+            }
+
+        })
+
+        adpater?.setEmptyView(R.layout.item_rv_empty, rv_see_pic)
 
 
         val url = intent.getStringExtra("url")

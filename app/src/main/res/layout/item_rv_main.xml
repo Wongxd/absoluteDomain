@@ -1,52 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    app:cardUseCompatPadding="true"
-    app:cardPreventCornerOverlap="true"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     app:cardCornerRadius="5dp"
-    android:layout_height="wrap_content">
+    app:cardPreventCornerOverlap="true"
+    app:cardUseCompatPadding="true">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:minWidth="120dp"
         android:orientation="vertical">
 
-        <ImageView
+        <com.wongxd.absolutedomain.widget.MaskImageView
             android:id="@+id/iv"
-            android:scaleType="centerCrop"
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:layout_gravity="center"
-            android:layout_margin="10dp" />
+            android:scaleType="centerCrop" />
 
         <TextView
-            android:padding="5dp"
-            android:lines="2"
-            android:gravity="center"
             android:id="@+id/tv_title"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:alpha="0.8"
+            android:gravity="center"
+            android:lines="2"
+            android:padding="5dp" />
 
-            <TextView
-                android:padding="5dp"
-                android:gravity="center"
-                android:id="@+id/tv_time"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/tv_time"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:padding="5dp"
+            android:textColor="?attr/colorPrimary" />
 
-            <TextView
-                android:paddingBottom="10dp"
-                android:gravity="center"
-                android:id="@+id/tv_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:gravity="center"
-                android:id="@+id/tv_like"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-    </LinearLayout>
+    </FrameLayout>
 </android.support.v7.widget.CardView>

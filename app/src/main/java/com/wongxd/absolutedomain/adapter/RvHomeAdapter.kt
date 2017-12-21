@@ -1,12 +1,12 @@
 package com.wongxd.absolutedomain.adapter
 
 import android.graphics.Color
-import android.widget.ImageView
 import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.wongxd.absolutedomain.R
 import com.wongxd.absolutedomain.bean.HomeListBean
+import com.wongxd.absolutedomain.widget.MaskImageView
 import com.wongxd.partymanage.base.kotin.extension.loadImg
 import com.wongxd.wthing_kotlin.database.Tu
 import com.wongxd.wthing_kotlin.database.TuTable
@@ -23,10 +23,7 @@ class RvHomeAdapter(val click: (HomeListBean) -> Unit) : BaseQuickAdapter<HomeLi
         with(helper) {
             setText(R.id.tv_title, item.title)
                     .setText(R.id.tv_time, item.date)
-                    .setText(R.id.tv_view, item.view)
-                    .setText(R.id.tv_like, item.like + "次喜欢")
-                    .setVisible(R.id.tv_like, false)
-            getView<ImageView>(R.id.iv).loadImg(item.imgPath)
+            getView<MaskImageView>(R.id.iv).loadImg(item.imgPath)
 
             mContext.tuDB.use {
                 val list = select(TuTable.TABLE_NAME).whereSimple(TuTable.ADDRESS + "=?", item.url).parseList { Tu(HashMap(it)) }

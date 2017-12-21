@@ -704,6 +704,7 @@ class TuFavoriteActivity : BaseSwipeActivity() {
     class TuAdapter(val click: (String) -> Unit) : BaseQuickAdapter<Tu, BaseViewHolder>(R.layout.item_rv_main) {
         override fun convert(helper: BaseViewHolder?, item: Tu?) {
             helper?.getView<ImageView>(R.id.iv)?.loadImg(item?.imgPath!!)
+            helper?.getView<TextView>(R.id.tv_title)?.setBackgroundColor(Color.WHITE)
             helper?.setText(R.id.tv_title, item?.name)
             helper?.itemView?.setOnClickListener { click(item?.address!!) }
             helper?.itemView?.setOnLongClickListener { re(helper?.layoutPosition); true }

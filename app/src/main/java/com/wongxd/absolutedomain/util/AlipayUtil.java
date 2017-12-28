@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 
 import java.net.URISyntaxException;
 
@@ -29,6 +30,10 @@ public class AlipayUtil {
      * @return 是否成功调用
      */
     public static boolean startAlipayClient(Activity activity, String urlCode) {
+        if (!hasInstalledAlipayClient(activity)) {
+            TU.cT("手机上没有安装支付宝");
+            return false;
+        }
         return startIntentUrl(activity, INTENT_URL_FORMAT.replace("{urlCode}", urlCode));
     }
 
@@ -39,7 +44,7 @@ public class AlipayUtil {
      * @param intentFullUrl Intent 跳转地址
      * @return 是否成功调用
      */
-    public static boolean startIntentUrl(Activity activity, String intentFullUrl) {
+    private static boolean startIntentUrl(Activity activity, String intentFullUrl) {
         try {
             Intent intent = Intent.parseUri(
                     intentFullUrl,
@@ -62,7 +67,7 @@ public class AlipayUtil {
      * @param context Context
      * @return 支付宝客户端是否已安装
      */
-    public static boolean hasInstalledAlipayClient(Context context) {
+    private static boolean hasInstalledAlipayClient(Context context) {
         PackageManager pm = context.getPackageManager();
         try {
             PackageInfo info = pm.getPackageInfo(ALIPAY_PACKAGE_NAME, 0);
@@ -72,4 +77,30 @@ public class AlipayUtil {
             return false;
         }
     }
+
+
+    /**
+     * 支付宝转账
+     *
+     * @param context
+     * @param userCode 手动解析二维码获得地址中的参数，例如 https://qr.alipay.com/aehvyvf4taxxxxxxx 最后那段
+     * @return 是否成功调用
+     */
+    public static boolean goAliPay(Context context, String userCode) {
+        if (hasInstalledAlipayClient(context)) {
+            Intent intent = new Intent();
+            intent.setAction("android.intent.action.VIEW");
+            Uri qrcode_url =
+                    Uri.parse("alipayqr://platformapi/startapp?saId=10000007&clientVersion=3.7.0.0718&qrcode=https%3A%2F%2Fqr.alipay.com%2F" + userCode + "%3F_s%3Dweb-other");
+            intent.setData(qrcode_url);
+            intent.setClassName("com.eg.android.AlipayGphone", "com.alipay.mobile.quinox.LauncherActivity");
+            context.startActivity(intent);
+            return true;
+        } else {
+            TU.cT("手机上没有安装支付宝");
+            return false;
+        }
+    }
+
+
 }

@@ -37,6 +37,7 @@ import com.wongxd.absolutedomain.login.LoginActivity
 import com.wongxd.absolutedomain.ui.aty.ThemeActivity
 import com.wongxd.absolutedomain.ui.aty.TuFavoriteActivity
 import com.wongxd.absolutedomain.user.UserInfoActivity
+import com.wongxd.absolutedomain.util.AlipayUtil
 import com.wongxd.absolutedomain.util.StatusBarUtil
 import com.wongxd.absolutedomain.util.TU
 import com.wongxd.absolutedomain.util.cache.DataCleanManager
@@ -291,8 +292,8 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
                 .setTitle("么么哒")
                 .setMessage("捐赠开发者？")
                 .addAction("捐赠") { dialog, index ->
-//                    openUrl("HTTPS://QR.ALIPAY.COM/FKX07373TRZS7EQ7SUVI9A")
-                    openUrl("https://ds.alipay.com/?from=mobilecodec&scheme=alipays%3A%2F%2Fplatformapi%2Fstartapp%3FsaId%3D10000007%26clientVersion%3D3.7.0.0718%26qrcode%3Dhttps%253A%252F%252Fqr.alipay.com%252FFKX07373TRZS7EQ7SUVI9A%253F_s%253Dweb-other")
+                    AlipayUtil.startAlipayClient(this,"FKX07373TRZS7EQ7SUVI9A")
+//                    openUrl("https://ds.alipay.com/?from=mobilecodec&scheme=alipays%3A%2F%2Fplatformapi%2Fstartapp%3FsaId%3D10000007%26clientVersion%3D3.7.0.0718%26qrcode%3Dhttps%253A%252F%252Fqr.alipay.com%252FFKX07373TRZS7EQ7SUVI9A%253F_s%253Dweb-other")
                     dialog.dismiss()
                 }
                 .addAction("不捐赠") { dialog, index -> dialog.dismiss() }
@@ -304,7 +305,8 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
                 .setTitle("么么哒")
                 .setMessage("领取支付宝红包，帮助开发者领取赏金吗？")
                 .addAction("领取") { dialog, index ->
-                    openUrl("https://qr.alipay.com/c1x03491e5pr1lnuoid3e22")
+//                    openUrl("https://qr.alipay.com/c1x03491e5pr1lnuoid3e22")
+                    AlipayUtil.startAlipayClient(this,"c1x03491e5pr1lnuoid3e22")
                     dialog.dismiss()
                 }
                 .addAction("不需要") { dialog, index -> dialog.dismiss() }

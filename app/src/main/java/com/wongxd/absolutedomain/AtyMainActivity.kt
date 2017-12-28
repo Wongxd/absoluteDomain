@@ -19,6 +19,7 @@ import android.widget.TextView
 import cn.bmob.v3.Bmob
 import cn.bmob.v3.BmobUser
 import com.jude.swipbackhelper.SwipeBackHelper
+import com.qmuiteam.qmui.widget.dialog.QMUIDialog
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.wongxd.absolutedomain.base.BaseSwipeActivity
 import com.wongxd.absolutedomain.base.rx.RxBus
@@ -52,7 +53,8 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
             R.id.menu_cache -> cacheThing()
             R.id.menu_about -> showAbout()
             R.id.menu_tu_favorite -> startActivity(Intent(this, TuFavoriteActivity::class.java))
-
+            R.id.menu_donate -> Donate()
+            R.id.menu_alipay_red -> getRedpacket()
 
         //右边
             R.id.menu_jdlingyu -> switchSite(1)
@@ -255,7 +257,7 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
 
         initPermission()
 
-        tv_title_aty_main.text="nvshens"
+        tv_title_aty_main.text = "nvshens"
         currentTypeList = NvshensFgt.typeList
         initTablayout()
         currentFgt = NvshensFgt()
@@ -263,15 +265,50 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
                 .commit()
 
         Bmob.initialize(this, App.BMOB_ID)
-        App.user = BmobUser.getCurrentUser(this,UserBean::class.java)
+        App.user = BmobUser.getCurrentUser(this, UserBean::class.java)
 
         RxBus.getDefault().toObservable(RxEventCodeType.LOGOUT, String::class.java)
                 .subscribe {
-                   showUserInfo()
+                    showUserInfo()
                 }
 
+        getRedpacket()
     }
 
+
+    fun openUrl(url: String) {
+        val intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME)
+        intent.addCategory("android.intent.category.BROWSABLE")
+        intent.component = null
+        startActivity(intent)
+    }
+
+    /**
+     * 捐赠
+     */
+    fun Donate() {
+        QMUIDialog.MessageDialogBuilder(this)
+                .setTitle("么么哒")
+                .setMessage("捐赠开发者？")
+                .addAction("捐赠") { dialog, index ->
+                    openUrl("HTTPS://QR.ALIPAY.COM/FKX07373TRZS7EQ7SUVI9A")
+                    dialog.dismiss()
+                }
+                .addAction("不捐赠") { dialog, index -> dialog.dismiss() }
+                .show()
+    }
+
+    fun getRedpacket() {
+        QMUIDialog.MessageDialogBuilder(this)
+                .setTitle("么么哒")
+                .setMessage("领取支付宝红包，帮助开发者领取赏金吗？")
+                .addAction("领取") { dialog, index ->
+                    openUrl("https://qr.alipay.com/c1x03491e5pr1lnuoid3e22")
+                    dialog.dismiss()
+                }
+                .addAction("不需要") { dialog, index -> dialog.dismiss() }
+                .show()
+    }
 
     lateinit var currentTypeList: ArrayList<TypeBean>
 

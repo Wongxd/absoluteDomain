@@ -15,6 +15,17 @@
             android:icon="@drawable/clean_cache"
             android:title="查看缓存" />
 
+
+        <item
+            android:id="@+id/menu_donate"
+            android:icon="@drawable/donate"
+            android:title="捐赠" />
+
+        <item
+            android:id="@+id/menu_alipay_red"
+            android:icon="@drawable/alipay"
+            android:title="支付宝红包" />
+
         <item
             android:id="@+id/menu_about"
             android:icon="@drawable/about"

@@ -3,21 +3,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.wongxd.absolutedomain">
 
-    <!--获取sd卡读的权限，用于文件上传和下载-->
+    <!-- 获取sd卡读的权限，用于文件上传和下载 -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <!--允许联网 -->
+    <!-- 允许联网 -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <!--获取GSM（2g）、WCDMA（联通3g）等网络状态的信息  -->
+    <!-- 获取GSM（2g）、WCDMA（联通3g）等网络状态的信息 -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <!--获取wifi网络状态的信息 -->
+    <!-- 获取wifi网络状态的信息 -->
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <!--保持CPU 运转，屏幕和键盘灯有可能是关闭的,用于文件上传和下载 -->
+    <!-- 保持CPU 运转，屏幕和键盘灯有可能是关闭的,用于文件上传和下载 -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <!--获取sd卡写的权限，用于文件上传和下载-->
+    <!-- 获取sd卡写的权限，用于文件上传和下载 -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <!--允许读取手机状态 用于创建BmobInstallation-->
+    <!-- 允许读取手机状态 用于创建BmobInstallation -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-
 
     <application
         android:name=".App"
@@ -27,7 +26,6 @@
         android:supportsRtl="true"
         android:theme="@style/SwipeTheme"
         tools:replace="android:icon">
-
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="com.wongxd.absolutedomain.fileProvider"
@@ -59,6 +57,7 @@
                 <data
                     android:mimeType="*/*"
                     android:scheme="file" />
+
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
@@ -72,6 +71,7 @@
             android:name=".photo.TakeImgActivity"
             android:theme="@style/transeparent" />
         <activity android:name=".user.UpdatePwdActivity" />
+        <activity android:name=".ui.WebViewActivity"></activity>
     </application>
 
 </manifest>

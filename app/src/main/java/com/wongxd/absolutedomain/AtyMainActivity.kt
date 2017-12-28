@@ -277,9 +277,9 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
 
 
     fun openUrl(url: String) {
-        val intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME)
-        intent.addCategory("android.intent.category.BROWSABLE")
-        intent.component = null
+        val intent = Intent()
+        intent.action = "android.intent.action.VIEW"
+        intent.data =  Uri.parse(url)
         startActivity(intent)
     }
 
@@ -291,7 +291,8 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
                 .setTitle("么么哒")
                 .setMessage("捐赠开发者？")
                 .addAction("捐赠") { dialog, index ->
-                    openUrl("HTTPS://QR.ALIPAY.COM/FKX07373TRZS7EQ7SUVI9A")
+//                    openUrl("HTTPS://QR.ALIPAY.COM/FKX07373TRZS7EQ7SUVI9A")
+                    openUrl("https://ds.alipay.com/?from=mobilecodec&scheme=alipays%3A%2F%2Fplatformapi%2Fstartapp%3FsaId%3D10000007%26clientVersion%3D3.7.0.0718%26qrcode%3Dhttps%253A%252F%252Fqr.alipay.com%252FFKX07373TRZS7EQ7SUVI9A%253F_s%253Dweb-other")
                     dialog.dismiss()
                 }
                 .addAction("不捐赠") { dialog, index -> dialog.dismiss() }

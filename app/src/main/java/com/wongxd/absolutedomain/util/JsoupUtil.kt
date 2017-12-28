@@ -648,7 +648,7 @@ object JsoupUtil {
         try {
 
             //https://m.nvshens.com/g/24724/2.html
-            val url =  tagUrl + "/$page.html"
+            val url = tagUrl + "/$page.html"
             var doc: Document? = null
             val apiStore = RetrofitUtils.getStringInstance().create(ApiStore::class.java)
             apiStore.getString(url).subscribe({
@@ -676,5 +676,47 @@ object JsoupUtil {
     }
 
 
+    /**
+     * 获取 meisiguan 某个图集的详情
+     *
+     * @param url: 图集的url
+     *
+     */
+    fun getMeiSiGuanDetail(urlOrigin: String): ChildDetailBean? {
+        if (TextUtils.isEmpty(urlOrigin)) return null
+        var url = urlOrigin
+        var tagUrl = ""
+        tagUrl = url.replace(".html", "")
+
+
+        var doc: Document? = null
+        var childList: ChildDetailBean? = null
+        val urls = ArrayList<String>()
+        try {
+            val apiStore = RetrofitUtils.getStringInstance().create(ApiStore::class.java)
+            apiStore.getString(url).subscribe({
+                doc = Jsoup.parse(it)
+            })
+
+            if (doc == null) return null
+
+            val div = doc?.getElementById("content")
+            val imgs =div?.getElementsByClass("content_left")?.first()?.getElementsByTag("img")
+
+
+
+            val title = doc?.title() ?: "美丝馆"
+
+            Logger.e(imgs.toString())
+
+            imgs?.mapTo(urls) { it.attr("src") }
+
+            childList = ChildDetailBean(title, urls)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        return childList
+    }
 }
 

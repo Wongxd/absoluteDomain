@@ -130,6 +130,8 @@ class SeePicActivity : BaseSwipeActivity() {
             return JsoupUtil.getkeke1234ChildDetail(url)
         } else if (url.contains("nvshens.")) {
             return JsoupUtil.getNvShensChildDetail(url)
+        }else if (url.contains("meisiguan.")) {
+            return JsoupUtil.getMeiSiGuanDetail(url)
         }
         return null
     }

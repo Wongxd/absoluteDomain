@@ -28,6 +28,7 @@ import com.wongxd.absolutedomain.bean.UserBean
 import com.wongxd.absolutedomain.fgt.BaseTypeFragment
 import com.wongxd.absolutedomain.fgt.jdlingyu.JdlingyuFgt
 import com.wongxd.absolutedomain.fgt.keke123.KeKe123Fgt
+import com.wongxd.absolutedomain.fgt.meisiguan.MeisiGuanFgt
 import com.wongxd.absolutedomain.fgt.mmonly.MMonlyFgt
 import com.wongxd.absolutedomain.fgt.nvshens.NvshensFgt
 import com.wongxd.absolutedomain.fgt.t192tt.t192ttFgt
@@ -59,7 +60,7 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
             R.id.menu_192tt -> switchSite(3)
 //            R.id.menu_mmonly -> switchSite(4)
             R.id.menu_nvshens -> switchSite(5)
-
+            R.id.menu_meisiguan -> switchSite(6)
 
         }
 
@@ -109,6 +110,12 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
                 tv_title_aty_main.text = "nvshens"
                 currentTypeList = NvshensFgt.typeList
                 currentFgt = NvshensFgt()
+            }
+
+            6 -> {
+                tv_title_aty_main.text = "meisiguan"
+                currentTypeList = MeisiGuanFgt.typeList
+                currentFgt = MeisiGuanFgt()
             }
 
         }

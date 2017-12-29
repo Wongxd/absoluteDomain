@@ -1,5 +1,6 @@
 package com.wongxd.absolutedomain.ui.aty
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.SystemClock
 import android.support.v7.widget.RecyclerView
@@ -20,6 +21,7 @@ import com.wongxd.absolutedomain.base.rx.RxEventCodeType
 import com.wongxd.absolutedomain.base.rx.Subscribe
 import com.wongxd.absolutedomain.bean.ChildDetailBean
 import com.wongxd.absolutedomain.download.CustomMission
+import com.wongxd.absolutedomain.download.DownloadListActivity
 import com.wongxd.absolutedomain.util.JsoupUtil
 import com.wongxd.absolutedomain.util.StatusBarUtil
 import com.wongxd.wthing_kotlin.database.*
@@ -34,7 +36,7 @@ import zlc.season.rxdownload3.RxDownload
 
 
 class SeePicActivity : BaseSwipeActivity() {
-
+    var isAddToDownload = false
     var adpater: RvSeePicAdapter? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,12 +77,15 @@ class SeePicActivity : BaseSwipeActivity() {
 
 
         iv_download_favorite.setOnClickListener {
-            QMUIDialog.MessageDialogBuilder(this)
-                    .setTitle("提示")
-                    .setMessage("要下载本页所有图片吗？")
-                    .addAction("下载"){dialog, index -> createTask() ;  dialog.dismiss() }
-                    .addAction("取消"){dialog, index ->  dialog.dismiss()  }
-                    .show()
+            if (isAddToDownload) {
+                startActivity(Intent(this, DownloadListActivity::class.java))
+            } else
+                QMUIDialog.MessageDialogBuilder(this)
+                        .setTitle("提示")
+                        .setMessage("要下载本页所有图片吗？")
+                        .addAction("下载") { dialog, index -> createTask(); isAddToDownload = true; dialog.dismiss() }
+                        .addAction("取消") { dialog, index -> dialog.dismiss() }
+                        .show()
         }
 
 
@@ -100,7 +105,7 @@ class SeePicActivity : BaseSwipeActivity() {
 
     private fun createTask() {
         adpater?.data?.map {
-            val mission =CustomMission(it,tv_title.text.toString(),it)
+            val mission = CustomMission(it, tv_title.text.toString(), it)
             RxDownload.create(mission).subscribe()
             RxDownload.start(mission)
         }
@@ -151,9 +156,9 @@ class SeePicActivity : BaseSwipeActivity() {
             return JsoupUtil.getkeke1234ChildDetail(url)
         } else if (url.contains("nvshens.")) {
             return JsoupUtil.getNvShensChildDetail(url)
-        }else if (url.contains("meisiguan.")) {
+        } else if (url.contains("meisiguan.")) {
             return JsoupUtil.getMeiSiGuanDetail(url)
-        }else if (url.contains("92mntu.")) {
+        } else if (url.contains("92mntu.")) {
             return JsoupUtil.getMntu92Detail(url)
         }
         return null

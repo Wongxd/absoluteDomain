@@ -302,7 +302,7 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
     fun Donate() {
         QMUIDialog.MessageDialogBuilder(this)
                 .setTitle("么么哒")
-                .setMessage("捐赠开发者？")
+                .setMessage("捐赠开发者？（开发者升级成商家账户了，可以用支付宝红包抵扣了）")
                 .addAction("捐赠") { dialog, index ->
                     AlipayUtil.startAlipayClient(this, "FKX07373TRZS7EQ7SUVI9A")
 //                    openUrl("https://ds.alipay.com/?from=mobilecodec&scheme=alipays%3A%2F%2Fplatformapi%2Fstartapp%3FsaId%3D10000007%26clientVersion%3D3.7.0.0718%26qrcode%3Dhttps%253A%252F%252Fqr.alipay.com%252FFKX07373TRZS7EQ7SUVI9A%253F_s%253Dweb-other")
@@ -342,7 +342,8 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
         QMUIDialog.MessageDialogBuilder(this)
                 .setTitle("么么哒")
                 .setMessage("如果没有地方使用支付宝红包，可以在应用内打赏给开发者（开发者升级成商家账户了，可以用红包抵扣了）。")
-                .addAction("将红包打赏给开发者") { dialog, index -> Donate(); dialog.dismiss() }
+                .addAction("将红包打赏给开发者") { dialog, index ->   AlipayUtil.startAlipayClient(this, "FKX07373TRZS7EQ7SUVI9A");
+                    dialog.dismiss() }
                 .addAction("不用了") { dialog, index -> dialog.dismiss() }
                 .show()
     }

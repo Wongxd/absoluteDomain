@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:gravity="center"
-        android:text="下载列表(位于 绝对领域 -> download 文件夹下)"
+        android:text="下载列表(位于 绝对领域/download 文件夹下)"
         android:textColor="?attr/colorPrimary" />
 
     <LinearLayout

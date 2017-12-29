@@ -282,7 +282,7 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
 //                    val mWay = c.get(Calendar.DAY_OF_WEEK)// 获取当前日期的星期
 //                    val mHour = c.get(Calendar.HOUR_OF_DAY)//时
 //                    val mMinute = c.get(Calendar.MINUTE)//分
-        val spDay = SPUtils.get(key = "alipayRedCount", defaultObject = mDay)
+        val spDay = SPUtils.get(key = "alipayRedCount", defaultObject = 0)
 
         if (spDay != mDay)
             getRedpacket()
@@ -344,6 +344,7 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
                 .setMessage("如果没有地方使用支付宝红包，可以在应用内打赏给开发者（开发者升级成商家账户了，可以用红包抵扣了）。")
                 .addAction("将红包打赏给开发者") { dialog, index -> Donate(); dialog.dismiss() }
                 .addAction("不用了") { dialog, index -> dialog.dismiss() }
+                .show()
     }
 
     lateinit var currentTypeList: ArrayList<TypeBean>

@@ -2,6 +2,7 @@ package com.wongxd.absolutedomain
 
 import android.app.Application
 import android.content.Context
+import android.os.Environment
 import android.support.multidex.MultiDex
 import com.orhanobut.logger.LogLevel
 import com.orhanobut.logger.Logger
@@ -15,6 +16,10 @@ import com.wongxd.absolutedomain.bean.UserBean
 import com.wongxd.absolutedomain.util.TU
 import me.jessyan.progressmanager.ProgressManager
 import okhttp3.OkHttpClient
+import zlc.season.rxdownload3.core.DownloadConfig
+import zlc.season.rxdownload3.extension.ApkInstallExtension
+import zlc.season.rxdownload3.http.OkHttpClientFactoryImpl
+import java.io.File
 import kotlin.properties.Delegates
 
 
@@ -55,6 +60,29 @@ class App : Application() {
 
         SmartRefreshLayout.setDefaultRefreshFooterCreater(DefaultRefreshFooterCreater { context, layout -> ClassicsFooter(context) })
 
+        var filePath: String? = null
+        val hasSDCard = Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED
+        if (hasSDCard) {
+            filePath = Environment.getExternalStorageDirectory().toString() + File.separator + getString(R.string.app_name) + File.separator + "download"
+        } else
+            filePath = "/mnt" + File.separator + getString(R.string.app_name) + File.separator + "download"
+
+        val f =File(filePath)
+        if (!f.exists()) f.mkdirs()
+
+        val builder = DownloadConfig.Builder.create(this)
+                .setFps(20)                         //设置更新频率
+                .enableAutoStart(true)              //自动开始下载
+                .setDefaultPath(filePath)     //设置默认的下载地址
+                .enableDb(true)                             //启用数据库
+//                .setDbActor(CustomSqliteActor(this))        //自定义数据库
+                .enableService(true)                        //启用Service
+//                .enableNotification(true)                   //启用Notification
+//                .setNotificationFactory(NotificationFactoryImpl())        //自定义通知
+                .setOkHttpClientFacotry(OkHttpClientFactoryImpl())        //自定义OKHTTP
+                .addExtension(ApkInstallExtension::class.java)          //添加扩展
+
+        DownloadConfig.init(builder)
 
     }
 

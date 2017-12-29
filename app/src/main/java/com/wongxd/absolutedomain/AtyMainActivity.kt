@@ -38,12 +38,14 @@ import com.wongxd.absolutedomain.ui.aty.ThemeActivity
 import com.wongxd.absolutedomain.ui.aty.TuFavoriteActivity
 import com.wongxd.absolutedomain.user.UserInfoActivity
 import com.wongxd.absolutedomain.util.AlipayUtil
+import com.wongxd.absolutedomain.util.SPUtils
 import com.wongxd.absolutedomain.util.StatusBarUtil
 import com.wongxd.absolutedomain.util.TU
 import com.wongxd.absolutedomain.util.cache.DataCleanManager
 import com.wongxd.absolutedomain.util.cache.GlideCatchUtil
 import com.wongxd.partymanage.base.kotin.extension.loadHeader
 import kotlinx.android.synthetic.main.aty_main.*
+import java.util.*
 
 
 class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -273,14 +275,24 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
                     showUserInfo()
                 }
 
-        getRedpacket()
+        val c = Calendar.getInstance()//
+//                    val mYear = c.get(Calendar.YEAR) // 获取当前年份
+//                    val mMonth = c.get(Calendar.MONTH) + 1// 获取当前月份
+        val mDay = c.get(Calendar.DAY_OF_MONTH)// 获取当日期
+//                    val mWay = c.get(Calendar.DAY_OF_WEEK)// 获取当前日期的星期
+//                    val mHour = c.get(Calendar.HOUR_OF_DAY)//时
+//                    val mMinute = c.get(Calendar.MINUTE)//分
+        val spDay = SPUtils.get(key = "alipayRedCount", defaultObject = mDay)
+
+        if (spDay != mDay)
+            getRedpacket()
     }
 
 
     fun openUrl(url: String) {
         val intent = Intent()
         intent.action = "android.intent.action.VIEW"
-        intent.data =  Uri.parse(url)
+        intent.data = Uri.parse(url)
         startActivity(intent)
     }
 
@@ -292,7 +304,7 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
                 .setTitle("么么哒")
                 .setMessage("捐赠开发者？")
                 .addAction("捐赠") { dialog, index ->
-                    AlipayUtil.startAlipayClient(this,"FKX07373TRZS7EQ7SUVI9A")
+                    AlipayUtil.startAlipayClient(this, "FKX07373TRZS7EQ7SUVI9A")
 //                    openUrl("https://ds.alipay.com/?from=mobilecodec&scheme=alipays%3A%2F%2Fplatformapi%2Fstartapp%3FsaId%3D10000007%26clientVersion%3D3.7.0.0718%26qrcode%3Dhttps%253A%252F%252Fqr.alipay.com%252FFKX07373TRZS7EQ7SUVI9A%253F_s%253Dweb-other")
                     dialog.dismiss()
                 }
@@ -303,14 +315,35 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
     fun getRedpacket() {
         QMUIDialog.MessageDialogBuilder(this)
                 .setTitle("么么哒")
-                .setMessage("领取支付宝红包，帮助开发者领取赏金吗？")
+                .setMessage("领取支付宝红包，帮助开发者领取赏金吗？\n如果没有地方使用红包，可以在应用内打赏给开发者（开发者升级成商家账户了，可以用红包抵扣了）。")
                 .addAction("领取") { dialog, index ->
-//                    openUrl("https://qr.alipay.com/c1x03491e5pr1lnuoid3e22")
-                    AlipayUtil.startAlipayClient(this,"c1x03491e5pr1lnuoid3e22")
+                    //                    openUrl("https://qr.alipay.com/c1x03491e5pr1lnuoid3e22")
+                    AlipayUtil.startAlipayClient(this, "c1x03491e5pr1lnuoid3e22")
+
+                    val c = Calendar.getInstance()//
+//                    val mYear = c.get(Calendar.YEAR) // 获取当前年份
+//                    val mMonth = c.get(Calendar.MONTH) + 1// 获取当前月份
+                    val mDay = c.get(Calendar.DAY_OF_MONTH)// 获取当日期
+//                    val mWay = c.get(Calendar.DAY_OF_WEEK)// 获取当前日期的星期
+//                    val mHour = c.get(Calendar.HOUR_OF_DAY)//时
+//                    val mMinute = c.get(Calendar.MINUTE)//分
+                    SPUtils.put(key = "alipayRedCount", `object` = mDay)
+                    showDonateTips()
                     dialog.dismiss()
                 }
                 .addAction("不需要") { dialog, index -> dialog.dismiss() }
                 .show()
+    }
+
+    /**
+     * 提醒用户可以把红包 打赏给我
+     */
+    private fun showDonateTips() {
+        QMUIDialog.MessageDialogBuilder(this)
+                .setTitle("么么哒")
+                .setMessage("如果没有地方使用支付宝红包，可以在应用内打赏给开发者（开发者升级成商家账户了，可以用红包抵扣了）。")
+                .addAction("将红包打赏给开发者") { dialog, index -> Donate(); dialog.dismiss() }
+                .addAction("不用了") { dialog, index -> dialog.dismiss() }
     }
 
     lateinit var currentTypeList: ArrayList<TypeBean>

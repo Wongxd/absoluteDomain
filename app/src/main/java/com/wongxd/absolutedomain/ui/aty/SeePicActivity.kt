@@ -80,6 +80,7 @@ class SeePicActivity : BaseSwipeActivity() {
                     .setMessage("要下载本页所有图片吗？")
                     .addAction("下载"){dialog, index -> createTask() ;  dialog.dismiss() }
                     .addAction("取消"){dialog, index ->  dialog.dismiss()  }
+                    .show()
         }
 
 

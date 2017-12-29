@@ -8,6 +8,7 @@ import android.text.TextUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.ontbee.legacyforks.cn.pedant.SweetAlert.SweetAlertDialog
 import com.orhanobut.logger.Logger
+import com.qmuiteam.qmui.widget.dialog.QMUIDialog
 import com.scwang.smartrefresh.layout.util.DensityUtil
 import com.wongxd.absolutedomain.R
 import com.wongxd.absolutedomain.adapter.RvSeePicAdapter
@@ -18,6 +19,7 @@ import com.wongxd.absolutedomain.base.rx.RxBus
 import com.wongxd.absolutedomain.base.rx.RxEventCodeType
 import com.wongxd.absolutedomain.base.rx.Subscribe
 import com.wongxd.absolutedomain.bean.ChildDetailBean
+import com.wongxd.absolutedomain.download.CustomMission
 import com.wongxd.absolutedomain.util.JsoupUtil
 import com.wongxd.absolutedomain.util.StatusBarUtil
 import com.wongxd.wthing_kotlin.database.*
@@ -28,6 +30,7 @@ import org.jetbrains.anko.db.select
 import org.jetbrains.anko.db.transaction
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
+import zlc.season.rxdownload3.RxDownload
 
 
 class SeePicActivity : BaseSwipeActivity() {
@@ -71,6 +74,15 @@ class SeePicActivity : BaseSwipeActivity() {
         adpater?.openLoadAnimation(BaseQuickAdapter.SLIDEIN_BOTTOM)
 
 
+        iv_download_favorite.setOnClickListener {
+            QMUIDialog.MessageDialogBuilder(this)
+                    .setTitle("提示")
+                    .setMessage("要下载本页所有图片吗？")
+                    .addAction("下载"){dialog, index -> createTask() ;  dialog.dismiss() }
+                    .addAction("取消"){dialog, index ->  dialog.dismiss()  }
+        }
+
+
         val url = intent.getStringExtra("url")
         smartLayout.setOnRefreshListener { doGetDetail(url) }
         doAsync {
@@ -82,6 +94,14 @@ class SeePicActivity : BaseSwipeActivity() {
                     doFavoriteLogic(url, childCache.title)
                 } else smartLayout.autoRefresh()
             }
+        }
+    }
+
+    private fun createTask() {
+        adpater?.data?.map {
+            val mission =CustomMission(it,tv_title.text.toString(),it)
+            RxDownload.create(mission).subscribe()
+            RxDownload.start(mission)
         }
     }
 

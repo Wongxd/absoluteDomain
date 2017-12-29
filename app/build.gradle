@@ -85,6 +85,7 @@ dependencies {
         exclude module: 'okio'
         exclude group: 'com.squareup.okhttp3'
     }
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
 //    implementation 'com.squareup.okhttp3:okhttp:3.9.1'
     //retrofit
     implementation('com.squareup.retrofit2:retrofit:2.3.0') {
@@ -143,6 +144,8 @@ dependencies {
     implementation 'com.qmuiteam:qmui:1.0.4'
 
     implementation 'com.github.thomper:sweet-alert-dialog:v1.4.0'
+
+    implementation 'zlc.season:rxdownload3:1.2.0'
 
     implementation 'cn.bmob.android:bmob-sdk:3.4.6'
     implementation 'com.squareup.okhttp:okhttp:2.4.0'//CDN文件服务使用okhttp相关包进行文件的上传和下载（必填）

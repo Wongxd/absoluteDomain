@@ -26,6 +26,7 @@ import com.wongxd.absolutedomain.base.rx.RxBus
 import com.wongxd.absolutedomain.base.rx.RxEventCodeType
 import com.wongxd.absolutedomain.bean.TypeBean
 import com.wongxd.absolutedomain.bean.UserBean
+import com.wongxd.absolutedomain.download.DownloadListActivity
 import com.wongxd.absolutedomain.fgt.BaseTypeFragment
 import com.wongxd.absolutedomain.fgt.jdlingyu.JdlingyuFgt
 import com.wongxd.absolutedomain.fgt.keke123.KeKe123Fgt
@@ -54,6 +55,7 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
+            R.id.menu_download_list -> startActivity(Intent(this, DownloadListActivity::class.java))
             R.id.menu_theme -> startActivity(Intent(this, ThemeActivity::class.java))
             R.id.menu_cache -> cacheThing()
             R.id.menu_about -> showAbout()
@@ -312,7 +314,8 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
     fun Donate() {
         QMUIDialog.MessageDialogBuilder(this)
                 .setTitle("么么哒")
-                .setMessage("捐赠开发者？（开发者升级成商家账户了，可以用支付宝红包抵扣了）")
+                .setMessage("捐赠开发者？（开发者升级成商家账户了，可以用支付宝红包抵扣了）\n\n"
+                        +"本应用已在规划除图片浏览的其它功能，而且对ui也是要重新设计。捐赠是个很好的激励嘛，嘿嘿。")
                 .addAction("捐赠") { dialog, index ->
                     AlipayUtil.startAlipayClient(this, "FKX07373TRZS7EQ7SUVI9A")
 //                    openUrl("https://ds.alipay.com/?from=mobilecodec&scheme=alipays%3A%2F%2Fplatformapi%2Fstartapp%3FsaId%3D10000007%26clientVersion%3D3.7.0.0718%26qrcode%3Dhttps%253A%252F%252Fqr.alipay.com%252FFKX07373TRZS7EQ7SUVI9A%253F_s%253Dweb-other")
@@ -326,7 +329,7 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
         QMUIDialog.MessageDialogBuilder(this)
                 .setTitle("么么哒")
                 .setMessage("领取支付宝红包，帮助开发者领取赏金吗？\n如果没有地方使用红包，可以在应用内打赏给开发者（开发者升级成商家账户了，可以用红包抵扣了）。\n\n"
-                + "本应用已在规划除图片浏览的其它功能，其中有些功能是需要服务器支持，捐赠用户可在未来的更新中享有特殊功能。")
+                +"本应用已在规划除图片浏览的其它功能，而且对ui也是要重新设计。捐赠是个很好的激励嘛，嘿嘿。")
                 .addAction("领取") { dialog, index ->
                     //                    openUrl("https://qr.alipay.com/c1x03491e5pr1lnuoid3e22")
                     AlipayUtil.startAlipayClient(this, "c1x03491e5pr1lnuoid3e22")
@@ -353,7 +356,7 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
         QMUIDialog.MessageDialogBuilder(this)
                 .setTitle("么么哒")
                 .setMessage("如果没有地方使用支付宝红包，可以在应用内打赏给开发者（开发者升级成商家账户了，可以用红包抵扣了）。\n\n" +
-                        "本应用已在规划除图片浏览的其它功能，其中有些功能是需要服务器支持，捐赠用户可在未来的更新中享有特殊功能。")
+                        "本应用已在规划除图片浏览的其它功能，而且对ui也是要重新设计。捐赠是个很好的激励嘛，嘿嘿。")
                 .addAction("将红包打赏给开发者") { dialog, index ->
                     AlipayUtil.startAlipayClient(this, "FKX07373TRZS7EQ7SUVI9A");
                     dialog.dismiss()

@@ -18,6 +18,9 @@
     <!-- 允许读取手机状态 用于创建BmobInstallation -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"/>
+
+
     <application
         android:name=".App"
         android:allowBackup="true"
@@ -71,7 +74,13 @@
             android:name=".photo.TakeImgActivity"
             android:theme="@style/transeparent" />
         <activity android:name=".user.UpdatePwdActivity" />
-        <activity android:name=".ui.WebViewActivity"></activity>
+        <activity android:name=".ui.WebViewActivity" />
+        <activity android:name=".download.DownloadListActivity" />
+
+        <service
+            android:name=".DownloadService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>

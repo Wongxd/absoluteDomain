@@ -325,7 +325,8 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
     fun getRedpacket() {
         QMUIDialog.MessageDialogBuilder(this)
                 .setTitle("么么哒")
-                .setMessage("领取支付宝红包，帮助开发者领取赏金吗？\n如果没有地方使用红包，可以在应用内打赏给开发者（开发者升级成商家账户了，可以用红包抵扣了）。")
+                .setMessage("领取支付宝红包，帮助开发者领取赏金吗？\n如果没有地方使用红包，可以在应用内打赏给开发者（开发者升级成商家账户了，可以用红包抵扣了）。\n\n"
+                + "本应用已在规划除图片浏览的其它功能，其中有些功能是需要服务器支持，捐赠用户可在未来的更新中享有特殊功能。")
                 .addAction("领取") { dialog, index ->
                     //                    openUrl("https://qr.alipay.com/c1x03491e5pr1lnuoid3e22")
                     AlipayUtil.startAlipayClient(this, "c1x03491e5pr1lnuoid3e22")
@@ -351,7 +352,7 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
     private fun showDonateTips() {
         QMUIDialog.MessageDialogBuilder(this)
                 .setTitle("么么哒")
-                .setMessage("如果没有地方使用支付宝红包，可以在应用内打赏给开发者（开发者升级成商家账户了，可以用红包抵扣了）。\n" +
+                .setMessage("如果没有地方使用支付宝红包，可以在应用内打赏给开发者（开发者升级成商家账户了，可以用红包抵扣了）。\n\n" +
                         "本应用已在规划除图片浏览的其它功能，其中有些功能是需要服务器支持，捐赠用户可在未来的更新中享有特殊功能。")
                 .addAction("将红包打赏给开发者") { dialog, index ->
                     AlipayUtil.startAlipayClient(this, "FKX07373TRZS7EQ7SUVI9A");

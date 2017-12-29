@@ -81,20 +81,20 @@ class RvSeePicAdapter(val click: (SeeBigPicBean) -> Unit) : BaseQuickAdapter<Str
 
             itemView.setOnClickListener { click(SeeBigPicBean(helper.layoutPosition, getView(R.id.iv))) }
 
-            doAsync {
-                val pos = helper.layoutPosition
-                val scale: Float
-                if (imageSizeMap.containsKey(pos)) {
-                    scale = imageSizeMap[pos] ?: DEFAULT_SCALE
-                } else {
-                    scale = load(mContext, item)
-                    imageSizeMap.put(pos, scale)
+                doAsync {
+                    val pos = helper.layoutPosition
+                    val scale: Float
+                    if (imageSizeMap.containsKey(pos)) {
+                        scale = imageSizeMap[pos] ?: DEFAULT_SCALE
+                    } else {
+                        scale = load(mContext, item)
+                        imageSizeMap.put(pos, scale)
+                    }
+                    uiThread {
+                        resizeItemView(iv, scale)
+                        iv.loadImg(item)
+                    }
                 }
-                uiThread {
-                    resizeItemView(iv, scale)
-                    iv.loadImg(item)
-                }
-            }
 
 
         }

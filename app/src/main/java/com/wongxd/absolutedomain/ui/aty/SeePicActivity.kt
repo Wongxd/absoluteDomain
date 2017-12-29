@@ -132,6 +132,8 @@ class SeePicActivity : BaseSwipeActivity() {
             return JsoupUtil.getNvShensChildDetail(url)
         }else if (url.contains("meisiguan.")) {
             return JsoupUtil.getMeiSiGuanDetail(url)
+        }else if (url.contains("92mntu.")) {
+            return JsoupUtil.getMntu92Detail(url)
         }
         return null
     }

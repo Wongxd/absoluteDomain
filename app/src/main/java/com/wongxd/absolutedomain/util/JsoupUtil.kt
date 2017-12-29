@@ -6,6 +6,8 @@ import com.wongxd.absolutedomain.Retrofit.ApiStore
 import com.wongxd.absolutedomain.Retrofit.RetrofitUtils
 import com.wongxd.absolutedomain.bean.ChildDetailBean
 import com.wongxd.absolutedomain.bean.HomeListBean
+import io.reactivex.Observer
+import io.reactivex.disposables.Disposable
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import java.net.URL
@@ -701,8 +703,7 @@ object JsoupUtil {
             if (doc == null) return null
 
             val div = doc?.getElementById("content")
-            val imgs =div?.getElementsByClass("content_left")?.first()?.getElementsByTag("img")
-
+            val imgs = div?.getElementsByClass("content_left")?.first()?.getElementsByTag("img")
 
 
             val title = doc?.title() ?: "美丝馆"
@@ -717,6 +718,105 @@ object JsoupUtil {
         }
 
         return childList
+    }
+
+
+    /**
+     * 获取 mntu92 某个图集的详情
+     *
+     * @param url: 图集的url
+     *
+     */
+    fun getMntu92Detail(urlOrigin: String): ChildDetailBean? {
+        if (TextUtils.isEmpty(urlOrigin)) return null
+        var url = urlOrigin
+        var tagUrl = ""
+        tagUrl = url.replace(".html", "")
+
+
+        var doc: Document? = null
+        var childList: ChildDetailBean? = null
+        val urls = ArrayList<String>()
+        try {
+            val apiStore = RetrofitUtils.getStringInstance().create(ApiStore::class.java)
+            apiStore.getString(url).subscribe(object : Observer<String> {
+                override fun onSubscribe(d: Disposable?) {
+                }
+
+                override fun onComplete() {
+                }
+
+                override fun onNext(t: String?) {
+                    doc = Jsoup.parse(t)
+                }
+
+                override fun onError(e: Throwable?) {
+                   return
+                }
+
+            })
+
+            if (doc == null) return null
+
+            Logger.e(doc.toString())
+
+            val img = doc?.select("#bigpic img")
+
+
+            val imgUrl = "http://92mntu.com" + img?.attr("src")
+            val title = doc?.select("#entry h1")?.text()
+
+            Logger.e("imgurl---$imgUrl---title---$title")
+
+            if (title != null) {
+                urls.add(imgUrl)
+                getMntu92Deep(tagUrl, 2, urls)
+            }
+
+            for (u in urls)
+                Logger.e(u)
+            childList = ChildDetailBean(title ?: "mntu92", urls)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        return childList
+    }
+
+    /**
+     * 获取mntu92 deep
+     */
+    private fun getMntu92Deep(tagUrl: String, currentPage: Int, urls: ArrayList<String>) {
+        var doc: Document? = null
+        val apiStore = RetrofitUtils.getStringInstance().create(ApiStore::class.java)
+        apiStore.getString(tagUrl + "_$currentPage.html").subscribe(object : Observer<String> {
+            override fun onSubscribe(d: Disposable?) {
+            }
+
+            override fun onComplete() {
+            }
+
+            override fun onNext(t: String?) {
+                doc = Jsoup.parse(t)
+            }
+
+            override fun onError(e: Throwable?) {
+                return
+            }
+
+        })
+
+
+        val img = doc?.select("#bigpic img")
+
+
+        val imgUrl = "http://92mntu.com" + img?.attr("src")
+        val title = doc?.select("#entry h1")?.text()
+
+        if (title != null) {
+            urls.add(imgUrl)
+            getMntu92Deep(tagUrl, currentPage + 1, urls)
+        }
     }
 }
 

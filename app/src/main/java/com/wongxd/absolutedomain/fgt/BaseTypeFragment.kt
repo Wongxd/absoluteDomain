@@ -3,10 +3,12 @@ package com.wongxd.absolutedomain.fgt
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
+import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.chad.library.adapter.base.BaseQuickAdapter
+import com.qmuiteam.qmui.widget.dialog.QMUIDialog
 import com.wongxd.absolutedomain.R
 import com.wongxd.absolutedomain.adapter.RvHomeAdapter
 import com.wongxd.absolutedomain.base.BaseLazyFragment
@@ -47,6 +49,26 @@ abstract class BaseTypeFragment : BaseLazyFragment() {
 
         if (tempObservalble != null)
             loadData(tempObservalble!!)
+
+
+        tv_page_fgt_type.setOnClickListener {
+            val builder = QMUIDialog.EditTextDialogBuilder(activity)
+            builder.setTitle("跳转到xx页")
+            builder.setInputType(InputType.TYPE_CLASS_NUMBER)
+            builder.setPlaceholder("请输入要跳转的页码")
+            builder.addAction("取消") { dialog, index -> dialog.dismiss() }
+            builder.addAction("确定") { dialog, index ->
+                val text = builder.editText.text
+                if (text != null && text.length > 0) {
+                    currentPage = text.toString().toInt()
+                    srl_fgt_type.autoLoadmore()
+                } else {
+                    TU.t("请填入要跳转的页码")
+                }
+                dialog.dismiss()
+            }
+                    .show()
+        }
     }
 
     /**

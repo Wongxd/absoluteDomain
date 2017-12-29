@@ -31,6 +31,7 @@ import com.wongxd.absolutedomain.fgt.jdlingyu.JdlingyuFgt
 import com.wongxd.absolutedomain.fgt.keke123.KeKe123Fgt
 import com.wongxd.absolutedomain.fgt.meisiguan.MeisiGuanFgt
 import com.wongxd.absolutedomain.fgt.mmonly.MMonlyFgt
+import com.wongxd.absolutedomain.fgt.mntu92.Mntu92Fgt
 import com.wongxd.absolutedomain.fgt.nvshens.NvshensFgt
 import com.wongxd.absolutedomain.fgt.t192tt.t192ttFgt
 import com.wongxd.absolutedomain.login.LoginActivity
@@ -41,6 +42,7 @@ import com.wongxd.absolutedomain.util.AlipayUtil
 import com.wongxd.absolutedomain.util.SPUtils
 import com.wongxd.absolutedomain.util.StatusBarUtil
 import com.wongxd.absolutedomain.util.TU
+import com.wongxd.absolutedomain.util.apk.UpdateUtil
 import com.wongxd.absolutedomain.util.cache.DataCleanManager
 import com.wongxd.absolutedomain.util.cache.GlideCatchUtil
 import com.wongxd.partymanage.base.kotin.extension.loadHeader
@@ -66,6 +68,8 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
 //            R.id.menu_mmonly -> switchSite(4)
             R.id.menu_nvshens -> switchSite(5)
             R.id.menu_meisiguan -> switchSite(6)
+//            R.id.menu_mntu92 -> switchSite(7)
+            R.id.menu_update -> UpdateUtil.goToAppMarket(this)
 
         }
 
@@ -121,6 +125,12 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
                 tv_title_aty_main.text = "meisiguan"
                 currentTypeList = MeisiGuanFgt.typeList
                 currentFgt = MeisiGuanFgt()
+            }
+
+            7 -> {
+                tv_title_aty_main.text = "mntu92"
+                currentTypeList = Mntu92Fgt.typeList
+                currentFgt = Mntu92Fgt()
             }
 
         }
@@ -341,9 +351,12 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
     private fun showDonateTips() {
         QMUIDialog.MessageDialogBuilder(this)
                 .setTitle("么么哒")
-                .setMessage("如果没有地方使用支付宝红包，可以在应用内打赏给开发者（开发者升级成商家账户了，可以用红包抵扣了）。")
-                .addAction("将红包打赏给开发者") { dialog, index ->   AlipayUtil.startAlipayClient(this, "FKX07373TRZS7EQ7SUVI9A");
-                    dialog.dismiss() }
+                .setMessage("如果没有地方使用支付宝红包，可以在应用内打赏给开发者（开发者升级成商家账户了，可以用红包抵扣了）。\n" +
+                        "本应用已在规划除图片浏览的其它功能，其中有些功能是需要服务器支持，捐赠用户可在未来的更新中享有特殊功能。")
+                .addAction("将红包打赏给开发者") { dialog, index ->
+                    AlipayUtil.startAlipayClient(this, "FKX07373TRZS7EQ7SUVI9A");
+                    dialog.dismiss()
+                }
                 .addAction("不用了") { dialog, index -> dialog.dismiss() }
                 .show()
     }

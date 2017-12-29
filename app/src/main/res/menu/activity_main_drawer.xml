@@ -26,6 +26,12 @@
             android:icon="@drawable/alipay"
             android:title="支付宝红包" />
 
+
+        <item
+            android:id="@+id/menu_update"
+            android:icon="@drawable/update"
+            android:title="升级" />
+
         <item
             android:id="@+id/menu_about"
             android:icon="@drawable/about"

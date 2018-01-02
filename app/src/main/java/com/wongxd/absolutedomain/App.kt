@@ -28,6 +28,7 @@ import kotlin.properties.Delegates
  */
 class App : Application() {
     companion object {
+        var filePath: String = "/mnt" + File.separator + "download"
         var instance: App by Delegates.notNull()
         //这里我就不写管理类了,捡个懒,直接在 Application 中管理单例 Okhttp
         private var mOkHttpClient: OkHttpClient by Delegates.notNull()
@@ -39,6 +40,7 @@ class App : Application() {
         super.attachBaseContext(base)
         MultiDex.install(this as Context)
     }
+
 
     override fun onCreate() {
         super.onCreate()
@@ -60,14 +62,14 @@ class App : Application() {
 
         SmartRefreshLayout.setDefaultRefreshFooterCreater(DefaultRefreshFooterCreater { context, layout -> ClassicsFooter(context) })
 
-        var filePath: String? = null
+
         val hasSDCard = Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED
         if (hasSDCard) {
             filePath = Environment.getExternalStorageDirectory().toString() + File.separator + getString(R.string.app_name) + File.separator + "download"
         } else
             filePath = "/mnt" + File.separator + getString(R.string.app_name) + File.separator + "download"
 
-        val f =File(filePath)
+        val f = File(filePath)
         if (!f.exists()) f.mkdirs()
 
         val builder = DownloadConfig.Builder.create(this)

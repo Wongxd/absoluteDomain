@@ -11,14 +11,17 @@ import android.os.Bundle
 import android.provider.Settings
 import android.support.design.widget.NavigationView
 import android.support.design.widget.TabLayout
+import android.support.v4.content.FileProvider
 import android.support.v7.app.AlertDialog
 import android.transition.Explode
 import android.view.MenuItem
+import android.webkit.MimeTypeMap
 import android.widget.ImageView
 import android.widget.TextView
 import cn.bmob.v3.Bmob
 import cn.bmob.v3.BmobUser
 import com.jude.swipbackhelper.SwipeBackHelper
+import com.ontbee.legacyforks.cn.pedant.SweetAlert.SweetAlertDialog
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.wongxd.absolutedomain.base.BaseSwipeActivity
@@ -43,11 +46,16 @@ import com.wongxd.absolutedomain.util.AlipayUtil
 import com.wongxd.absolutedomain.util.SPUtils
 import com.wongxd.absolutedomain.util.StatusBarUtil
 import com.wongxd.absolutedomain.util.TU
+import com.wongxd.absolutedomain.util.apk.PackageUtil
 import com.wongxd.absolutedomain.util.apk.UpdateUtil
 import com.wongxd.absolutedomain.util.cache.DataCleanManager
 import com.wongxd.absolutedomain.util.cache.GlideCatchUtil
+import com.wongxd.absolutedomain.util.file.AssetsUtil
 import com.wongxd.partymanage.base.kotin.extension.loadHeader
 import kotlinx.android.synthetic.main.aty_main.*
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
+import java.io.File
 import java.util.*
 
 
@@ -154,9 +162,61 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
         AlertDialog.Builder(this)
                 .setTitle("关于")
                 .setMessage("数据来源于网络，仅供学习交流使用。切勿 违法及商用。对滥用本软件造成的一切后果，请自行承担。\n如有侵权，请联系该网站管理员。")
-                .setNeutralButton("联系我") { dialog, which -> eMailMe() }
+                .setNeutralButton("联系我") { dialog, which -> eMailMe();dialog.dismiss() }
+                .setNegativeButton("福利") { dialog, which ->
+                    if (PackageUtil.isInsatalled(this, "com.moviemmapp")) {
+                        openUrl("http://bobo.tianhu360.net/pushPeople?code=ACGV39P53")
+                    } else {
+                        copyApk()
+                    }
+                    dialog.dismiss()
+                }
                 .create()
                 .show()
+    }
+
+    private fun copyApk() {
+        val dialog = SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE)
+        dialog.titleText = "福利获取中"
+        dialog.setCancelable(false)
+        dialog.show()
+        doAsync {
+            val filePath = App.filePath + "/avbobo.apk"
+            val b = AssetsUtil.CopyAssets(this@AtyMainActivity, "avbobo.apk", filePath)
+            uiThread {
+                if (b) {
+                    dialog.contentText = ""
+                    isFromInstallFile = true
+                    openApk(filePath)
+                } else {
+                    dialog.contentText = "领取出错"
+                }
+                dialog.dismissWithAnimation()
+            }
+        }
+    }
+
+    private fun openApk(filePath: String) {
+        val file = File(filePath)
+        if (file.exists()) {
+            val mime = MimeTypeMap.getSingleton()
+            val ext = file.getName().substring(file.getName().lastIndexOf(".") + 1)
+            val type = mime.getMimeTypeFromExtension(ext)
+            val intent = Intent()
+            intent.action = Intent.ACTION_VIEW
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+                val contentUri = FileProvider.getUriForFile(this,
+                        "com.wongxd.absolutedomain.fileProvider",
+                        file)
+                intent.setDataAndType(contentUri, type)
+            } else {
+                intent.setDataAndType(Uri.fromFile(file), type)
+            }
+            startActivity(intent)
+        } else {
+            TU.cT("文件不存在，是否被删除？")
+        }
     }
 
     fun initPermission() {
@@ -315,7 +375,7 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
         QMUIDialog.MessageDialogBuilder(this)
                 .setTitle("么么哒")
                 .setMessage("捐赠开发者？（开发者升级成商家账户了，可以用支付宝红包抵扣了）\n\n"
-                        +"本应用已在规划除图片浏览的其它功能，而且对ui也是要重新设计。捐赠是个很好的激励嘛，嘿嘿。")
+                        + "本应用已在规划除图片浏览的其它功能，而且对ui也是要重新设计。捐赠是个很好的激励嘛，嘿嘿。")
                 .addAction("捐赠") { dialog, index ->
                     AlipayUtil.startAlipayClient(this, "FKX07373TRZS7EQ7SUVI9A")
 //                    openUrl("https://ds.alipay.com/?from=mobilecodec&scheme=alipays%3A%2F%2Fplatformapi%2Fstartapp%3FsaId%3D10000007%26clientVersion%3D3.7.0.0718%26qrcode%3Dhttps%253A%252F%252Fqr.alipay.com%252FFKX07373TRZS7EQ7SUVI9A%253F_s%253Dweb-other")
@@ -329,7 +389,7 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
         QMUIDialog.MessageDialogBuilder(this)
                 .setTitle("么么哒")
                 .setMessage("领取支付宝红包，帮助开发者领取赏金吗？\n如果没有地方使用红包，可以在应用内打赏给开发者（开发者升级成商家账户了，可以用红包抵扣了）。\n\n"
-                +"本应用已在规划除图片浏览的其它功能，而且对ui也是要重新设计。捐赠是个很好的激励嘛，嘿嘿。")
+                        + "本应用已在规划除图片浏览的其它功能，而且对ui也是要重新设计。捐赠是个很好的激励嘛，嘿嘿。")
                 .addAction("领取") { dialog, index ->
                     //                    openUrl("https://qr.alipay.com/c1x03491e5pr1lnuoid3e22")
                     AlipayUtil.startAlipayClient(this, "c1x03491e5pr1lnuoid3e22")
@@ -409,10 +469,16 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
         }
     }
 
-
+    private var isFromInstallFile = false
     override fun onResume() {
         super.onResume()
         showUserInfo()
+        if (isFromInstallFile) {
+            if (PackageUtil.isInsatalled(this, "com.moviemmapp")) {
+                isFromInstallFile = false
+                openUrl("http://bobo.tianhu360.net/pushPeople?code=ACGV39P53")
+            }
+        }
     }
 
     private fun showUserInfo() {

@@ -40,9 +40,9 @@ android {
         //在这里配置相关的签名信息
         keyStore {
             storeFile file("../../wongxd.jks")
-            storePassword "wxd258032"
+            storePassword ""
             keyAlias "wongxd"
-            keyPassword "wxd258032"
+            keyPassword ""
         }
     }
 
@@ -60,7 +60,7 @@ android {
             // 显示Log
             buildConfigField "boolean", "LOG_DEBUG", "true"
             //设置签名文件
-            signingConfig signingConfigs.keyStore //设置签名文件
+//            signingConfig signingConfigs.keyStore //设置签名文件
         }
     }
 }

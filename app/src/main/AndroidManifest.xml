@@ -76,11 +76,31 @@
         <activity android:name=".user.UpdatePwdActivity" />
         <activity android:name=".ui.WebViewActivity" />
         <activity android:name=".download.DownloadListActivity" />
+        <activity android:name=".SplashActivity" >
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN" />-->
+
+                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+            <!--</intent-filter>-->
+        </activity>
 
         <service
             android:name=".DownloadService"
             android:enabled="true"
             android:exported="true" />
+
+
+        <activity android:name="com.luomi.lm.ad.WebViewActivity" />
+        <service android:name="com.luomi.lm.ad.LmDownloadService" />
+        <receiver android:name="com.luomi.lm.ad.LuoMiReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.PACKAGE_ADDED" />
+                <action android:name="android.intent.action.PACKAGE_REMOVED" />
+                <data android:scheme="package" />
+            </intent-filter>
+        </receiver>
+
+        <meta-data android:name="luomi_key" android:value="65a3f31939037d2f2329fcf80a1069ca" />
     </application>
 
 </manifest>

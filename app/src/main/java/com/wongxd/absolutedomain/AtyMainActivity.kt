@@ -15,12 +15,18 @@ import android.support.v4.content.FileProvider
 import android.support.v7.app.AlertDialog
 import android.transition.Explode
 import android.view.MenuItem
+import android.view.View
 import android.webkit.MimeTypeMap
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import cn.bmob.v3.Bmob
 import cn.bmob.v3.BmobUser
 import com.jude.swipbackhelper.SwipeBackHelper
+import com.luomi.lm.ad.ADType
+import com.luomi.lm.ad.DRAgent
+import com.luomi.lm.ad.IAdSuccessBack
+import com.luomi.lm.ad.LogUtil
 import com.ontbee.legacyforks.cn.pedant.SweetAlert.SweetAlertDialog
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog
 import com.tbruyelle.rxpermissions2.RxPermissions
@@ -163,14 +169,14 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
                 .setTitle("关于")
                 .setMessage("数据来源于网络，仅供学习交流使用。切勿 违法及商用。对滥用本软件造成的一切后果，请自行承担。\n如有侵权，请联系该网站管理员。")
                 .setNeutralButton("联系我") { dialog, which -> eMailMe();dialog.dismiss() }
-                .setNegativeButton("福利") { dialog, which ->
-                    if (PackageUtil.isInsatalled(this, "com.moviemmapp")) {
-                        openUrl("http://bobo.tianhu360.net/pushPeople?code=ACGV39P53")
-                    } else {
-                        copyApk()
-                    }
-                    dialog.dismiss()
-                }
+//                .setNegativeButton("福利") { dialog, which ->
+//                    if (PackageUtil.isInsatalled(this, "com.moviemmapp")) {
+//                        openUrl("http://bobo.tianhu360.net/pushPeople?code=ACGV39P53")
+//                    } else {
+//                        copyApk()
+//                    }
+//                    dialog.dismiss()
+//                }
                 .create()
                 .show()
     }
@@ -221,7 +227,7 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
 
     fun initPermission() {
         val permissions = RxPermissions(this)
-        permissions.requestEach(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.ACCESS_WIFI_STATE)
+        permissions.requestEach(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.READ_PHONE_STATE)
                 .subscribe { // will emit 2 Permission objects
                     permission ->
                     if (permission.granted) {
@@ -467,7 +473,18 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
             else
                 startActivity(Intent(this, UserInfoActivity::class.java))
         }
+
+
+        val rightHeader = nav_aty_main_right.getHeaderView(0)
+        llHeader = rightHeader.findViewById(R.id.ll_right_header)
+        StatusBarUtil.setMargin(this,llHeader)
+
+        showAds(llHeader,ADType.MESSAGE_SMALL_IMG)
+        showAds(llHeader,ADType.BANNER)
+
     }
+
+    private lateinit var llHeader: LinearLayout
 
     private var isFromInstallFile = false
     override fun onResume() {
@@ -492,5 +509,44 @@ class AtyMainActivity : BaseSwipeActivity(), NavigationView.OnNavigationItemSele
         }
     }
 
+
+    /**
+     * @param type ADType.MESSAGE_SMALL_IMG
+     */
+    fun showAds(container:LinearLayout,type:Int) {
+        LogUtil.setENABLE_LOGCAT(false)
+        /**
+         * this  上下文
+         * adtype 广告类型（详情请看附录表）
+         * true  针对开屏是否显示倒计时展示 针对banner是是否显示关闭按钮
+         * IAdSuccessBack 广告展示回调接口
+         */
+        DRAgent.getInstance().getOpenView(applicationContext, type, true, object : IAdSuccessBack {
+
+            override fun onError(result: String) {
+                println(">>>>>>广告展示失败:" + result)
+                startActivity(Intent(this@AtyMainActivity, AtyMainActivity::class.java))
+                finish()
+            }
+
+            override fun onClick(result: String) {
+                println(">>>>>广告被点击:" + result)
+            }
+
+            override fun OnSuccess(result: String) {
+                println(">>>广告展示成功:" + result)
+                if (result == "7") {
+                    startActivity(Intent(this@AtyMainActivity, AtyMainActivity::class.java))
+                    finish()
+                }
+
+            }
+
+            override fun OnLoadAd(view: View) {
+                println(">>>>>>广告加载成功")
+                container.addView(view)
+            }
+        })
+    }
 
 }

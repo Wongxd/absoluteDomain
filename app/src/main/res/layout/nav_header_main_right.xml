@@ -9,19 +9,9 @@
     android:padding="10dp"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
-    <ImageView
-        android:scaleX="-1.0"
-        android:id="@+id/iv_header"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:layout_marginTop="35dp" />
-
-    <TextView
-        android:gravity="end"
-        android:paddingRight="10dp"
+    <LinearLayout
+        android:orientation="vertical"
+        android:id="@+id/ll_right_header"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="15dp"
-        android:textColor="#ffffff"
-        android:textSize="16sp" />
+        android:layout_height="200dp" />
 </LinearLayout>

@@ -1,5 +1,6 @@
 package com.wongxd.absolutedomain.util;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
@@ -10,6 +11,7 @@ import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.support.v4.app.ActivityCompat;
 import android.text.ClipboardManager;
 import android.text.TextUtils;
 import android.util.Base64;
@@ -97,6 +99,7 @@ public class SystemUtils {
 
     /**
      * 获取状态栏高度
+     *
      * @param res
      * @return
      */
@@ -252,13 +255,35 @@ public class SystemUtils {
 
     /**
      * 通过Base32将Bitmap转换成Base64字符串
+     *
      * @param bit
      * @return
      */
-    public String Bitmap2StrByBase64(Bitmap bit){
-        ByteArrayOutputStream bos=new ByteArrayOutputStream();
+    public String Bitmap2StrByBase64(Bitmap bit) {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
         bit.compress(Bitmap.CompressFormat.JPEG, 90, bos);//参数100表示不压缩
-        byte[] bytes=bos.toByteArray();
+        byte[] bytes = bos.toByteArray();
         return Base64.encodeToString(bytes, Base64.DEFAULT);
     }
+
+
+    /**
+     * 获取设备唯一ID
+     *
+     * @param context
+     * @return
+     */
+    public static String getDeviceUniqID(Context context) {
+        String unique_id = "";
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
+            android.telephony.TelephonyManager tm = (android.telephony.TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+            unique_id = tm.getDeviceId();
+        }
+        if (TextUtils.isEmpty(unique_id)) {
+            unique_id = android.os.Build.SERIAL;
+        }
+        return unique_id;
+    }
+
+
 }

@@ -4,6 +4,8 @@ import android.app.Application
 import android.content.Context
 import android.os.Environment
 import android.support.multidex.MultiDex
+import com.luomi.lm.ad.DRAgent
+import com.luomi.lm.ad.LogUtil
 import com.orhanobut.logger.LogLevel
 import com.orhanobut.logger.Logger
 import com.scwang.smartrefresh.layout.SmartRefreshLayout
@@ -86,6 +88,9 @@ class App : Application() {
 
         DownloadConfig.init(builder)
 
+        //广告
+        LogUtil.setENABLE_LOGCAT(true)
+        DRAgent.getInstance().init(this.applicationContext, "65a3f31939037d2f2329fcf80a1069ca", true)
     }
 
 
